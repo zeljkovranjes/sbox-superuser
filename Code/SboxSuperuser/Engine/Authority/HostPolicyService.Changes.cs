@@ -16,9 +16,9 @@ internal sealed partial class HostPolicyService
 		var targets = change.Edit.Kind is PolicyEditKind.AddUserGroup or PolicyEditKind.RemoveUserGroup or PolicyEditKind.SetUserPermission
 			? new[] { change.Edit.Subject } : Array.Empty<string>();
 		return await AuditedMutationAsync( authenticate, origin, requestId, "security.policy.change", targets,
-			() => SerializedAsync( async () =>
+			boundIdentity => SerializedAsync( async () =>
 		{
-			var actor = authenticate();
+			var actor = boundIdentity();
 			if ( !CanManage( actor ) )
 			{
 				return new CommandResult( CommandStatus.Denied, "Only an authenticated owner or dedicated local console may change security policy." );

@@ -40,6 +40,15 @@ internal sealed partial class HostAuditService : IAuditWriter
 	internal AuditDiagnostics Diagnostics() => new( IsDegraded, _readStatus, _writeStatus, _retentionPending, _revision,
 		_journal.Records.Count, new AuditRetentionOptions( _journal.MaximumRecords, _journal.RetentionDays ) );
 
+	internal void OnStorageChanged( StoreKey key )
+	{
+		if ( key.ModuleId == Key.ModuleId && key.DocumentId == Key.DocumentId )
+		{
+			// Raw recovery invalidates observed health. Every query/write reloads; idle maintenance also validates it.
+			_readStatus = StoreReadStatus.Unknown;
+		}
+	}
+
 	private async Task<bool> LoadAsync( CancellationToken cancellation )
 	{
 		try

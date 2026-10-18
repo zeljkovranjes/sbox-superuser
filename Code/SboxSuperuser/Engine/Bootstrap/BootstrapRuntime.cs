@@ -57,6 +57,7 @@ internal sealed class BootstrapRuntime : IDisposable
 		Store = new Storage.HostAdminStore( Application.IsDedicatedServer, () => IsUsable );
 		Audit = new Audit.HostAuditService( Store, () => ThreadSafe.IsMainThread && IsUsable,
 			error => Log.Warning( $"[Superuser] Audit storage degraded; type={error.GetType().Name}; files preserved." ) );
+		Store.StorageChanged += Audit.OnStorageChanged;
 		var ownerStatus = Owners.State switch
 		{
 			BootstrapState.Ready => StoreReadStatus.Found,
@@ -156,5 +157,6 @@ internal sealed class BootstrapRuntime : IDisposable
 		_disposed = true;
 		Dispatcher.Dispose();
 		Store.StorageChanged -= Policy.OnStorageChanged;
+		Store.StorageChanged -= Audit.OnStorageChanged;
 	}
 }

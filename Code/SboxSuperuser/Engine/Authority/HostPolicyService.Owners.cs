@@ -9,7 +9,7 @@ internal sealed partial class HostPolicyService
 	{
 		var command = add ? "security.owner.add" : "security.owner.remove";
 		return AuditedMutationAsync( authenticate, CommandOrigin.Console, requestId, command, new[] { steamId },
-			() => WriteOwnersAsync( authenticate, current => current.Change( steamId, add ), false, command, requestId, cancellation ) );
+			boundIdentity => WriteOwnersAsync( boundIdentity, current => current.Change( steamId, add ), false, command, requestId, cancellation ) );
 	}
 
 	internal Task<CommandResult> RecoverOwnersAsync( Func<ActorIdentity> authenticate, IEnumerable<string> explicitOwners,
@@ -18,7 +18,7 @@ internal sealed partial class HostPolicyService
 		var replacement = new OwnerSet( explicitOwners );
 		return AuditedMutationAsync( authenticate, CommandOrigin.Console, requestId, "security.owner.recover",
 			_owners.Ids.Union( replacement.Ids ),
-			() => WriteOwnersAsync( authenticate, _ => replacement, true, "security.owner.recover", requestId, cancellation ) );
+			boundIdentity => WriteOwnersAsync( boundIdentity, _ => replacement, true, "security.owner.recover", requestId, cancellation ) );
 	}
 
 	private async Task<CommandResult> WriteOwnersAsync( Func<ActorIdentity> authenticate, Func<OwnerSet, OwnerSet> change,
