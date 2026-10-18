@@ -21,6 +21,7 @@ internal sealed class BootstrapRuntime : IDisposable
 	internal Core.Commands.ConsoleRootState ConsoleRoot { get; }
 	internal Commands.AdministrationCommands Administration { get; }
 	internal Modules.ModuleManager Modules { get; }
+	internal ChatIntegration.Platform.PlatformChatAdapter Chat { get; }
 
 	internal BootstrapState Health
 	{
@@ -85,6 +86,7 @@ internal sealed class BootstrapRuntime : IDisposable
 			error => Log.Warning( $"[Superuser] Module lifecycle failed; type={error.GetType().Name}; inspect module status." ),
 			CommandDiscovery.AttributeCommandDiscovery.Discover );
 		Administration = new Commands.AdministrationCommands( Policy, Audit, Commands, Dispatcher, ConsoleDiagnostics, Modules );
+		Chat = ConsoleRoot.IsAvailable ? new ChatIntegration.Platform.PlatformChatAdapter( this ) : null;
 		if ( !ConsoleRoot.IsAvailable )
 		{
 			Log.Warning( $"[Superuser] {ConsoleRoot.Message}" );
@@ -186,6 +188,7 @@ internal sealed class BootstrapRuntime : IDisposable
 	/// <summary>Revokes this runtime so retained references cannot resolve identities.</summary>
 	public void Dispose()
 	{
+		Chat?.Dispose();
 		Modules.Dispose();
 		Administration.Dispose();
 		_disposed = true;

@@ -5,7 +5,7 @@ namespace SboxSuperuser.Components;
 
 /// <summary>Enables one trusted library runtime for the active dedicated session, or an explicit editor test.</summary>
 [Title( "Superuser Bootstrap" ), Category( "Superuser" )]
-public sealed class SuperuserBootstrap : Component
+public sealed partial class SuperuserBootstrap : Component
 {
 	private SuperuserSession _session;
 
@@ -13,7 +13,7 @@ public sealed class SuperuserBootstrap : Component
 	[Property, Group( "Testing" )]
 	public bool AllowEditorTesting { get; set; }
 
-	/// <summary>Sets the logical command root; alternate names use superuser root in console. Re-enable to apply.</summary>
+	/// <summary>Sets the logical console root and slash-chat prefix; re-enable to apply.</summary>
 	[Property, Group( "Commands" )]
 	public string CommandRoot { get; set; } = "admin";
 
