@@ -1,0 +1,18 @@
+if ( !Game.IsEditor || !Networking.IsHost ) throw new InvalidOperationException( "Fresh isolated editor play session required." );
+var bootstrap = Game.ActiveScene.GetAllObjects( true ).SelectMany( item => item.Components.GetAll() ).OfType<SboxSuperuser.Components.SuperuserBootstrap>().Single();
+bootstrap.Enabled = false;
+bootstrap.AllowEditorTesting = true;
+bootstrap.Enabled = true;
+for ( var i = 0; i < 100 && SboxSuperuser.Superuser.GetDiagnostics().State != SboxSuperuser.BootstrapState.Ready; i++ ) await Task.Delay( 25, cancellationToken );
+if ( SboxSuperuser.Superuser.GetDiagnostics().State != SboxSuperuser.BootstrapState.Ready ) throw new InvalidOperationException( "Fresh session did not recover." );
+var stored = await SboxSuperuser.Superuser.GetStore().ReadAsync( new SboxSuperuser.StoreKey( "moderation", "history" ), 1, cancellationToken );
+if ( stored.Document?.PayloadJson != FileSystem.Data.ReadAllText( "superuser-t17/reload-proof.json" ) ) throw new InvalidOperationException( "Source restart lost moderation history." );
+var audit = await SboxSuperuser.Superuser.QueryAuditAsync( Connection.Local, new SboxSuperuser.AuditQuery( command: "sample.hold" ), cancellationToken );
+if ( audit.Entries.Count != 1 || audit.Entries[ 0 ].Outcome != SboxSuperuser.CommandStatus.Unknown ) throw new InvalidOperationException( "Interrupted source operation lost its durable Unknown outcome." );
+var flags = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static;
+var runtime = typeof( SboxSuperuser.Superuser ).GetMethod( "FindAuthorityRuntime", flags ).Invoke( null, null );
+var moderation = runtime.GetType().GetProperty( "Moderation", flags ).GetValue( runtime );
+var kind = typeof( SboxSuperuser.Superuser ).Assembly.GetType( "SboxSuperuser.Core.Moderation.ModerationKind" );
+var result = (SboxSuperuser.CommandResult)moderation.GetType().GetMethod( "CheckRestriction", flags ).Invoke( moderation, new object[] { "76561198000000060", Enum.Parse( kind, "Ban" ) } );
+if ( result.Status != SboxSuperuser.CommandStatus.Denied ) throw new InvalidOperationException( "Active ban was lost." );
+return new { Pass = true, SboxSuperuser.Superuser.GetDiagnostics().RuntimeId, stored.Document.Revision, InterruptedAudit = audit.Entries[ 0 ].Outcome, ActiveBan = true };
