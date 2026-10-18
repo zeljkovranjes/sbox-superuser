@@ -20,13 +20,24 @@ public sealed class CommandResult
 	{
 		Status = ContractGuard.EnumValue( status, nameof( status ) );
 		Message = ContractGuard.Text( message, nameof( message ) );
+		if ( Message.Any( char.IsControl ) )
+		{
+			throw new ArgumentException( "Result messages must be printable.", nameof( message ) );
+		}
+
 		var copy = new Dictionary<string, string>( StringComparer.Ordinal );
 		if ( data is not null )
 		{
 			foreach ( var pair in data )
 			{
-				copy.Add( ContractGuard.Text( pair.Key, nameof( data ) ),
-					pair.Value ?? throw new ArgumentException( "Result fields cannot be null.", nameof( data ) ) );
+				var key = ContractGuard.Text( pair.Key, nameof( data ) );
+				var value = pair.Value ?? throw new ArgumentException( "Result fields cannot be null.", nameof( data ) );
+				if ( key.Any( char.IsControl ) || value.Any( char.IsControl ) )
+				{
+					throw new ArgumentException( "Result fields must be printable.", nameof( data ) );
+				}
+
+				copy.Add( key, value );
 			}
 		}
 
