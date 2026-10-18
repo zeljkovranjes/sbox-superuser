@@ -12,6 +12,11 @@ internal sealed class BootstrapRuntime : IDisposable
 	internal Guid Id { get; } = Guid.NewGuid();
 	internal OwnerConfigurationFile Owners { get; }
 	internal Storage.HostAdminStore Store { get; }
+	internal Authority.HostPolicyService Policy { get; }
+
+	internal BootstrapState Health => !Policy.IsUsable
+		? Owners.State == BootstrapState.OwnersInvalid && Policy.OwnerSource == "bootstrap" ? BootstrapState.OwnersInvalid : BootstrapState.AuthorityDegraded
+		: Policy.OwnerSource == "bootstrap" ? Owners.State : Policy.OwnerCount > 0 ? BootstrapState.Ready : BootstrapState.OwnersMissing;
 
 	internal bool IsUsable => !_disposed && _scene.IsValid() && _scene == Game.ActiveScene
 		&& Networking.IsActive && Networking.IsHost && _host is not null && _host.IsActive
@@ -25,6 +30,16 @@ internal sealed class BootstrapRuntime : IDisposable
 		_allowEditorTesting = allowEditorTesting;
 		Owners = new OwnerConfigurationFile( Application.IsDedicatedServer );
 		Store = new Storage.HostAdminStore( Application.IsDedicatedServer, () => IsUsable );
+		var ownerStatus = Owners.State switch
+		{
+			BootstrapState.Ready => StoreReadStatus.Found,
+			BootstrapState.OwnersMissing => StoreReadStatus.Missing,
+			_ => StoreReadStatus.Corrupt
+		};
+		Policy = new Authority.HostPolicyService( Store, Owners.Configuration?.Ids ?? Array.Empty<string>(),
+			ownerStatus, () => IsUsable,
+			error => Log.Warning( $"[Superuser] Authority validation failed; type={error.GetType().Name}; files preserved." ) );
+		Store.StorageChanged += Policy.OnStorageChanged;
 	}
 
 	internal bool TryResolvePlayer( Connection connection, out ActorIdentity identity )
@@ -51,8 +66,7 @@ internal sealed class BootstrapRuntime : IDisposable
 	internal bool IsOwner( Connection connection )
 	{
 		return TryResolvePlayer( connection, out var identity )
-			&& Owners.State == BootstrapState.Ready
-			&& Owners.Configuration.Contains( identity.SubjectId );
+			&& Policy.IsOwner( identity.SubjectId );
 	}
 
 	// Called only by the separate non-forwarded dedicated-console entry, never the player route.
@@ -72,5 +86,6 @@ internal sealed class BootstrapRuntime : IDisposable
 	public void Dispose()
 	{
 		_disposed = true;
+		Store.StorageChanged -= Policy.OnStorageChanged;
 	}
 }

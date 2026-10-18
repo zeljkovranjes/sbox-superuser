@@ -7,6 +7,7 @@ internal sealed class HostAdminStore : IRecoverableAdminStore
 {
 	private readonly StoreCoordinator _coordinator;
 	private readonly string _root;
+	internal event Action<StoreKey> StorageChanged;
 
 	internal HostAdminStore( bool dedicated, Func<bool> available )
 	{
@@ -29,6 +30,7 @@ internal sealed class HostAdminStore : IRecoverableAdminStore
 		var result = await _coordinator.WriteAsync( DirectoryFor( request.Key ), request.Document.SchemaVersion,
 			request.ExpectedRevision, request.Document.PayloadJson, cancellation );
 		Report( request.Key, result.Status );
+		NotifyChange( request.Key, result.Status );
 		return WriteResult( result );
 	}
 
@@ -52,7 +54,16 @@ internal sealed class HostAdminStore : IRecoverableAdminStore
 		var result = await _coordinator.RecoverAsync( DirectoryFor( key ), generationId, expectedHeadRevision,
 			recoveryIntent.ToJson(), cancellation );
 		Report( key, result.Status );
+		NotifyChange( key, result.Status );
 		return WriteResult( result );
+	}
+
+	private void NotifyChange( StoreKey key, StorageStatus status )
+	{
+		if ( status is StorageStatus.Committed or StorageStatus.Unknown or StorageStatus.Corrupt or StorageStatus.Conflict )
+		{
+			StorageChanged?.Invoke( key );
+		}
 	}
 
 	private string DirectoryFor( StoreKey key )

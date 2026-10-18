@@ -61,7 +61,7 @@ internal sealed partial class HostPolicyService : Permissions.IPermissionEvaluat
 
 	internal void ReplaceRegisteredPermissions( IEnumerable<string> permissions ) => _resolver.ReplaceRegistered( permissions );
 
-	internal void OnStoreCommitted( StoreKey key )
+	internal void OnStorageChanged( StoreKey key )
 	{
 		if ( key.ModuleId != "security" || key.DocumentId is not ("policy" or "owners") )
 		{

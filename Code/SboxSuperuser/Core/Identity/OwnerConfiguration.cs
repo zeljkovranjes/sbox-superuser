@@ -8,6 +8,7 @@ internal sealed class OwnerConfiguration
 	private readonly HashSet<string> _owners;
 
 	internal int Count => _owners.Count;
+	internal IReadOnlyList<string> Ids => Array.AsReadOnly( _owners.ToArray() );
 
 	private OwnerConfiguration( HashSet<string> owners )
 	{

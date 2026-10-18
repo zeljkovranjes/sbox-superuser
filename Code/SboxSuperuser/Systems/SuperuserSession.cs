@@ -43,8 +43,8 @@ internal sealed class SuperuserSession : GameObjectSystem<SuperuserSession>
 	{
 		Reconcile();
 		return new BootstrapDiagnostics( _state, _runtime?.Id, _registrations.Count,
-			_runtime?.Owners.Configuration?.Count ?? 0, _runtime?.Owners.Path,
-			_runtime?.Owners.Message ?? _state.ToString() );
+			_runtime?.Policy.OwnerCount ?? 0, _runtime?.Owners.Path,
+			_runtime is null ? _state.ToString() : $"{_runtime.Owners.Message} Policy={_runtime.Policy.PolicyStatus}; ownerSource={_runtime.Policy.OwnerSource}; ownerStatus={_runtime.Policy.OwnerStatus}" );
 	}
 
 	private void Reconcile()
@@ -80,6 +80,7 @@ internal sealed class SuperuserSession : GameObjectSystem<SuperuserSession>
 
 		if ( _runtime is not null )
 		{
+			SetState( _runtime.Health );
 			return;
 		}
 
@@ -96,7 +97,7 @@ internal sealed class SuperuserSession : GameObjectSystem<SuperuserSession>
 		}
 
 		_runtime = new BootstrapRuntime( Scene, _registrations.AllowsEditorTesting );
-		SetState( _runtime.Owners.State );
+		SetState( _runtime.Health );
 		Log.Info( $"[Superuser] Runtime {_runtime.Id} initialized; owners={_runtime.Owners.Configuration?.Count ?? 0}; file={_runtime.Owners.Path}" );
 	}
 

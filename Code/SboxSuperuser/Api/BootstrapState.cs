@@ -23,4 +23,7 @@ public enum BootstrapState
 
 	/// <summary>Disposed bootstrap state.</summary>
 	Disposed = 6,
+
+	/// <summary>Stored authority is corrupt, incompatible, unavailable or awaiting validation; authorization fails closed.</summary>
+	AuthorityDegraded = 7,
 }
