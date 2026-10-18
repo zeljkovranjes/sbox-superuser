@@ -17,6 +17,9 @@ Removable sample - verifies repeated module reload and failure rollback in the e
 Slash commands - platform chat consumes exact /admin commands before dispatch and sends results only to the requester
 Private help - chatbox help shows readable command details and pagination using the platform overlay
 Chat validation - two real clients verify ordinary-chat pass-through, private errors and one attributed request per submission
+Custom chat hooks - independent backends consume commands before broadcast and receive authenticated private results through a scene event
+Chat examples - compiled platform and independent chatboxes demonstrate private feedback, request retries and ordinary-message checks
+Result fallback - disabled views unsubscribe automatically and failing observers preserve the platform notification fallback
 ### Improved
 # Audit
 Completion checks - verifies attributable Unknown outcomes across an actual dedicated-server interruption and restart
