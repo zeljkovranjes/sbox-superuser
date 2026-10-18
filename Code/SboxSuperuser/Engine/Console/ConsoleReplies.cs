@@ -13,7 +13,8 @@ internal static class ConsoleReplies
 			return;
 		}
 
-		if ( !Networking.IsHost || recipient is null || !recipient.IsActive )
+		if ( !Networking.IsHost || recipient is null || !recipient.IsActive
+			|| !Connection.All.Any( current => ReferenceEquals( current, recipient ) ) )
 		{
 			return;
 		}
