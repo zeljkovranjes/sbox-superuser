@@ -1,6 +1,6 @@
 # Superuser
 
-Superuser provides console and chat administration, host-local records and explicit owner configuration for dedicated servers. Add one Superuser Bootstrap to your game's network scene; enable its editor switch for local testing. Permissions, managed modules, typed dispatch and durable audit records run in the same s&box C# library. Custom chat hooks are available; moderation and visual admin UI remain pending.
+Superuser provides console and chat administration, host-local records and explicit owner configuration for dedicated servers. Add one Superuser Bootstrap to your game's network scene; enable its editor switch for local testing. Permissions, managed modules, typed dispatch and durable audit records run in the same s&box C# library. Custom chat hooks and moderation are available; visual admin UI remains deferred.
 
 ## Requirements
 
@@ -64,7 +64,7 @@ Dedicated servers are the only production target. Opt-in editor testing is devel
 
 ## Limitations
 
-- Tasks 1–15 are implemented. Moderation enforcement and visual admin UI remain pending.
+- Tasks 1–16 are implemented. Lifecycle certification, two-game portability, load validation and release packaging remain pending; visual admin UI is deferred.
 - Task 1's unavailable dedicated multiplayer evidence remains marked Blocked; Task 2 does not certify that deployment.
 - Chat commands use `/admin` by default; `!` is ordinary text. The compatibility probe remains separate from administration commands.
 - Native dynamic registration and full engine-name enumeration are unavailable. Visible managed-name collisions are reported; see the [console guide](docs/T11-CONSOLE.md) for the fixed transport and configured-root fallback.
@@ -105,6 +105,8 @@ Task 13 adds [platform chat commands](docs/T13-PLATFORM-CHAT.md) through the sam
 Task 14 adds [custom chat hooks](docs/T14-CUSTOM-CHAT.md) and two compiled chatbox examples. Scene-owned private results support a game's renderer; independent backends authenticate the RPC sender before command consumption or ordinary-message routing.
 
 Task 15 adds [explicit native bindings](docs/T15-NATIVE-BINDINGS.md). Host setup creates the optional settings module; operators use `admin settings list/get/set/reset`. Writes require readback, and engine/framework persistence have one owner. Actual editor and dedicated checks cover failure rollback, reload and process restart. Native command submission reports Unknown because the engine provides no acknowledgment.
+
+Task 16 adds [moderation and admission](docs/T16-MODERATION.md): kick, persisted bans, warnings, text mute, linked revocations and private history. Real editor clients verify reconnect rejection and both chat paths; actual dedicated restart preserves UTC expiry. Moderation history retains at most 512 records within its encoded byte budget, reserving space for revocations.
 
 ## License
 
