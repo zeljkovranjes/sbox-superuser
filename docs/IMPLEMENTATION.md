@@ -21,8 +21,8 @@ The specification is [version 0.2](sbox-admin-specification.docx). Current autho
 | T15 Native bindings | Complete | [T15](T15-NATIVE-BINDINGS.md) |
 | T16 Moderation and admission | Complete | [T16](T16-MODERATION.md) |
 | T17 Lifecycle validation | Complete; arbitrary live source edits unsupported | [T17](T17-LIFECYCLE.md) |
-| T18 Two game integrations | In progress | [T18](T18-PORTABILITY.md) |
+| T18 Two game integrations | Complete | [T18](T18-PORTABILITY.md) |
 | T19 Security, recovery and load | Not started | Depends on T18 |
 | T20 Unpublished release candidate | Not started | Depends on T19 |
 
-Current baseline: 230 passing contract cases and 75 Core cases. Task records distinguish plain-.NET tests from actual engine execution, editor-host checks and actual dedicated-server recovery/restart. Historical task reports describe their completion point; this ledger tracks current progress. T01–T17 are implemented, retaining the recorded dedicated-client deployment limitation. T18 is the next executable task.
+Current baseline: 230 passing contract cases and 75 Core cases. Task records distinguish plain-.NET tests from actual engine execution, editor-host checks and actual dedicated-server recovery/restart. Historical task reports describe their completion point; this ledger tracks current progress. T01–T18 are implemented, retaining the recorded dedicated-client deployment limitation. T19 is the next executable task.
