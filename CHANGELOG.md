@@ -47,8 +47,12 @@ Navigation - replaces implementation history and task labels with a linked guide
 Examples - verifies the guide snippets in a fresh game, including native dedicated ping and private client chat
 # Audit
 Completion checks - verifies attributable Unknown outcomes across an actual dedicated-server interruption and restart
-Validation - all 307 contract and Core tests pass and the actual engine whitelist accepts the library
+Validation - all 311 contract and Core tests pass and the actual engine references accept the library
 ### Fixed
+# Security
+Owner protection - group ranks stop at 99 so a policy-editing owner cannot outrank and punish another owner
+Private results - command messages and fields reject control characters that could forge extra console or chat lines
+Reply routing - remote console replies require the original connection to remain in the live connection set
 # Documentation
 Logger examples - uses the engine's global Log in sample snippets so they compile in the adopting game
 
