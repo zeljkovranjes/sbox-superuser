@@ -10,3 +10,11 @@ Development-only sources for an adopting game. All probe behavior stays in Super
 6. Follow the [T01 report](../../docs/T01-COMPATIBILITY.md). Dedicated clients require a valid published adopting game package record on this build.
 
 This fixture has no player controller or administration logic. Do not ship its diagnostic scene in a production game.
+
+## Task 3 bootstrap fixture
+
+`bootstrap.scene` adds one Superuser Bootstrap to the diagnostic scene, with Allow Editor Testing off. Set it as the isolated game's startup scene for dedicated checks, or enable the switch in the editor. Keep `LabSession.cs` to start the test network session. Production games provide their own network session.
+
+`owners.example.json` grants nobody. Copy it to the adopting game's FileSystem.Data as `superuser/owners.json` for dedicated hosting, or `superuser/editor-owners.json` for editor testing. Add only the explicit decimal Steam IDs you intend to make owners. Restart bootstrap after editing the file. Owner files stay host-local and are never copied into scene properties.
+
+Run `superuser_status`, `superuser_identity` and, only on an actual dedicated console, `superuser_local_identity`. The player diagnostic accepts no arguments. These commands observe identity; they do not dispatch administration actions. See [T03](../../docs/T03-BOOTSTRAP.md) for verification scripts and limits.
