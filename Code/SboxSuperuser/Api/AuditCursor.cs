@@ -5,6 +5,7 @@ public sealed class AuditCursor
 {
 	/// <summary>Gets the revision at which the previous page was read.</summary>
 	public long Revision { get; }
+
 	/// <summary>Gets the exclusive upper sequence bound for the next page.</summary>
 	public long BeforeSequence { get; }
 

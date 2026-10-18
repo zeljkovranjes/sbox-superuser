@@ -23,11 +23,11 @@ internal sealed partial class HostAuditService
 		}, _ => false, cancellation );
 	}
 
-	public Task<bool> CompleteAsync( AuditAction action, CommandStatus outcome, CancellationToken cancellation )
+	public async Task<bool> CompleteAsync( AuditAction action, CommandStatus outcome, CancellationToken cancellation )
 	{
-		return SerializedAsync( async () =>
+		try
 		{
-			try
+			return await SerializedAsync( async () =>
 			{
 				if ( !await LoadAsync( cancellation ) )
 				{
@@ -36,12 +36,21 @@ internal sealed partial class HostAuditService
 				var protectedIds = new HashSet<Guid>( _active ) { action.Id };
 				var candidate = _journal.Complete( action.Id, outcome.ToString(), _clock() ).Trim( _clock(), protectedIds );
 				return await PersistAsync( candidate, action, cancellation );
-			}
-			finally
+			}, _ => false, cancellation, completion: true );
+		}
+		finally
+		{
+			// Even rejected admission or a retired runtime must release the in-flight retention pin.
+			await _gate.WaitAsync( CancellationToken.None );
+			try
 			{
 				_active.Remove( action.Id );
 			}
-		}, _ => false, cancellation, completion: true );
+			finally
+			{
+				_gate.Release();
+			}
+		}
 	}
 
 	public Task<bool> RecordAsync( AuditAction action, CommandStatus outcome, CancellationToken cancellation )

@@ -5,16 +5,22 @@ public sealed class AuditDiagnostics
 {
 	/// <summary>Gets whether persistence or retention needs operator attention.</summary>
 	public bool IsDegraded { get; }
+
 	/// <summary>Gets the most recent validated read status.</summary>
 	public StoreReadStatus ReadStatus { get; }
+
 	/// <summary>Gets the last audit write status; Unknown also represents no write yet.</summary>
 	public StoreWriteStatus LastWriteStatus { get; }
+
 	/// <summary>Gets whether old audit files still await bounded cleanup.</summary>
 	public bool RetentionPending { get; }
+
 	/// <summary>Gets the active committed journal revision.</summary>
 	public long Revision { get; }
+
 	/// <summary>Gets retained journal rows.</summary>
 	public int RetainedCount { get; }
+
 	/// <summary>Gets the configured retention count and age.</summary>
 	public AuditRetentionOptions Retention { get; }
 

@@ -8,22 +8,31 @@ public sealed class AuditQuery
 {
 	/// <summary>Gets the maximum returned rows, from 1 through 100.</summary>
 	public int PageSize { get; }
+
 	/// <summary>Gets the prior response cursor, or null for the newest page.</summary>
 	public AuditCursor Cursor { get; }
+
 	/// <summary>Gets an optional exact request ID filter.</summary>
 	public Guid? RequestId { get; }
+
 	/// <summary>Gets an optional exact command key filter.</summary>
 	public string Command { get; }
+
 	/// <summary>Gets an optional exact actor subject filter.</summary>
 	public string ActorSubject { get; }
+
 	/// <summary>Gets an optional outcome filter.</summary>
 	public CommandStatus? Outcome { get; }
+
 	/// <summary>Gets an optional authenticated source filter.</summary>
 	public CommandOrigin? Origin { get; }
+
 	/// <summary>Gets an inclusive UTC creation lower bound.</summary>
 	public DateTimeOffset? FromUtc { get; }
+
 	/// <summary>Gets an inclusive UTC creation upper bound.</summary>
 	public DateTimeOffset? ToUtc { get; }
+
 	/// <summary>Gets an optional exact affected player ID filter.</summary>
 	public string TargetSteamId { get; }
 
