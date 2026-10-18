@@ -17,13 +17,14 @@ internal static class AuditFormat
 	internal static string WriteState( AuditJournal journal ) => "{\"auditSchema\":1,\"maximumRecords\":"
 		+ journal.MaximumRecords.ToString( CultureInfo.InvariantCulture ) + ",\"retentionDays\":" + journal.RetentionDays.ToString( CultureInfo.InvariantCulture )
 		+ ",\"nextSequence\":" + journal.NextSequence.ToString( CultureInfo.InvariantCulture )
+		+ ",\"needsRetentionCheckpoint\":" + (journal.NeedsRetentionCheckpoint ? "true" : "false")
 		+ ",\"records\":[" + string.Join( ",", journal.Records.Select( WriteRecord ) ) + "]}";
 
 	internal static AuditJournal ReadPayload( string payload )
 	{
 		using var document = JsonDocument.Parse( payload, new JsonDocumentOptions { MaxDepth = 32 } );
 		var state = document.RootElement.GetProperty( "state" );
-		StoreFormat.RequireFields( state, "auditSchema", "maximumRecords", "retentionDays", "nextSequence", "records" );
+		StoreFormat.RequireFields( state, "auditSchema", "maximumRecords", "retentionDays", "nextSequence", "needsRetentionCheckpoint", "records" );
 		if ( state.GetProperty( "auditSchema" ).GetInt32() != 1 )
 		{
 			throw new UnsupportedStoreSchemaException();
@@ -36,7 +37,7 @@ internal static class AuditFormat
 		}
 
 		var journal = new AuditJournal( state.GetProperty( "maximumRecords" ).GetInt32(), state.GetProperty( "retentionDays" ).GetInt32(),
-			state.GetProperty( "nextSequence" ).GetInt64(), records.EnumerateArray().Select( ReadRecord ) );
+			state.GetProperty( "nextSequence" ).GetInt64(), records.EnumerateArray().Select( ReadRecord ), state.GetProperty( "needsRetentionCheckpoint" ).GetBoolean() );
 		if ( journal.Records.Count > journal.MaximumRecords || System.Text.Encoding.UTF8.GetByteCount( WriteState( journal ) ) > AuditJournal.MaximumStateBytes )
 		{
 			throw new FormatException( "Stored audit data exceeds retention bounds." );

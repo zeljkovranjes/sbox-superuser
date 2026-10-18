@@ -9,8 +9,10 @@ internal sealed class AuditJournal
 	internal int RetentionDays { get; }
 	internal long NextSequence { get; }
 	internal IReadOnlyList<AuditRecord> Records { get; }
+	internal bool NeedsRetentionCheckpoint { get; }
 
-	internal AuditJournal( int maximumRecords = 512, int retentionDays = 30, long nextSequence = 1, IEnumerable<AuditRecord> records = null )
+	internal AuditJournal( int maximumRecords = 512, int retentionDays = 30, long nextSequence = 1, IEnumerable<AuditRecord> records = null,
+		bool needsRetentionCheckpoint = false )
 	{
 		if ( maximumRecords is < 1 or > 4096 || retentionDays is < 1 or > 3650 || nextSequence < 1 )
 		{
@@ -29,6 +31,7 @@ internal sealed class AuditJournal
 		RetentionDays = retentionDays;
 		NextSequence = nextSequence;
 		Records = Array.AsReadOnly( copy.OrderBy( record => record.Sequence ).ToArray() );
+		NeedsRetentionCheckpoint = needsRetentionCheckpoint;
 	}
 
 	internal AuditJournal Append( AuditRecord record )
@@ -38,7 +41,7 @@ internal sealed class AuditJournal
 			throw new InvalidOperationException( "Audit append requires the next sequence." );
 		}
 
-		return new AuditJournal( MaximumRecords, RetentionDays, NextSequence + 1, Records.Append( record ) );
+		return new AuditJournal( MaximumRecords, RetentionDays, NextSequence + 1, Records.Append( record ), NeedsRetentionCheckpoint );
 	}
 
 	internal AuditJournal Complete( Guid id, string outcome, DateTimeOffset utc )
@@ -49,7 +52,7 @@ internal sealed class AuditJournal
 		}
 
 		return new AuditJournal( MaximumRecords, RetentionDays, NextSequence,
-			Records.Select( record => record.Id == id ? record.Complete( outcome, utc ) : record ) );
+			Records.Select( record => record.Id == id ? record.Complete( outcome, utc ) : record ), NeedsRetentionCheckpoint );
 	}
 
 	internal AuditJournal Trim( DateTimeOffset now, IReadOnlySet<Guid> protectedIds )
@@ -69,8 +72,10 @@ internal sealed class AuditJournal
 			selected.RemoveAt( index );
 		}
 
-		return new AuditJournal( MaximumRecords, RetentionDays, NextSequence, selected );
+		return new AuditJournal( MaximumRecords, RetentionDays, NextSequence, selected, NeedsRetentionCheckpoint );
 	}
+
+	internal AuditJournal WithRetentionCheckpoint( bool required ) => new( MaximumRecords, RetentionDays, NextSequence, Records, required );
 
 	internal bool IsExpired( AuditRecord record, DateTimeOffset now ) => now - record.CreatedUtc >= TimeSpan.FromDays( RetentionDays );
 }

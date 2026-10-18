@@ -53,8 +53,14 @@ public sealed class AuditQuery
 			SteamIdentity.Validate( targetSteamId, nameof( targetSteamId ) );
 		}
 
-		if ( outcome.HasValue ) ContractGuard.EnumValue( outcome.Value, nameof( outcome ) );
-		if ( origin.HasValue ) ContractGuard.EnumValue( origin.Value, nameof( origin ) );
+		if ( outcome.HasValue )
+		{
+			ContractGuard.EnumValue( outcome.Value, nameof( outcome ) );
+		}
+		if ( origin.HasValue )
+		{
+			ContractGuard.EnumValue( origin.Value, nameof( origin ) );
+		}
 		PageSize = pageSize;
 		Cursor = cursor;
 		RequestId = requestId;
