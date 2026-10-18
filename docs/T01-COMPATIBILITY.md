@@ -73,10 +73,14 @@ On this workstation `FileSystem.Data.GetFullPath("superuser-t01")` resolved bene
 | Generated `Code/chomnr_sbox_superuser.csproj` | `dotnet build` passed: 0 errors, 0 warnings. Output redirected to `dev/out/build` for the command-line build. |
 | Editor checks | Observations above passed; no dedicated or two-client claim. |
 | Existing test project | `dotnet test tests/SboxSuperuser.Tests/SboxSuperuser.Tests.csproj` completed; **no test cases exist**. This is not a unit-test pass count. Existing test project was not changed. |
-| Workspace structure/Core harness | Final `sbox-check` result recorded in the final verification commit. |
+| Workspace structure/Core harness | `sbox-check` passed: `SboxSuperuser: follows the standard.` The checker also built the existing plain .NET Core harness. |
+| Publication checks | `um publish check .`: 0 failures; one absolute-user-path warning in ignored build output `dev/out/build/Sandbox.Engine.xml`. No engine files are tracked or pushed. `git diff --check` passed. |
+| Repository | Created `zeljkovranjes/sbox-superuser` with private visibility; pushed the implementation/report and confirmed visibility through GitHub. |
 | Runtime/editor code split | No editor code is shipped, so no `Editor/*.csproj` exists. |
 | External runtime dependencies | None added; all executable probe logic is in this library. |
 
 Implementation: `Code/SboxSuperuser/Components/CompatibilityProbe*.cs`, internal adapters in `Code/SboxSuperuser/Engine/Compatibility/`, and `dev/verify-editor.cs`. Implementation history starts at `b33aace`; editor exercise at `f88259b`; local-console fallback at `f89608e`. The final report/verification commits follow those changes in the private repository. No package has been published on sbox.game.
+
+The editor generated `.vscode`, `ProjectSettings`, `Libraries` and `Localization` even when opened on this library. These were created during this test and archived to ignored `dev/out/editor-generated` after closing the owned editor, preserving the marked library layout. The user's pre-existing editor remained open and untouched. Future direct library-editor sessions may regenerate those directories; they are not part of the shipped library. The native runtime project generated under `Code/` remains available for builds.
 
 T01 remains **Blocked**, specifically on dedicated runtime, two-client transport/privacy, admission ordering and recoverable disk-write evidence. Available editor validation is complete. Next action is to supply that evidence and update this record; **do not start T02 until the user instructs it**.
