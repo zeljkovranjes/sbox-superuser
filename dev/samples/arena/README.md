@@ -54,7 +54,7 @@ Dedicated production hosts and explicit editor-host tests only. The sample start
 
 ## Development
 
-Run `sbox-check`, build the generated runtime project, and run every project in `tests/`. Use the library's T18 verification scripts in this isolated game. Plain .NET builds do not apply the engine whitelist.
+Build the generated runtime project and run the library's arena verification scripts in this isolated game. Plain .NET builds do not apply the engine whitelist.
 
 ## License
 

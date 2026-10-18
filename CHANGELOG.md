@@ -41,6 +41,9 @@ Text mute - platform and independent chat enforce restrictions while slash comma
 Persistent history - UTC expiry survives dedicated restart and linked revocations retain original records
 Failure handling - failed ban writes leave players connected; explicit backup recovery restores history without resetting sanctions
 ### Improved
+# Documentation
+Getting started - short Markdown chapters cover setup, a working ping command, custom chat and core APIs
+Navigation - replaces implementation history and task labels with a linked guide and concise example-first README
 # Audit
 Completion checks - verifies attributable Unknown outcomes across an actual dedicated-server interruption and restart
 Validation - all 212 tests pass and the engine whitelist accepts audit cleanup; Tasks 5–10 are complete
@@ -108,6 +111,4 @@ Scene lifecycle - repeated initialization stays idempotent; duplicates suspend a
 # Validation
 Dedicated multiplayer - the unpublished test game cannot load on joining clients; a published adopting game is needed for dedicated network validation
 Storage guarantees - actual process interruption and restart recovery are verified; power-loss durability and cross-process writers are unsupported
-Administration - Task 1 provides diagnostics only; administration commands and UI are not implemented
-Administration runtime - native console/chat ingress and module management remain later tasks
 Storage retention - policy and owner backups remain retained; damaged historical audit files require operator review and are never silently erased
