@@ -25,9 +25,10 @@ internal sealed partial class HostAuditService
 
 	public async Task<bool> CompleteAsync( AuditAction action, CommandStatus outcome, CancellationToken cancellation )
 	{
+		var completed = false;
 		try
 		{
-			return await SerializedAsync( async () =>
+			completed = await SerializedAsync( async () =>
 			{
 				if ( !await LoadAsync( cancellation ) )
 				{
@@ -38,19 +39,25 @@ internal sealed partial class HostAuditService
 				return await PersistAsync( candidate, action, cancellation );
 			}, _ => false, cancellation, completion: true );
 		}
+		catch ( Exception error )
+		{
+			_writeFailed = true;
+			_report( error );
+		}
+
+		// No await in finally: its generated ExceptionDispatchInfo is blocked by the engine whitelist.
+		// Even rejected admission or a retired runtime must release the in-flight retention pin.
+		await _gate.WaitAsync( CancellationToken.None );
+		try
+		{
+			_active.Remove( action.Id );
+		}
 		finally
 		{
-			// Even rejected admission or a retired runtime must release the in-flight retention pin.
-			await _gate.WaitAsync( CancellationToken.None );
-			try
-			{
-				_active.Remove( action.Id );
-			}
-			finally
-			{
-				_gate.Release();
-			}
+			_gate.Release();
 		}
+
+		return completed;
 	}
 
 	public Task<bool> RecordAsync( AuditAction action, CommandStatus outcome, CancellationToken cancellation )
