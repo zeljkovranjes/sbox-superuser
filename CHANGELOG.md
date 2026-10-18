@@ -1,13 +1,18 @@
 # Changelog
 
 ## 2026-10-18
-Title: Console Administration
+Title: Console and Module Administration
 ### Added
 # Console
 Operator commands - native admin help, access management, diagnostics and private audit queries use the authoritative dispatcher
 Configured roots - bootstrap supports a logical root with a fixed native fallback and reports visible managed-name collisions
 Private replies - authenticated remote console results go only to the requesting connection; retries retain one correlated audit record
 Recovery diagnostics - local audit health remains inspectable when command auditing cannot write
+# Modules
+Managed lifetimes - validates dependencies and API versions, stages startup atomically and cleans up tracked subscriptions
+Owner controls - module enable and disable retain stored data and protect required security services
+Bounded shutdown - removes entry points immediately, signals cancellation and prevents restart while old work remains active
+Removable sample - verifies repeated module reload and failure rollback in the editor and an actual dedicated server
 ### Improved
 # Audit
 Completion checks - verifies attributable Unknown outcomes across an actual dedicated-server interruption and restart

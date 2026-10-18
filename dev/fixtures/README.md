@@ -30,3 +30,7 @@ Run `dev/verify-command-discovery.cs` through `run_csharp` after the game compil
 Copy `IDispatchProbe.cs` into the game's `Api/`, and `DispatchProbe.cs` plus `DispatchCommands.cs` into `Engine/Commands/`. They provide a compiled main-thread counter and asynchronous hold barrier, not moderation or dog spawning. Test commands deliberately use the default help permission to avoid editing stored lab policy; never ship them in a production game.
 
 With the isolated bootstrap scene playing, run `dev/verify-dispatch-editor.cs` for the authenticated player route. On an actual dedicated instance, run `dev/verify-dispatch-dedicated.cs` for the separate dedicated-local boundary and service queue. Both remove their registrations; the editor script restores its bootstrap switch.
+
+## Task 12 module fixtures
+
+Copy `SampleCounterModule.cs`, `SamplePulseSource.cs`, `SamplePulseSubscription.cs`, `FailingStartupModule.cs` and `HeldCommandModule.cs` into the game's `Engine/Modules/`. Run `dev/verify-module-lifecycle.cs` on the isolated editor host or dedicated server. It installs a removable module, invokes native management commands, checks five reloads, retained versioned data, listener cleanup, startup rollback and bounded shutdown of a deliberately held command. It restores owner configuration and bootstrap settings afterward. The deliberately failing and held modules are development-only fixtures; never install them in a production game.
