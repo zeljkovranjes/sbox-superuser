@@ -28,10 +28,11 @@ internal static class ChatReplies
 		}
 
 		// Local system notifications have no sender and never enter the command transport.
-		Chat.AddText( $"[Superuser] {status}: {message}" );
-		for ( var index = 0; index < keys.Length; index++ )
+		var fields = keys.Select( (key, index) => new KeyValuePair<string, string>( key, values[ index ] ) ).ToDictionary( pair => pair.Key, pair => pair.Value );
+		var result = new CommandResult( status, message, fields );
+		foreach ( var line in ChatResultText.Lines( result ) )
 		{
-			Chat.AddText( $"{keys[ index ]}: {values[ index ]}" );
+			Chat.AddText( line );
 		}
 		Log.Info( $"[Superuser chat {requestId:N}] Private result: {status}." );
 	}
