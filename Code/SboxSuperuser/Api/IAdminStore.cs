@@ -1,6 +1,6 @@
 namespace SboxSuperuser;
 
-/// <summary>Host-local versioned storage contract; no implementation or durability guarantee is supplied in T02.</summary>
+/// <summary>Host-local versioned aggregate storage; call from the engine main thread on the authoritative host.</summary>
 public interface IAdminStore
 {
 	/// <summary>Reads a compatible generation; distinguishes missing, corrupt, unsupported and unavailable data.</summary>

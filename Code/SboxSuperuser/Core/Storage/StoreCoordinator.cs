@@ -91,5 +91,5 @@ internal sealed partial class StoreCoordinator
 	}
 
 	private static bool IsDataError( Exception error ) => error is JsonException or FormatException
-		or ArgumentException or InvalidOperationException or OverflowException or KeyNotFoundException;
+		or ArgumentException or InvalidOperationException or KeyNotFoundException;
 }

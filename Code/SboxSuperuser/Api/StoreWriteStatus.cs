@@ -23,4 +23,10 @@ public enum StoreWriteStatus
 
 	/// <summary>Failed storage outcome.</summary>
 	Failed = 6,
+
+	/// <summary>Candidate data violates the supported transactional schema.</summary>
+	InvalidData = 7,
+
+	/// <summary>Existing committed data is corrupt; explicit operator recovery is required.</summary>
+	Corrupt = 8,
 }
