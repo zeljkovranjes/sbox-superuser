@@ -1,6 +1,6 @@
 # Superuser
 
-Superuser provides host-local administration storage, authenticated identities and explicit owner configuration for dedicated servers. Add one Superuser Bootstrap to your game's network scene; enable its editor switch for local testing. Versioned transactions, retained backups, permissions, typed commands and authoritative dispatch run in the same s&box C# library. Durable action audit and UI remain pending.
+Superuser provides host-local administration storage, authenticated identities and explicit owner configuration for dedicated servers. Add one Superuser Bootstrap to your game's network scene; enable its editor switch for local testing. Permissions, typed command dispatch and durable audit records run in the same s&box C# library. Native administration commands, general chat integration and UI remain pending.
 
 ## Requirements
 
@@ -46,12 +46,14 @@ The dedicated console's local connection is not a player; use `superuser_local_i
 | Allow Editor Testing | `false` | Allows bootstrap or probe execution on an editor host; does not enable player-hosted release games. |
 | Probe Storage On Start | `false` | Exercises isolated files under `FileSystem.Data/superuser-t01/<mode>/` and preserves an existing baseline. |
 | Rejected Test Steam Id | Empty | Deliberately rejects only this test account at the admission callback. Empty accepts all connections. |
+| Audit maximum records | `512` | Owner-configured retained rows, from 1–4096, also subject to a 384000-byte state limit. |
+| Audit retention days | `30` | Owner-configured creation age, from 1–3650 days; active intents stay protected. |
 
 Bootstrap and compatibility probe each have their own Allow Editor Testing switch. Storage/admission options belong only to the probe. Bootstrap reads fixed host-local owner files by default; explicit dedicated-local owner changes create managed overrides. No owner list is stored in scene properties. See the [owner recovery procedure](docs/T06-AUTHORITY.md).
 
 ## How it works
 
-A scene-owned coordinator initializes one runtime and suspends access when duplicate bootstraps appear. Identity comes from live engine connections; ownership comes only from validated host-local configuration. Storage serializes transactions and acknowledges them after closing and validating a new generation and its commit marker. Corrupt committed data fails closed; explicit local recovery creates a new revision while retaining the damaged files and prior backups. Scene replacement retires old store handles; see [bootstrap](docs/T03-BOOTSTRAP.md) and [storage](docs/T04-STORAGE.md) for evidence and limits.
+A scene-owned coordinator initializes one runtime and suspends access when duplicate bootstraps appear. Identity comes from live engine connections; ownership comes only from validated host-local configuration. Storage serializes transactions and acknowledges them after closing and validating a new generation and its commit marker. Commands persist an audit intent before execution and a correlated outcome afterward; interrupted work remains Unknown. Audit queries filter access, redact arguments and enforce bounded retention, while policy backups remain retained. See [bootstrap](docs/T03-BOOTSTRAP.md), [storage](docs/T04-STORAGE.md) and [audit](docs/T10-AUDIT.md) for recovery and limits.
 
 ## Multiplayer
 
@@ -59,13 +61,13 @@ Dedicated servers are the only production target. Opt-in editor testing is devel
 
 ## Limitations
 
-- Tasks 1–9 are implemented. No native admin root, general chat ingress, module loader, moderation enforcement or UI is installed.
+- Tasks 1–10 are implemented. No native admin root, general chat ingress, module loader, moderation enforcement or UI is installed.
 - Task 1's unavailable dedicated multiplayer evidence remains marked Blocked; Task 2 does not certify that deployment.
 - Chat commands use `/`; the future administration root will be `/admin`. The current probe does not implement administration commands.
 - The probe is for isolated testing and should be removed from a production scene.
 - Do not enter credentials or sensitive arguments into diagnostic commands: bounded test arguments are logged.
 - Storage requires one host process per data root. Process interruption/restart recovery is verified; filesystem flush-to-device and power-loss durability are not guaranteed.
-- All committed generations are retained. Payloads and backup results are bounded; retention, audit queries and action outcomes remain later tasks. See the storage guide for limits.
+- Policy and owner backups retain all committed generations. Only audit history has automatic retention; damaged historical audit files are preserved and reported as degraded.
 - Future ImGui source can be staged in [dev/ui-source/sbox-imgui](dev/ui-source/sbox-imgui/README.md); no UI is integrated.
 
 ## Development
@@ -86,7 +88,9 @@ Task 7 adds [atomic command registration and typed discovery](docs/T07-COMMANDS.
 
 Task 8 adds [strict argument parsing, player targeting and generated syntax](docs/T08-PARSING.md). The suites contain 138 contract and 20 Core cases. Use `TokenizeCommandText`, `ParseCommandArguments` and `GetCommandSyntax`; parsing grants no execution authority.
 
-Task 9 adds [authoritative dispatch](docs/T09-DISPATCH.md), with 157 contract and 29 Core cases. Host adapters call `ExecuteCommandAsync` with the live engine caller; trusted host code can issue revocable `CommandService` handles. Module registrations explicitly approve game capabilities. Durable action audit remains T10.
+Task 9 adds [authoritative dispatch](docs/T09-DISPATCH.md). Host adapters call `ExecuteCommandAsync` with the live engine caller; trusted host code can issue revocable `CommandService` handles. Module registrations explicitly approve game capabilities.
+
+Task 10 adds [durable audit intents and outcomes](docs/T10-AUDIT.md). Use `QueryAuditAsync` for permission-filtered pages, `ConfigureAuditRetentionAsync` for owner-only settings and `GetAuditDiagnostics` for host-local health. The current suites contain 180 contract and 32 Core cases. Editor storage-failure checks and an actual dedicated-process interruption/restart verify the outcome guarantees.
 
 ## License
 

@@ -1,7 +1,14 @@
 # Changelog
 
+## 2026-10-18
+Title: Verified Durable Audit
+### Improved
+# Audit
+Completion checks - verifies attributable Unknown outcomes across an actual dedicated-server interruption and restart
+Validation - all 212 tests pass and the engine whitelist accepts audit cleanup; Tasks 5–10 are complete
+
 ## 2026-10-17
-Title: Authoritative Command Dispatch
+Title: Durable Administration Audit
 ### Added
 # Diagnostics
 Compatibility probe - checks type discovery, caller identity and argument forwarding inside the library
@@ -47,6 +54,11 @@ Execution - authenticates live callers and rechecks queued permission, registrat
 Queue and retries - bounds outstanding work and deduplicates actor-scoped request IDs without repeating mutations
 Cancellation - distinguishes unstarted cancellation from interrupted mutations with Unknown outcomes and safe errors
 Capabilities - scopes approved game services to modules and supports explicitly limited, revocable internal callers
+# Audit
+Durable outcomes - requires a persisted intent before execution and preserves Unknown when an action has no confirmed outcome
+Private records - provides permission-filtered pages and exact filters with argument redaction and sensitive chat-command refusal
+Retention - owners configure record count and age; bounded cleanup preserves two validated generations and resumes after interruption
+Health - reports degraded audit storage and prevents actions whose required intent cannot be persisted
 ### Improved
 # Diagnostics
 Chat probe - uses /superuser-probe in the chatbox; nonmatching messages pass through normally
@@ -60,4 +72,4 @@ Dedicated multiplayer - the unpublished test game cannot load on joining clients
 Storage guarantees - actual process interruption and restart recovery are verified; power-loss durability and cross-process writers are unsupported
 Administration - Task 1 provides diagnostics only; administration commands and UI are not implemented
 Administration runtime - native console/chat ingress and module management remain later tasks
-Storage retention - retains all committed generations; automatic pruning and audit outcomes remain later tasks
+Storage retention - policy and owner backups remain retained; damaged historical audit files require operator review and are never silently erased
