@@ -1,6 +1,6 @@
 # Implementation ledger
 
-The specification is [version 0.2](sbox-admin-specification.docx). Current authorization is to implement T05–T10 in order and stop before T11. Everything ships inside one library; production is dedicated-server only, editor tests opt in, and chat uses `/`.
+The specification is [version 0.2](sbox-admin-specification.docx). Current authorization is to implement T11–T20 in order and prepare an unpublished release candidate. Everything ships inside one library; production is dedicated-server only, editor tests opt in, and chat uses `/`.
 
 | Task | Status | Record |
 |---|---|---|
@@ -14,6 +14,15 @@ The specification is [version 0.2](sbox-admin-specification.docx). Current autho
 | T08 Argument parsing and targeting | Complete | [T08](T08-PARSING.md) |
 | T09 Authoritative dispatcher | Complete | [T09](T09-DISPATCH.md) |
 | T10 Audit and durable outcomes | Complete | [T10](T10-AUDIT.md) |
-| T11–T20 | Outside current execution scope | Not started |
+| T11 Native console and help | In progress | [T11](T11-CONSOLE.md) |
+| T12 Module lifecycle | Not started | Depends on T11 |
+| T13 Platform chat | Not started | Depends on T11, T12 |
+| T14 Custom chat hooks | Not started | Depends on T13 |
+| T15 Native bindings | Not started | Depends on T11, T12 |
+| T16 Moderation and admission | Not started | Depends on T06, T10, T11, T14 |
+| T17 Lifecycle validation | Not started | Depends on T12–T16 |
+| T18 Two game integrations | Not started | Depends on T17 |
+| T19 Security, recovery and load | Not started | Depends on T18 |
+| T20 Unpublished release candidate | Not started | Depends on T19 |
 
-Current tests: 180 passing contract cases and 32 Core cases. Task records distinguish plain-.NET tests from actual engine execution, editor-host checks and actual dedicated-server recovery/restart. Historical task reports describe their completion point; this ledger tracks current progress. T05–T10 are complete; execution stops before T11. No generic native `admin` root, general chat dispatcher, moderation enforcement or UI is implemented yet.
+Current baseline: 180 passing contract cases and 32 Core cases. Task records distinguish plain-.NET tests from actual engine execution, editor-host checks and actual dedicated-server recovery/restart. Historical task reports describe their completion point; this ledger tracks current progress. T01–T10 are implemented, retaining the recorded dedicated-client deployment limitation. T11 is the next executable task.
