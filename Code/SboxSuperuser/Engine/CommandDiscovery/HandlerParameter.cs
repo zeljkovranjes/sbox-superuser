@@ -45,6 +45,15 @@ internal sealed class HandlerParameter
 		{
 			throw new ArgumentException( "Optional defaults must be representable by the declared parameter type." );
 		}
+
+		if ( optional && kind is CommandArgumentKind.Integer or CommandArgumentKind.Number )
+		{
+			var number = Convert.ToDouble( defaultValue, System.Globalization.CultureInfo.InvariantCulture );
+			if ( !double.IsFinite( number ) || number < minimum || number > maximum )
+			{
+				throw new ArgumentException( "The optional default violates the declared numeric bounds." );
+			}
+		}
 	}
 
 	internal object Bind( CommandArguments arguments )
@@ -75,13 +84,41 @@ internal sealed class HandlerParameter
 
 	private static CommandArgumentKind Kind( Type type )
 	{
-		if ( type == typeof( string ) ) return CommandArgumentKind.String;
-		if ( type == typeof( int ) || type == typeof( long ) ) return CommandArgumentKind.Integer;
-		if ( type == typeof( float ) || type == typeof( double ) ) return CommandArgumentKind.Number;
-		if ( type == typeof( bool ) ) return CommandArgumentKind.Boolean;
-		if ( type == typeof( CommandDuration ) ) return CommandArgumentKind.Duration;
-		if ( type == typeof( PlayerReference ) ) return CommandArgumentKind.Player;
-		if ( TypeLibrary.GetType( type )?.IsEnum == true ) return CommandArgumentKind.Enum;
+		if ( type == typeof( string ) )
+		{
+			return CommandArgumentKind.String;
+		}
+
+		if ( type == typeof( int ) || type == typeof( long ) )
+		{
+			return CommandArgumentKind.Integer;
+		}
+
+		if ( type == typeof( float ) || type == typeof( double ) )
+		{
+			return CommandArgumentKind.Number;
+		}
+
+		if ( type == typeof( bool ) )
+		{
+			return CommandArgumentKind.Boolean;
+		}
+
+		if ( type == typeof( CommandDuration ) )
+		{
+			return CommandArgumentKind.Duration;
+		}
+
+		if ( type == typeof( PlayerReference ) )
+		{
+			return CommandArgumentKind.Player;
+		}
+
+		if ( TypeLibrary.GetType( type )?.IsEnum == true )
+		{
+			return CommandArgumentKind.Enum;
+		}
+
 		throw new ArgumentException( $"Unsupported parameter type '{type.Name}'." );
 	}
 }

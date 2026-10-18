@@ -1,3 +1,17 @@
 namespace SboxSuperuser.Engine.CommandDiscovery;
 
-internal delegate TResult HandlerSignature7<T1, T2, T3, T4, T5, T6, T7, TResult>( T1 value1, T2 value2, T3 value3, T4 value4, T5 value5, T6 value6, T7 value7 );
+internal sealed class HandlerSignature7<T1, T2, T3, T4, T5, T6, T7> : IHandlerSignature
+{
+	/// <summary>Checks closed delegate binding without executing the handler.</summary>
+	public void Validate( Sandbox.MethodDescription method )
+	{
+		if ( method.ReturnType == typeof( CommandResult ) )
+		{
+			_ = method.CreateDelegate<Func<T1, T2, T3, T4, T5, T6, T7, CommandResult>>();
+		}
+		else
+		{
+			_ = method.CreateDelegate<Func<T1, T2, T3, T4, T5, T6, T7, Task<CommandResult>>>();
+		}
+	}
+}

@@ -7,7 +7,7 @@ internal static class AttributeCommandDiscovery
 {
 	internal static void Discover( CommandRegistrationScope scope )
 	{
-		foreach ( var entry in TypeLibrary.GetMethodsWithAttribute<AdminCommandAttribute>() )
+		foreach ( var entry in TypeLibrary.GetMethodsWithAttribute<AdminCommandAttribute>( onlyStatic: false ) )
 		{
 			if ( entry.Attribute.ModuleId != scope.ModuleId )
 			{
@@ -51,12 +51,9 @@ internal static class AttributeCommandDiscovery
 
 		// Delegate binding validates a closed, invocable signature without invoking the handler or inspecting MethodInfo.
 		var signature = Signature( parameters.Length );
-		var closed = TypeLibrary.GetType( signature )?.MakeGenericType( parameters.Select( value => value.ParameterType )
-			.Append( method.ReturnType ).ToArray() ) ?? throw new NotSupportedException( "TypeLibrary signature binding unavailable; use explicit registration." );
-		if ( method.CreateDelegate( closed ) is null )
-		{
-			throw new ArgumentException( "The handler cannot bind to a closed signature." );
-		}
+		var validator = TypeLibrary.GetType( signature )?.CreateGeneric<IHandlerSignature>( parameters.Select( value => value.ParameterType )
+			.ToArray() ) ?? throw new NotSupportedException( "TypeLibrary signature binding unavailable; use explicit registration." );
+		validator.Validate( method );
 
 		var descriptor = new CommandDescriptor( attribute.Name, attribute.Description, attribute.Permission, attribute.ModuleId,
 			bindings.Select( value => value.Descriptor ), attribute.Aliases, attribute.ExecutionPolicy );
@@ -78,15 +75,15 @@ internal static class AttributeCommandDiscovery
 
 	private static Type Signature( int count ) => count switch
 	{
-		1 => typeof( HandlerSignature1<,> ),
-		2 => typeof( HandlerSignature2<,,> ),
-		3 => typeof( HandlerSignature3<,,,> ),
-		4 => typeof( HandlerSignature4<,,,,> ),
-		5 => typeof( HandlerSignature5<,,,,,> ),
-		6 => typeof( HandlerSignature6<,,,,,,> ),
-		7 => typeof( HandlerSignature7<,,,,,,,> ),
-		8 => typeof( HandlerSignature8<,,,,,,,,> ),
-		9 => typeof( HandlerSignature9<,,,,,,,,,> ),
+		1 => typeof( HandlerSignature1<> ),
+		2 => typeof( HandlerSignature2<,> ),
+		3 => typeof( HandlerSignature3<,,> ),
+		4 => typeof( HandlerSignature4<,,,> ),
+		5 => typeof( HandlerSignature5<,,,,> ),
+		6 => typeof( HandlerSignature6<,,,,,> ),
+		7 => typeof( HandlerSignature7<,,,,,,> ),
+		8 => typeof( HandlerSignature8<,,,,,,,> ),
+		9 => typeof( HandlerSignature9<,,,,,,,,> ),
 		_ => throw new ArgumentOutOfRangeException( nameof( count ) )
 	};
 }

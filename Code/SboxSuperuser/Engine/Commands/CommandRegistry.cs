@@ -79,6 +79,11 @@ internal sealed class CommandRegistry
 
 	internal void Remove( string moduleId, Guid token )
 	{
+		if ( !_available() )
+		{
+			return;
+		}
+
 		if ( !_modules.TryGetValue( moduleId, out var current ) || current != token )
 		{
 			return;
