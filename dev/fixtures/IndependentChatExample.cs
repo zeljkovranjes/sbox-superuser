@@ -46,8 +46,8 @@ public sealed class IndependentChatExample : Component
 			return;
 		}
 		// Each recipient retains their Steam filtering preferences. No platform-chat network submission.
-		var safeName = Utility.Steam.FilterName( name );
-		var safeText = Utility.Steam.FilterChat( text );
+		var safeName = Sandbox.Utility.Steam.FilterName( name );
+		var safeText = Sandbox.Utility.Steam.FilterChat( text );
 		Scene.RunEvent<IExampleChatMessageEvent>( listener => listener.OnExampleChatMessage( safeName, safeText ) );
 	}
 }

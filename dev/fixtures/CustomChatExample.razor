@@ -16,15 +16,16 @@
 			<div class="message">@line</div>
 		}
 	</div>
-	<TextEntry @ref="_input" MaxLength="512" Placeholder="Message or /admin help" onsubmit="@SubmitInput" />
+	<TextEntry @ref="_input" MaxLength="@MaximumInputLength" Placeholder="Message or /admin help" onsubmit="@SubmitInput" />
 </root>
 
 @code
 {
 	private readonly List<string> _lines = new();
-	private TextEntry _input;
+	private TextEntry _input = null;
 	private IndependentChatExample _backend;
 	private int _revision;
+	private int MaximumInputLength => IndependentBackend ? 512 : Math.Min( 512, ProjectSettings.Platform.ChatMaxMessageLength );
 
 	/// <summary>Selects the independent example backend instead of platform Chat.Say.</summary>
 	[Property] public bool IndependentBackend { get; set; }
@@ -53,7 +54,7 @@
 	/// <summary>Uses exactly one transport; a custom input control can call the same method.</summary>
 	public void SubmitText( string text )
 	{
-		if ( string.IsNullOrWhiteSpace( text ) || text.Length > 512 )
+		if ( string.IsNullOrWhiteSpace( text ) || text.Length > MaximumInputLength )
 		{
 			return;
 		}
