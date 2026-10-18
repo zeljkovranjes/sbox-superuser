@@ -27,7 +27,7 @@ The game registers its own command and optional capability through the library's
 
 ```csharp
 var diagnostics = SboxSuperuser.Superuser.GetDiagnostics();
-Sandbox.Log.Info( diagnostics.State );
+Log.Info( diagnostics.State );
 ```
 
 ## Options
