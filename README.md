@@ -1,6 +1,6 @@
 # Superuser
 
-Superuser provides console administration, host-local records and explicit owner configuration for dedicated servers. Add one Superuser Bootstrap to your game's network scene; enable its editor switch for local testing. Permissions, access commands, typed dispatch and durable audit records run in the same s&box C# library. General chat integration, moderation and UI remain pending.
+Superuser provides console and platform-chat administration, host-local records and explicit owner configuration for dedicated servers. Add one Superuser Bootstrap to your game's network scene; enable its editor switch for local testing. Permissions, managed modules, typed dispatch and durable audit records run in the same s&box C# library. Custom chat, moderation and visual admin UI remain pending.
 
 ## Requirements
 
@@ -21,6 +21,7 @@ This package is not published on sbox.game. Add this local library to a test gam
 5. Reload the scene or disable/re-enable bootstrap after editing owner configuration. See [bootstrap setup](docs/T03-BOOTSTRAP.md) for failures and dedicated-console diagnostics.
 6. For Task 1 checks, additionally add **Superuser Compatibility Probe** and opt into its editor mode. Its commands remain `superuser_probe`, `superuser_probe_local` and `/superuser-probe` in the chatbox.
 7. Host code can obtain `Superuser.GetStore()` for versioned transactions. Follow the [storage and recovery guide](docs/T04-STORAGE.md); editor and dedicated records are isolated.
+8. With platform chat enabled, enter `/admin help` in the in-game chatbox. Replies are private. See [chat setup](docs/T13-PLATFORM-CHAT.md).
 
 ### In code
 
@@ -62,7 +63,7 @@ Dedicated servers are the only production target. Opt-in editor testing is devel
 
 ## Limitations
 
-- Tasks 1–12 are implemented. General chat ingress, moderation enforcement and UI remain pending.
+- Tasks 1–13 are implemented. Custom-backend chat APIs, moderation enforcement and visual admin UI remain pending.
 - Task 1's unavailable dedicated multiplayer evidence remains marked Blocked; Task 2 does not certify that deployment.
 - Chat commands use `/`; the future administration root will be `/admin`. The current probe does not implement administration commands.
 - Native dynamic registration and full engine-name enumeration are unavailable. Visible managed-name collisions are reported; see the [console guide](docs/T11-CONSOLE.md) for the fixed transport and configured-root fallback.
@@ -97,6 +98,8 @@ Task 10 adds [durable audit intents and outcomes](docs/T10-AUDIT.md). Use `Query
 Task 11 adds [native console commands and permission-filtered help](docs/T11-CONSOLE.md). Run `admin help`, `admin help group.create`, or `superuser <configured-root> help`. Access edits require owner authority and audit queries remain private. The current suites contain 186 contract and 44 Core cases; actual dedicated console and two-client editor checks passed.
 
 Task 12 adds [managed module lifetimes](docs/T12-MODULES.md). Trusted host setup calls `RegisterModulesAsync`; owners use `admin modules list`, `admin modules enable <id>` and `admin modules disable <id>`. Failed startup rolls back registrations, listeners are tracked for cleanup, and timed-out work prevents overlapping restart. The current suites contain 198 contract and 49 Core cases. Editor and actual dedicated checks cover five reloads, persisted data retention and bounded cancellation. Arbitrary source hot reload remains a T17 verification item.
+
+Task 13 adds [platform chat commands](docs/T13-PLATFORM-CHAT.md) through the same dispatcher. Two actual editor clients verify synchronous command consumption, private successes/errors and one request per submission. The current suites contain 207 contract and 61 Core cases. Platform rate limits remain active; `/` is the only admin chat prefix.
 
 ## License
 

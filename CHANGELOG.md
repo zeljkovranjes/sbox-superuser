@@ -1,7 +1,7 @@
 # Changelog
 
 ## 2026-10-18
-Title: Console and Module Administration
+Title: Console, Modules and Private Chat
 ### Added
 # Console
 Operator commands - native admin help, access management, diagnostics and private audit queries use the authoritative dispatcher
@@ -13,6 +13,10 @@ Managed lifetimes - validates dependencies and API versions, stages startup atom
 Owner controls - module enable and disable retain stored data and protect required security services
 Bounded shutdown - removes entry points immediately, signals cancellation and prevents restart while old work remains active
 Removable sample - verifies repeated module reload and failure rollback in the editor and an actual dedicated server
+# Chat
+Slash commands - platform chat consumes exact /admin commands before dispatch and sends results only to the requester
+Private help - chatbox help shows readable command details and pagination using the platform overlay
+Chat validation - two real clients verify ordinary-chat pass-through, private errors and one attributed request per submission
 ### Improved
 # Audit
 Completion checks - verifies attributable Unknown outcomes across an actual dedicated-server interruption and restart
