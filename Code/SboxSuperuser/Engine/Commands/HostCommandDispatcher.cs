@@ -1,5 +1,6 @@
 using SboxSuperuser.Core.Commands;
 using SboxSuperuser.Engine.Authority;
+using SboxSuperuser.Engine.Audit;
 
 namespace SboxSuperuser.Engine.Commands;
 
@@ -13,15 +14,17 @@ internal sealed partial class HostCommandDispatcher : ICommandDispatcher, IDispo
 	private readonly CancellationTokenSource _lifetime = new();
 	private readonly RequestQueue<CommandResult> _queue;
 	private bool _disposed;
+	private readonly IAuditWriter _audit;
 
 	internal HostCommandDispatcher( HostPolicyService policy, CommandRegistry registry, Func<bool> available,
-		Func<IReadOnlyList<CommandPlayer>> players, Action<Exception> report, Func<DateTimeOffset> clock = null )
+		Func<IReadOnlyList<CommandPlayer>> players, Action<Exception> report, Func<DateTimeOffset> clock = null, IAuditWriter audit = null )
 	{
 		_policy = policy;
 		_registry = registry;
 		_available = available;
 		_players = players;
 		_report = report;
+		_audit = audit;
 		_queue = new RequestQueue<CommandResult>( clock ?? (() => DateTimeOffset.UtcNow), Result( CommandStatus.Cancelled, "Cancelled before execution." ) );
 	}
 
@@ -51,6 +54,18 @@ internal sealed partial class HostCommandDispatcher : ICommandDispatcher, IDispo
 
 	public async Task<CommandResult> DispatchAsync( CommandContext context, CommandRequest request )
 	{
+		var audit = new AuditSubmission();
+		var result = await DispatchCoreAsync( context, request, audit );
+		if ( _audit is not null && audit.Action is not null && !audit.Handled )
+		{
+			await _audit.RecordAsync( audit.Action, result.Status, CancellationToken.None );
+		}
+
+		return result;
+	}
+
+	private async Task<CommandResult> DispatchCoreAsync( CommandContext context, CommandRequest request, AuditSubmission audit )
+	{
 		try
 		{
 			if ( context is null || request is null || context.RequestId != request.RequestId
@@ -60,6 +75,12 @@ internal sealed partial class HostCommandDispatcher : ICommandDispatcher, IDispo
 			}
 
 			var authorization = ValidateCaller( context, services );
+			// Only a still-authenticated transport identity may be attributed in the journal.
+			if ( authorization is null )
+			{
+				audit.Action = new AuditAction( context.Actor, context.Origin, request.RequestId,
+					"command.unresolved", DateTimeOffset.UtcNow );
+			}
 			if ( authorization is not null )
 			{
 				return authorization;
@@ -75,6 +96,7 @@ internal sealed partial class HostCommandDispatcher : ICommandDispatcher, IDispo
 			var retry = _queue.FindRetry( key, fingerprint );
 			if ( retry is not null )
 			{
+				audit.Handled = retry.Admission != QueueAdmission.Conflict;
 				return retry.Admission == QueueAdmission.Conflict
 					? Result( CommandStatus.Conflict, "This request ID was already used with a different payload." ) : await retry.Result;
 			}
@@ -83,6 +105,13 @@ internal sealed partial class HostCommandDispatcher : ICommandDispatcher, IDispo
 			if ( command is null )
 			{
 				return Result( CommandStatus.NotFound, "Command is not registered." );
+			}
+
+			audit.Action = CreateAuditAction( context, command.Descriptor, null );
+			if ( context.Origin == CommandOrigin.Chat && command.Descriptor.Arguments.Any( argument =>
+				argument.Audit == CommandArgumentAudit.Sensitive || AuditRedaction.SensitiveName( argument.Name ) ) )
+			{
+				return Result( CommandStatus.Denied, "Sensitive commands require a private non-chat transport." );
 			}
 
 			if ( !HasPermission( context, services, command.Descriptor.Permission ) )
@@ -97,8 +126,9 @@ internal sealed partial class HostCommandDispatcher : ICommandDispatcher, IDispo
 					: new Dictionary<string, string> { [ "choices" ] = string.Join( ",", parsed.PlayerChoices.Select( player => player.SteamId ) ) } );
 			}
 
+			audit.Action = CreateAuditAction( context, command.Descriptor, parsed.Arguments );
 			var admission = _queue.Submit( key, fingerprint,
-				() => ExecuteAsync( context, services, request.Command, command, parsed.Arguments ), context.Cancellation );
+				() => ExecuteAuditedAsync( context, services, request.Command, command, parsed.Arguments, audit ), context.Cancellation );
 			return admission.Admission switch
 			{
 				QueueAdmission.Conflict => Result( CommandStatus.Conflict, "This request ID was already used with a different payload." ),

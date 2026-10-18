@@ -5,6 +5,18 @@ internal sealed partial class HostCommandDispatcher
 	private async Task<CommandResult> ExecuteAsync( CommandContext original, CommandExecutionServices services,
 		string entryName, RegisteredCommand command, CommandArguments arguments )
 	{
+		var rejected = ValidateExecution( original, services, entryName, command, arguments );
+		if ( rejected is not null )
+		{
+			return rejected;
+		}
+
+		return await InvokeAsync( original, services, command, arguments );
+	}
+
+	private CommandResult ValidateExecution( CommandContext original, CommandExecutionServices services,
+		string entryName, RegisteredCommand command, CommandArguments arguments )
+	{
 		var rejected = ValidateCaller( original, services );
 		if ( rejected is not null )
 		{
@@ -27,6 +39,12 @@ internal sealed partial class HostCommandDispatcher
 			return targetError;
 		}
 
+		return null;
+	}
+
+	private async Task<CommandResult> InvokeAsync( CommandContext original, CommandExecutionServices services,
+		RegisteredCommand command, CommandArguments arguments )
+	{
 		var context = new CommandContext( original.Actor, original.Origin, original.RequestId, original.Cancellation,
 			new CommandExecutionServices( this, services.Authenticate, services.Service, command.Capabilities ) );
 		try
