@@ -14,9 +14,24 @@ internal sealed class BootstrapRuntime : IDisposable
 	internal Storage.HostAdminStore Store { get; }
 	internal Authority.HostPolicyService Policy { get; }
 
-	internal BootstrapState Health => !Policy.IsUsable
-		? Owners.State == BootstrapState.OwnersInvalid && Policy.OwnerSource == "bootstrap" ? BootstrapState.OwnersInvalid : BootstrapState.AuthorityDegraded
-		: Policy.OwnerSource == "bootstrap" ? Owners.State : Policy.OwnerCount > 0 ? BootstrapState.Ready : BootstrapState.OwnersMissing;
+	internal BootstrapState Health
+	{
+		get
+		{
+			if ( !Policy.IsUsable )
+			{
+				return Owners.State == BootstrapState.OwnersInvalid && Policy.OwnerSource == "bootstrap"
+					? BootstrapState.OwnersInvalid : BootstrapState.AuthorityDegraded;
+			}
+
+			if ( Policy.OwnerSource == "bootstrap" )
+			{
+				return Owners.State;
+			}
+
+			return Policy.OwnerCount > 0 ? BootstrapState.Ready : BootstrapState.OwnersMissing;
+		}
+	}
 
 	internal bool IsUsable => !_disposed && _scene.IsValid() && _scene == Game.ActiveScene
 		&& Networking.IsActive && Networking.IsHost && _host is not null && _host.IsActive

@@ -34,7 +34,12 @@ internal sealed partial class HostPolicyService
 
 			var intent = new AuditIntent( Guid.NewGuid(), requestId, actor.Kind, actor.SubjectId, origin,
 				"security.policy.change", DateTimeOffset.UtcNow,
-				new Dictionary<string, string> { [ "operation" ] = change.Edit.Kind.ToString() } );
+				new Dictionary<string, string>
+				{
+					[ "operation" ] = change.Edit.Kind.ToString(),
+					[ "subject" ] = change.Edit.Subject.Length <= 256 ? change.Edit.Subject : "[oversized key omitted]"
+				}, change.Edit.Kind is PolicyEditKind.AddUserGroup or PolicyEditKind.RemoveUserGroup or PolicyEditKind.SetUserPermission
+					? new[] { change.Edit.Subject } : Array.Empty<string>() );
 			var transaction = new PolicyTransaction( PolicyCodec.WriteState( candidate ), new[] { intent } );
 			var result = await _store.WriteAsync( transaction.CreateWriteRequest( PolicyKey, _resolver.Policy.Revision ), cancellation );
 			LastWriteStatus = result.Status;

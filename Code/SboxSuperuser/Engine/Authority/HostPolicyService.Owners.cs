@@ -62,9 +62,15 @@ internal sealed partial class HostPolicyService
 			}
 
 			var expected = stored.Document?.Revision ?? 0;
-			var intent = new AuditIntent( Guid.NewGuid(), requestId, actor.Kind, actor.SubjectId,
-				CommandOrigin.Console, command, DateTimeOffset.UtcNow );
-			var transaction = new PolicyTransaction( PolicyCodec.WriteOwners( candidate ), new[] { intent } );
+			var affected = _owners.Ids.Except( candidate.Ids ).Concat( candidate.Ids.Except( _owners.Ids ) ).ToArray();
+			var intents = new List<AuditIntent>();
+			for ( var offset = 0; offset < Math.Max( affected.Length, 1 ); offset += 64 )
+			{
+				intents.Add( new AuditIntent( Guid.NewGuid(), requestId, actor.Kind, actor.SubjectId,
+					CommandOrigin.Console, command, DateTimeOffset.UtcNow, targets: affected.Skip( offset ).Take( 64 ) ) );
+			}
+
+			var transaction = new PolicyTransaction( PolicyCodec.WriteOwners( candidate ), intents );
 			var result = await _store.WriteAsync( transaction.CreateWriteRequest( OwnersKey, expected ), cancellation );
 			LastWriteStatus = result.Status;
 			if ( result.Status == StoreWriteStatus.Committed )
