@@ -1,6 +1,6 @@
 # T12: Module lifecycle
 
-Status: **Implementation and runtime checks passed; final package verification in progress.** Implements dependency and API-version checks, staged registration, owner-only enable/disable, bounded cancellation and listener cleanup. Required security modules stay enabled. No stored data is deleted when a module stops.
+Status: **Complete.** Implements dependency and API-version checks, staged registration, owner-only enable/disable, bounded cancellation and listener cleanup. Required security modules stay enabled. No stored data is deleted when a module stops.
 
 The manager owns module registrations. Commands publish only after startup succeeds. Modules must register every listener's disposable subscription with their registration scope and honor cancellation; arbitrary trusted C# cannot be forcibly interrupted. A timed-out module remains quarantined until its work and cleanup finish, preventing overlapping reloads.
 
@@ -47,3 +47,5 @@ The engine whitelist rejects both tested `Task.WhenAny` overloads. Shutdown ther
 Editing runtime constructor lambdas during development left an existing hot-loaded delegate without a matching substitution and a newly added field uninitialized. Restarting play mode created a valid runtime. This is recorded evidence for T17; T12's repeated **module** reload checks do not certify arbitrary source hot reload or cross-scene behavior. Dedicated-client deployment remains subject to the T01 package prerequisite. No publication was performed.
 
 Backup before fixture writes: `E:/06-um-data/backups/superuser-t12-lab-data/20261018-003545.zip` (43 files). Raw test results are in ignored `dev/out/t12-*`. Owner configuration is restored by the script. Data files are development evidence only.
+
+Final checks: library and adopting game builds passed with zero warnings/errors, both package/Core checks passed, all 247 tests passed, and actual engine whitelist compilation was clean. Final bounded-drain observations were 5.065 seconds (editor) and 5.074 seconds (dedicated). The adopting game's empty test project was run without claiming a test count. Publication lint found zero failures and two ignored local-path warnings. The dedicated fixture was stopped by exact PID; the editor runtime was confirmed inactive before archiving only new audit and sample data to the lab's `dev/out/t12-module-evidence`. Pre-existing test data and saved scenes were preserved. Next: T13 platform chat, using `/`.
