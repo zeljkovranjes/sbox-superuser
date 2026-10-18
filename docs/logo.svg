@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">Superuser</title>
+  <desc id="desc">A white humanoid wearing a flowing navy blue cape, framed by a shield on a dark rounded square.</desc>
+  <rect width="1024" height="1024" rx="160" fill="#181920"/>
+
+  <!-- A shield replaces the retargeter's circular guide. -->
+  <path d="M512 104C400 170 273 198 156 208V450C156 668 287 825 512 924C737 825 868 668 868 450V208C751 198 624 170 512 104Z"
+        fill="none" stroke="#57585D" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- The cape stays behind the figure so the pose reads at small sizes. -->
+  <path d="M438 354C389 414 368 485 329 554C298 610 282 644 260 683C310 689 345 733 412 746C462 756 503 732 547 721C606 706 659 733 718 716C686 644 660 565 634 490C612 427 592 382 558 354Z"
+        fill="#243F70"/>
+  <path d="M438 375C414 481 398 587 355 681M557 376C559 475 593 588 639 673"
+        fill="none" stroke="#34558A" stroke-width="14" stroke-linecap="round"/>
+
+  <!-- Round bones and joint markers match the reference logo. -->
+  <g fill="none" stroke="#F0F0F5" stroke-width="32" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M512 345V560"/>
+    <path d="M512 367L418 401L374 487L449 535"/>
+    <path d="M512 367L606 401L650 487L575 535"/>
+    <path d="M512 560L464 662L432 782H399"/>
+    <path d="M512 560L560 662L592 782H625"/>
+  </g>
+  <circle cx="512" cy="267" r="62" fill="#F0F0F5"/>
+  <g fill="#3D6096">
+    <circle cx="512" cy="345" r="21"/>
+    <circle cx="418" cy="401" r="21"/>
+    <circle cx="606" cy="401" r="21"/>
+    <circle cx="374" cy="487" r="21"/>
+    <circle cx="650" cy="487" r="21"/>
+    <circle cx="449" cy="535" r="21"/>
+    <circle cx="575" cy="535" r="21"/>
+    <circle cx="464" cy="662" r="21"/>
+    <circle cx="560" cy="662" r="21"/>
+    <circle cx="432" cy="782" r="21"/>
+    <circle cx="592" cy="782" r="21"/>
+  </g>
+  <circle cx="512" cy="560" r="30" fill="#597CAF"/>
+</svg>

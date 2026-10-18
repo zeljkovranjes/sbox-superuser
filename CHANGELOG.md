@@ -3,6 +3,8 @@
 ## 2026-10-18
 Title: Administration and an Example-First Guide
 ### Added
+# Identity
+Project icon - adds a navy caped figure and shield as a scalable SVG, matching the Humanoid Retargeter logo style
 # Validation
 Measured limits - actual dedicated pressure and persistence workloads now have a recorded environment, timings and bounded-capacity evidence
 Security checks - repeated two-client privacy and injected storage failures confirm private errors and no disconnect after a failed ban write
