@@ -36,6 +36,11 @@ internal static class CommandMetadata
 			}
 
 			optionalSeen |= argument.IsOptional;
+			if ( argument.Audit == CommandArgumentAudit.SafeValue && argument.Kind == CommandArgumentKind.String )
+			{
+				throw new ArgumentException( "Free-text arguments must be redacted; safe audit values require a non-text type." );
+			}
+
 			if ( argument.IsRemainder && (argument.Kind != CommandArgumentKind.String || index != command.Arguments.Count - 1) )
 			{
 				throw new ArgumentException( "Only the final string argument may consume the remainder." );

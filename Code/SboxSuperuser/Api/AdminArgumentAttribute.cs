@@ -25,6 +25,9 @@ public sealed class AdminArgumentAttribute : Attribute
 	/// <summary>Gets or sets the mandatory player target policy.</summary>
 	public CommandTargetPolicy TargetPolicy { get; set; }
 
+	/// <summary>Gets or sets audit handling; defaults to redaction.</summary>
+	public CommandArgumentAudit Audit { get; set; }
+
 	/// <summary>Names one handler parameter; metadata for unknown or repeated parameters is rejected.</summary>
 	public AdminArgumentAttribute( string parameter )
 	{

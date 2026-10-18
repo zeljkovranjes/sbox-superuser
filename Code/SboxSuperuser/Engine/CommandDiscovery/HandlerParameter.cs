@@ -39,7 +39,7 @@ internal sealed class HandlerParameter
 
 		Descriptor = new CommandArgumentDescriptor( metadata?.Name ?? name.ToLowerInvariant(), metadata?.Description ?? name,
 			kind, optional, metadata?.IsRemainder ?? false, minimum, maximum, _enumValues.Keys,
-			metadata?.TargetPolicy ?? CommandTargetPolicy.None );
+			metadata?.TargetPolicy ?? CommandTargetPolicy.None, metadata?.Audit ?? CommandArgumentAudit.Redacted );
 		if ( optional && defaultValue is null && type != typeof( string )
 			|| optional && kind == CommandArgumentKind.Enum && !_enumValues.Values.Contains( defaultValue ) )
 		{

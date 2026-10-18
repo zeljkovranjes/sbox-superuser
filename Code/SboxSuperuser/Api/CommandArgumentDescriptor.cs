@@ -32,16 +32,20 @@ public sealed class CommandArgumentDescriptor
 	/// <summary>Gets required online/protection checks for player arguments.</summary>
 	public CommandTargetPolicy TargetPolicy { get; }
 
+	/// <summary>Gets audit handling; values are redacted unless a safe non-text scalar is explicitly declared.</summary>
+	public CommandArgumentAudit Audit { get; }
+
 	/// <summary>Creates metadata without installing a parser or resolving a target.</summary>
 	public CommandArgumentDescriptor( string name, string description, CommandArgumentKind kind,
 		bool isOptional = false, bool isRemainder = false, double? minimum = null,
 		double? maximum = null, IEnumerable<string> choices = null,
-		CommandTargetPolicy targetPolicy = CommandTargetPolicy.None )
+		CommandTargetPolicy targetPolicy = CommandTargetPolicy.None, CommandArgumentAudit audit = CommandArgumentAudit.Redacted )
 	{
 		Name = ContractGuard.Key( name, nameof( name ) );
 		Description = ContractGuard.Text( description, nameof( description ) );
 		Kind = ContractGuard.EnumValue( kind, nameof( kind ) );
 		TargetPolicy = ContractGuard.EnumValue( targetPolicy, nameof( targetPolicy ) );
+		Audit = ContractGuard.EnumValue( audit, nameof( audit ) );
 		if ( (minimum.HasValue && !double.IsFinite( minimum.Value ))
 			|| (maximum.HasValue && !double.IsFinite( maximum.Value )) || minimum > maximum )
 		{
