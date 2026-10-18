@@ -7,5 +7,6 @@ internal enum ModerationKind
 	Warn,
 	TextMute,
 	Unban,
-	Unmute
+	Unmute,
+	Note
 }

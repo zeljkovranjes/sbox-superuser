@@ -8,4 +8,7 @@ public sealed class AdminPlayerRow
 
 	/// <summary>Gets the host's sanitized display name.</summary>
 	public string Name { get; init; }
+
+	/// <summary>Gets the player's recorded warnings; zero unless the caller may read moderation history.</summary>
+	public int Warnings { get; init; }
 }

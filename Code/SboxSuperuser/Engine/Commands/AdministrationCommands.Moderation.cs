@@ -12,6 +12,7 @@ internal sealed partial class AdministrationCommands
 		RegisterModerationAction( "mute", ModerationKind.TextMute, CommandTargetPolicy.PunitiveAnyPlayer, timed: true );
 		RegisterModerationAction( "unban", ModerationKind.Unban, CommandTargetPolicy.AnyPlayer, revoke: true );
 		RegisterModerationAction( "unmute", ModerationKind.Unmute, CommandTargetPolicy.AnyPlayer, revoke: true );
+		RegisterModerationAction( "note", ModerationKind.Note, CommandTargetPolicy.AnyPlayer );
 		Register( "moderation.history", "Read private moderation history for an online player or offline Steam ID", "admin.players.history",
 			new[] { Player(), Page() }, (context, arguments) => Task.FromResult( _moderation.History( context, arguments.Get<PlayerReference>( "user" ).SteamId, PageNumber( arguments ) ) ) );
 	}

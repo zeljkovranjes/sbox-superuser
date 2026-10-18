@@ -27,7 +27,7 @@ public sealed class AdminReply
 	/// <summary>Gets actions currently permitted for this target; the host rechecks on execution.</summary>
 	public AdminAction[] Actions { get; init; } = Array.Empty<AdminAction>();
 
-	/// <summary>Gets active restrictions the caller may inspect.</summary>
+	/// <summary>Gets active restrictions the caller may inspect; for a Restrictions query, across all players.</summary>
 	public AdminModerationRow[] Restrictions { get; init; } = Array.Empty<AdminModerationRow>();
 
 	/// <summary>Gets at most 20 history entries when HistoryAllowed is true.</summary>
@@ -38,6 +38,30 @@ public sealed class AdminReply
 
 	/// <summary>Gets at most 20 recent authorized audit records.</summary>
 	public AdminActivityRow[] Activity { get; init; } = Array.Empty<AdminActivityRow>();
+
+	/// <summary>Gets installed modules when ModulesAllowed is true.</summary>
+	public AdminModuleRow[] Modules { get; init; } = Array.Empty<AdminModuleRow>();
+
+	/// <summary>Gets whether the caller may see installed modules (owners only).</summary>
+	public bool ModulesAllowed { get; init; }
+
+	/// <summary>Gets the commands the caller may run, for a Commands query.</summary>
+	public AdminCommandRow[] Commands { get; init; } = Array.Empty<AdminCommandRow>();
+
+	/// <summary>Gets permission groups, for an owner's Permissions query.</summary>
+	public AdminGroupRow[] Groups { get; init; } = Array.Empty<AdminGroupRow>();
+
+	/// <summary>Gets players with explicit policy, for an owner's Permissions query.</summary>
+	public AdminUserRow[] Users { get; init; } = Array.Empty<AdminUserRow>();
+
+	/// <summary>Gets every registered permission key, for an owner's Permissions query.</summary>
+	public string[] PermissionKeys { get; init; } = Array.Empty<string>();
+
+	/// <summary>Gets recent public chat, newest first, for a Chat query.</summary>
+	public AdminChatRow[] Chat { get; init; } = Array.Empty<AdminChatRow>();
+
+	/// <summary>Gets a command's result fields, such as row1..row8, page and more for listings.</summary>
+	public Dictionary<string, string> Data { get; init; } = new();
 
 	/// <summary>Gets whether another player/history page is available.</summary>
 	public bool HasMore { get; init; }

@@ -3,6 +3,9 @@ namespace SboxSuperuser;
 /// <summary>Permission-filtered moderation evidence; kick records require the audit outcome to confirm execution.</summary>
 public sealed class AdminModerationRow
 {
+	/// <summary>Gets the target Steam ID; filled in server-wide views such as Restrictions.</summary>
+	public string SteamId { get; init; } = "";
+
 	/// <summary>Gets the recorded action kind.</summary>
 	public string Kind { get; init; }
 

@@ -12,7 +12,8 @@ public sealed partial class PolicySnapshot
 			new GroupPolicy( "moderator", new[] { "player" }, new[]
 			{
 				Allow( "admin.players.kick" ), Allow( "admin.players.warn" ),
-				Allow( "admin.players.mute" ), Allow( "admin.players.unmute" )
+				Allow( "admin.players.mute" ), Allow( "admin.players.unmute" ), Allow( "admin.players.note" ),
+				Allow( "admin.chat.read" )
 			}, 10 ),
 			new GroupPolicy( "admin", new[] { "moderator" }, new[]
 			{

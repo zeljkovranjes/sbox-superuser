@@ -26,6 +26,9 @@ internal sealed partial class BootstrapRuntime : IDisposable
 	internal Admin.HostAdminQueries AdminQueries { get; }
 	internal Admin.AdminRequestGate AdminRequests { get; } = new();
 
+	/// <summary>Recent public chat for moderators; memory only, cleared when this runtime stops.</summary>
+	internal Core.Chat.RecentChat RecentChat { get; } = new();
+
 	internal BootstrapState Health
 	{
 		get
@@ -105,7 +108,8 @@ internal sealed partial class BootstrapRuntime : IDisposable
 			CommandDiscovery.AttributeCommandDiscovery.Discover );
 		Moderation = new Moderation.HostModerationService( Store, ModerationAvailable, Dispatcher.CanUse, CanModerateTarget, ReportModerationFailure );
 		Store.StorageChanged += Moderation.OnStorageChanged;
-		AdminQueries = new Admin.HostAdminQueries( Policy, Moderation, Audit, OnlinePlayers );
+		AdminQueries = new Admin.HostAdminQueries( Policy, Moderation, Audit, OnlinePlayers, () => Modules.Statuses,
+			() => Commands.Descriptors, () => ConsoleDiagnostics().Data, RecentChat );
 		Administration = new Commands.AdministrationCommands( Policy, Audit, Commands, Dispatcher, ConsoleDiagnostics, Modules,
 			Moderation, DisconnectModeratedAsync, NotifyModerationWarning );
 		Chat = new ChatIntegration.Platform.PlatformChatAdapter( this );
@@ -227,6 +231,7 @@ internal sealed partial class BootstrapRuntime : IDisposable
 		if ( _disposed ) return;
 		_disposed = true;
 		Chat?.Dispose();
+		RecentChat.Clear();
 		Modules?.Dispose();
 		Administration?.Dispose();
 		Dispatcher?.Dispose();

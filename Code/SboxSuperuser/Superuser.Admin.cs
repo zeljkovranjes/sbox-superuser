@@ -13,8 +13,9 @@ public static partial class Superuser
 	{
 		ArgumentNullException.ThrowIfNull( query );
 		var id = Client().Begin();
-		if ( Networking.IsHost ) _ = RunAdminQueryAsync( Connection.Local, id, query.Kind, query.Search, query.Page );
-		else ForwardAdminQuery( id, query.Kind, query.Search, query.Page );
+		var outcome = query.Outcome is { } status ? (int)status : NoOutcome;
+		if ( Networking.IsHost ) _ = RunAdminQueryAsync( Connection.Local, id, query.Kind, query.Search, query.Page, query.Actor, outcome );
+		else ForwardAdminQuery( id, query.Kind, query.Search, query.Page, query.Actor, outcome );
 		return id;
 	}
 
@@ -28,6 +29,17 @@ public static partial class Superuser
 		return id;
 	}
 
+	/// <summary>Runs one registered command from an admin view; the reply carries its status, message and data rows.</summary>
+	public static Guid RequestAdminCommand( AdminCommandRequest request )
+	{
+		ArgumentNullException.ThrowIfNull( request );
+		var id = Client().Begin();
+		var arguments = request.Arguments.ToArray();
+		if ( Networking.IsHost ) _ = RunAdminCommandAsync( Connection.Local, id, request.Command, arguments );
+		else ForwardAdminCommand( id, request.Command, arguments );
+		return id;
+	}
+
 	private static AdminClientSession Client()
 	{
 		if ( !ThreadSafe.IsMainThread || !Game.ActiveScene.IsValid() )
@@ -35,17 +47,30 @@ public static partial class Superuser
 		return Game.ActiveScene.GetSystem<AdminClientSession>();
 	}
 
+	// Outcome travels as an int because the RPC has no nullable enum; this marks "any outcome".
+	private const int NoOutcome = -1;
+
 	[Rpc.Host]
-	private static void ForwardAdminQuery( Guid id, AdminQueryKind kind, string search, int page )
-		=> _ = RunAdminQueryAsync( Rpc.Caller, id, kind, search, page );
+	private static void ForwardAdminQuery( Guid id, AdminQueryKind kind, string search, int page, string actor, int outcome )
+		=> _ = RunAdminQueryAsync( Rpc.Caller, id, kind, search, page, actor, outcome );
 
 	[Rpc.Host]
 	private static void ForwardAdminAction( Guid id, AdminAction action, string steamId, string reason, string duration )
 		=> _ = RunAdminActionAsync( Rpc.Caller, id, action, steamId, reason, duration );
 
-	private static Task RunAdminQueryAsync( Connection caller, Guid id, AdminQueryKind kind, string search, int page )
-		=> RunAdminRequestAsync( caller, id, runtime => runtime.AdminQueries.QueryAsync(
-			() => runtime.TryResolvePlayer( caller, out var actor ) ? actor : null, new AdminQuery( kind, search, page ), id, CancellationToken.None ) );
+	[Rpc.Host]
+	private static void ForwardAdminCommand( Guid id, string command, string[] arguments )
+		=> _ = RunAdminCommandAsync( Rpc.Caller, id, command, arguments );
+
+	private static Task RunAdminQueryAsync( Connection caller, Guid id, AdminQueryKind kind, string search, int page, string actor, int outcome )
+		=> RunAdminRequestAsync( caller, id, runtime =>
+		{
+			var query = kind == AdminQueryKind.ActivitySearch
+				? new AdminQuery( search, actor, outcome == NoOutcome ? null : (CommandStatus)outcome, page )
+				: new AdminQuery( kind, search, page );
+			return runtime.AdminQueries.QueryAsync( () => runtime.TryResolvePlayer( caller, out var player ) ? player : null,
+				query, id, CancellationToken.None );
+		} );
 
 	private static Task RunAdminActionAsync( Connection caller, Guid id, AdminAction action, string steamId, string reason, string duration )
 		=> RunAdminRequestAsync( caller, id, async runtime =>
@@ -54,6 +79,15 @@ public static partial class Superuser
 			var result = await runtime.Dispatcher.SubmitAsync( () => runtime.TryResolvePlayer( caller, out var actor ) ? actor : null,
 				CommandOrigin.Interface, request.ToCommand( id ), CancellationToken.None );
 			return HostAdminQueries.Failure( id, result.Status, result.Message );
+		} );
+
+	private static Task RunAdminCommandAsync( Connection caller, Guid id, string command, string[] arguments )
+		=> RunAdminRequestAsync( caller, id, async runtime =>
+		{
+			var request = new AdminCommandRequest( command, arguments );
+			var result = await runtime.Dispatcher.SubmitAsync( () => runtime.TryResolvePlayer( caller, out var actor ) ? actor : null,
+				CommandOrigin.Interface, request.ToCommand( id ), CancellationToken.None );
+			return HostAdminQueries.FromResult( id, result );
 		} );
 
 	private static async Task RunAdminRequestAsync( Connection caller, Guid id,

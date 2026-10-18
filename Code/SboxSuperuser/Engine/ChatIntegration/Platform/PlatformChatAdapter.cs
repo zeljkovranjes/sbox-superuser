@@ -40,7 +40,11 @@ internal sealed class PlatformChatAdapter : IDisposable
 			{
 				message.Suppress = true;
 				ChatReplies.Send( message.Sender, Guid.NewGuid(), result );
+				return;
 			}
+			// Only lines every player is about to see are kept; commands and blocked messages never are.
+			if ( _runtime.TryResolvePlayer( message.Sender, out var sender ) )
+				_runtime.RecentChat.Record( sender.SubjectId, message.Sender.DisplayName, message.Message, DateTimeOffset.UtcNow );
 			return;
 		}
 		// Consumption must be visible to later listeners before any asynchronous handler starts.
