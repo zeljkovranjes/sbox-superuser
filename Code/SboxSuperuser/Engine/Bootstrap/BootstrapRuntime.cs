@@ -172,6 +172,19 @@ internal sealed class BootstrapRuntime : IDisposable
 			&& Policy.IsOwner( identity.SubjectId );
 	}
 
+	internal CommandResult CheckOrdinaryChat( Connection sender )
+	{
+		if ( !TryResolvePlayer( sender, out _ ) )
+		{
+			return new CommandResult( CommandStatus.Denied, "An authenticated player connection is required." );
+		}
+		if ( !Policy.IsUsable )
+		{
+			return new CommandResult( CommandStatus.StorageUnavailable, "Authority state is unavailable." );
+		}
+		return new CommandResult( CommandStatus.Success, "No framework text restriction is active." );
+	}
+
 	// Called only by the separate non-forwarded dedicated-console entry, never the player route.
 	internal bool TryResolveDedicatedConsole( out ActorIdentity identity )
 	{

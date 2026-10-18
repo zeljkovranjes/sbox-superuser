@@ -3,7 +3,7 @@ using SboxSuperuser.Systems;
 
 namespace SboxSuperuser;
 
-/// <summary>Host-side bootstrap diagnostics and authenticated identity access; no command dispatcher yet.</summary>
+/// <summary>Entry points for host administration, authenticated dispatch, storage and chat integration.</summary>
 public static partial class Superuser
 {
 	/// <summary>Returns local bootstrap health without exposing owner IDs or granting authority.</summary>

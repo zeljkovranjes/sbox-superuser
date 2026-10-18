@@ -17,6 +17,16 @@ internal sealed class PlatformChatAdapter : IDisposable
 
 	private bool Available() => !_disposed && ThreadSafe.IsMainThread && _runtime.IsUsable && _runtime.ConsoleRoot.IsAvailable;
 
+	internal bool TryHandle( Connection sender, string message, Guid requestId )
+	{
+		if ( !Available() || !_ingress.Owns( message ) )
+		{
+			return false;
+		}
+		_ = ExecuteAsync( sender, message, requestId );
+		return true;
+	}
+
 	internal void Observe( ChatMessageEvent message )
 	{
 		if ( message is null || message.Suppress || message.Sender is null || !Available() || !_ingress.Owns( message.Message ) )
