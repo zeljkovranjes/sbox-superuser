@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <AssemblyName>SboxSuperuser.Contracts</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../Code/SboxSuperuser/Assembly.cs" />
+    <Compile Include="../Code/SboxSuperuser/Core/**/*.cs" />
+    <Compile Include="../Code/SboxSuperuser/Api/**/*.cs" />
+    <Compile Include="../Code/SboxSuperuser/Engine/Commands/*.cs" />
+    <Compile Include="../Code/SboxSuperuser/Engine/ChatIntegration/*.cs" />
+    <Compile Include="../Code/SboxSuperuser/Engine/Permissions/*.cs" />
+    <Compile Include="../Code/SboxSuperuser/Engine/Modules/*.cs" />
+    <InternalsVisibleTo Include="SboxSuperuser.Contracts.Tests" />
+  </ItemGroup>
+</Project>
