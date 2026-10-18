@@ -21,7 +21,7 @@ The specification is [version 0.2](sbox-admin-specification.docx). Current autho
 | T15 Native bindings | Complete | [T15](T15-NATIVE-BINDINGS.md) |
 | T16 Moderation and admission | Complete | [T16](T16-MODERATION.md) |
 | T17 Lifecycle validation | Complete; arbitrary live source edits unsupported | [T17](T17-LIFECYCLE.md) |
-| T18 Two game integrations | Not started | Depends on T17 |
+| T18 Two game integrations | In progress | [T18](T18-PORTABILITY.md) |
 | T19 Security, recovery and load | Not started | Depends on T18 |
 | T20 Unpublished release candidate | Not started | Depends on T19 |
 
