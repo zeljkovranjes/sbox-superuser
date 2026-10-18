@@ -26,4 +26,7 @@ public enum BootstrapState
 
 	/// <summary>Stored authority is corrupt, incompatible, unavailable or awaiting validation; authorization fails closed.</summary>
 	AuthorityDegraded = 7,
+
+	/// <summary>Audit persistence or retention is degraded; new actions require a confirmed durable intent.</summary>
+	AuditDegraded = 8,
 }

@@ -80,6 +80,7 @@ internal sealed class SuperuserSession : GameObjectSystem<SuperuserSession>
 
 		if ( _runtime is not null )
 		{
+			_runtime.MaintainAudit();
 			SetState( _runtime.Health );
 			return;
 		}

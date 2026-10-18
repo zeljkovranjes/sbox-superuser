@@ -8,6 +8,8 @@ internal sealed class BootstrapRuntime : IDisposable
 	private readonly Connection _host;
 	private readonly bool _allowEditorTesting;
 	private bool _disposed;
+	private DateTimeOffset _nextAuditMaintenance = DateTimeOffset.UtcNow.AddSeconds( 60 );
+	private Task _auditMaintenance;
 
 	internal Guid Id { get; } = Guid.NewGuid();
 	internal OwnerConfigurationFile Owners { get; }
@@ -15,6 +17,7 @@ internal sealed class BootstrapRuntime : IDisposable
 	internal Authority.HostPolicyService Policy { get; }
 	internal Commands.CommandRegistry Commands { get; }
 	internal Commands.HostCommandDispatcher Dispatcher { get; }
+	internal Audit.HostAuditService Audit { get; }
 
 	internal BootstrapState Health
 	{
@@ -24,6 +27,11 @@ internal sealed class BootstrapRuntime : IDisposable
 			{
 				return Owners.State == BootstrapState.OwnersInvalid && Policy.OwnerSource == "bootstrap"
 					? BootstrapState.OwnersInvalid : BootstrapState.AuthorityDegraded;
+			}
+
+			if ( Audit.IsDegraded )
+			{
+				return BootstrapState.AuditDegraded;
 			}
 
 			if ( Policy.OwnerSource == "bootstrap" )
@@ -47,6 +55,8 @@ internal sealed class BootstrapRuntime : IDisposable
 		_allowEditorTesting = allowEditorTesting;
 		Owners = new OwnerConfigurationFile( Application.IsDedicatedServer );
 		Store = new Storage.HostAdminStore( Application.IsDedicatedServer, () => IsUsable );
+		Audit = new Audit.HostAuditService( Store, () => ThreadSafe.IsMainThread && IsUsable,
+			error => Log.Warning( $"[Superuser] Audit storage degraded; type={error.GetType().Name}; files preserved." ) );
 		var ownerStatus = Owners.State switch
 		{
 			BootstrapState.Ready => StoreReadStatus.Found,
@@ -55,12 +65,23 @@ internal sealed class BootstrapRuntime : IDisposable
 		};
 		Policy = new Authority.HostPolicyService( Store, Owners.Configuration?.Ids ?? Array.Empty<string>(),
 			ownerStatus, () => IsUsable,
-			error => Log.Warning( $"[Superuser] Authority validation failed; type={error.GetType().Name}; files preserved." ) );
+			error => Log.Warning( $"[Superuser] Authority validation failed; type={error.GetType().Name}; files preserved." ), Audit );
 		Store.StorageChanged += Policy.OnStorageChanged;
 		Commands = new Commands.CommandRegistry( Policy.RegisteredPermissions, Policy.ReplaceRegisteredPermissions,
 			() => ThreadSafe.IsMainThread && IsUsable );
 		Dispatcher = new Commands.HostCommandDispatcher( Policy, Commands, () => ThreadSafe.IsMainThread && IsUsable,
-			OnlinePlayers, error => Log.Warning( $"[Superuser] Command execution failed; type={error.GetType().Name}; outcome may be Unknown." ) );
+			OnlinePlayers, error => Log.Warning( $"[Superuser] Command execution failed; type={error.GetType().Name}; outcome may be Unknown." ), audit: Audit );
+	}
+
+	internal void MaintainAudit()
+	{
+		if ( !IsUsable || DateTimeOffset.UtcNow < _nextAuditMaintenance || _auditMaintenance is { IsCompleted: false } )
+		{
+			return;
+		}
+
+		_nextAuditMaintenance = DateTimeOffset.UtcNow.AddSeconds( 60 );
+		_auditMaintenance = Audit.MaintainAutomaticAsync( CancellationToken.None );
 	}
 
 	private IReadOnlyList<CommandPlayer> OnlinePlayers()
