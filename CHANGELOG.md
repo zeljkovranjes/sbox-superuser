@@ -27,10 +27,10 @@ Input ownership - configurable F6 binding and Escape close; removing the menu re
 Custom backends - trusted host setup can select storage before bootstrap; versioned writes, recovery, audit retention and unavailable outcomes keep their existing semantics
 Storage tutorial - includes a runnable adapter and setup component, exact placement instructions and database implementation requirements
 # Documentation
-Integration guide - documents the optional menu, replacement view and dedicated/editor storage selection; README includes the centered project SVG
+Integration guide - documents the optional menu, replacement view and dedicated/editor storage selection
 README screenshot - the top of the README shows the admin menu in game
 Documentation structure - the README and docs follow one contents page with concepts, a tutorial, running guides and reference chapters for the host API, console commands and each admin menu window
-README - ends with the admin menu overview and license; known limits now live in the release status and dedicated-server pages
+README - opens with the admin menu screenshot instead of the logo and ends with the menu overview and license; known limits now live in the release status and dedicated-server pages
 # Identity
 Project icon - adds a navy caped figure and shield as a scalable SVG, matching the Humanoid Retargeter logo style
 # Validation

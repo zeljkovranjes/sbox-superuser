@@ -4,13 +4,9 @@
 
 [<img alt="github" src="https://img.shields.io/badge/github-zeljkovranjes/sbox--superuser-8da0cb?style=for-the-badge&labelColor=555555&logo=github" height="20">](https://github.com/zeljkovranjes/sbox-superuser)
 
-<p align="center">
-  <img src="docs/logo.svg" width="160" alt="Superuser — navy caped figure and shield">
-</p>
-
-This library gives an s&box game a complete administration layer &mdash;
-commands, permissions, moderation, audit and storage &mdash; running inside the
-game's own dedicated server process. Players reach it through the console, slash
+This library gives an s&box game a complete administration layer of commands,
+permissions, moderation, audit and storage, running inside the game's own
+dedicated server process. Players reach it through the console, slash
 commands in chat, or an optional in-game moderation menu.
 
 ![The Superuser admin menu in game: active bans and mutes with time left, recent chat, commands, the audit log and About](docs/admin-menu.png)
@@ -44,8 +40,8 @@ from the message itself.
 Superuser does not know what a "player" means in your game. Gameplay commands
 come from your code, registered as modules with their own permission keys; the
 library supplies routing, authorization, the audit trail and storage around them.
-Two [sample games](dev/samples/README.md) with nothing in common &mdash; one built
-on pawns, one on a roster &mdash; use it unchanged.
+Two [sample games](dev/samples/README.md) with nothing in common, one built on
+pawns and one on a roster, use it unchanged.
 
 <br>
 
