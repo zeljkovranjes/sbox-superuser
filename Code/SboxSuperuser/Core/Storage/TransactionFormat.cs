@@ -70,7 +70,7 @@ internal static class TransactionFormat
 		var origin = intent.GetProperty( "origin" ).GetString();
 		switch ( intent.GetProperty( "actorKind" ).GetString() )
 		{
-			case "Player" when origin is "Console" or "Chat":
+			case "Player" when origin is "Console" or "Chat" or "Interface":
 				SteamIdentity.Validate( subject, "actorSubject" );
 				break;
 			case "DedicatedConsole" when origin == "Console" && subject == "dedicated-console":

@@ -93,7 +93,7 @@ internal sealed class AuditRecord
 
 	private static void ValidateActor( string kind, string subject, string origin )
 	{
-		if ( kind == "Player" && origin is "Console" or "Chat" )
+		if ( kind == "Player" && origin is "Console" or "Chat" or "Interface" )
 		{
 			SteamIdentity.Validate( subject, nameof( subject ) );
 			return;

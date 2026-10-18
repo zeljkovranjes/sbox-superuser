@@ -85,7 +85,7 @@ internal sealed partial class HostCommandDispatcher
 
 		var current = services.Authenticate();
 		if ( current is null || current.Kind != context.Actor.Kind || current.SubjectId != context.Actor.SubjectId
-			|| current.Kind == ActorKind.Player && context.Origin is not (CommandOrigin.Console or CommandOrigin.Chat)
+			|| current.Kind == ActorKind.Player && context.Origin is not (CommandOrigin.Console or CommandOrigin.Chat or CommandOrigin.Interface)
 			|| current.Kind == ActorKind.DedicatedConsole && context.Origin != CommandOrigin.Console
 			|| current.Kind == ActorKind.InternalService && (context.Origin != CommandOrigin.InternalService || services.Service is null
 				|| !services.Service.IsActive || services.Service.Id != current.SubjectId) )

@@ -14,4 +14,7 @@ public enum CommandOrigin
 
 	/// <summary>Host service invocation.</summary>
 	InternalService = 3,
+
+	/// <summary>Authenticated administration interface.</summary>
+	Interface = 4,
 }

@@ -29,7 +29,7 @@ internal sealed class ModerationEntry
 		else if ( actorKind == "InternalService" ) ContractGuard.Key( actorSubject, nameof( actorSubject ) );
 		else if ( actorKind != "DedicatedConsole" || actorSubject != "dedicated-console" )
 			throw new ArgumentException( "Invalid moderation actor." );
-		if ( origin is not ("Console" or "Chat" or "InternalService")
+		if ( origin is not ("Console" or "Chat" or "InternalService" or "Interface")
 			|| actorKind == "Player" && origin == "InternalService"
 			|| actorKind == "DedicatedConsole" && origin != "Console"
 			|| actorKind == "InternalService" && origin != "InternalService"
