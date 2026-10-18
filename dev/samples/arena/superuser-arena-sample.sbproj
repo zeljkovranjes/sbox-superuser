@@ -1,0 +1,31 @@
+{
+  "Title": "Superuser Arena Sample",
+  "Type": "game",
+  "Org": "notpointless",
+  "Ident": "chomnr_superuser_arena_sample",
+  "Schema": 1,
+  "IncludeSourceFiles": true,
+  "Resources": null,
+  "PackageReferences": [],
+  "EditorReferences": null,
+  "Mounts": null,
+  "IsStandaloneOnly": false,
+  "AI": {
+    "EnableMcpCommunication": true
+  },
+  "Metadata": {
+    "Summary": "Demonstrates a game-specific administration capability using the Superuser library.",
+    "Description": "Demonstrates Superuser integration in an isolated game. Uses a game-specific player representation and optional gameplay capability. Requires the local Superuser library.",
+    "WebsiteUrl": "https://github.com/zeljkovranjes/sbox-superuser",
+    "Tags": [
+      "tools",
+      "testing",
+      "dedicated-server"
+    ],
+    "Compiler": {
+      "ReleaseMode": "Release"
+    },
+    "GameNetworkType": "Multiplayer",
+    "StartupScene": "scenes/sample.scene"
+  }
+}
