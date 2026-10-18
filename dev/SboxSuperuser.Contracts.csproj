@@ -20,6 +20,7 @@
     <Compile Include="../Code/SboxSuperuser/Engine/Modules/*.cs" />
     <Compile Include="../Code/SboxSuperuser/Engine/NativeSettings/NativeValue.cs" />
     <Compile Include="../Code/SboxSuperuser/Engine/NativeSettings/NativeSettingState.cs" />
+    <Compile Include="../Code/SboxSuperuser/Engine/Moderation/HostModerationService*.cs" />
     <InternalsVisibleTo Include="SboxSuperuser.Contracts.Tests" />
   </ItemGroup>
 </Project>
