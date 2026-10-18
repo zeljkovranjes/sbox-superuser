@@ -29,10 +29,10 @@ public sealed class PolicyChange
 		=> new( new PolicyEdit( PolicyEditKind.SetGroupPermission, Group( groupId ),
 			ContractGuard.Key( permission, nameof( permission ) ), Effect: (int)ContractGuard.EnumValue( effect, nameof( effect ) ) ) );
 
-	/// <summary>Requests a nonnegative group target-protection level.</summary>
+	/// <summary>Requests a group target-protection level below the reserved owner level.</summary>
 	public static PolicyChange SetGroupProtection( string groupId, int level )
 	{
-		if ( level < 0 )
+		if ( level is < 0 or > TargetProtection.MaximumGroupLevel )
 		{
 			throw new ArgumentOutOfRangeException( nameof( level ) );
 		}

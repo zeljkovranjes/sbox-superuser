@@ -13,9 +13,9 @@ internal sealed class GroupDefinition
 		IEnumerable<KeyValuePair<string, int>> entries, int protectionLevel )
 	{
 		Id = ContractGuard.Key( id, nameof( id ) );
-		if ( id == "owner" || protectionLevel < 0 )
+		if ( id == "owner" || protectionLevel is < 0 or > TargetProtection.MaximumGroupLevel )
 		{
-			throw new ArgumentException( "Owner is reserved; protection must be nonnegative." );
+			throw new ArgumentException( $"Owner is reserved; group protection must be between 0 and {TargetProtection.MaximumGroupLevel}." );
 		}
 
 		Parents = PolicyEntries.Groups( parents );

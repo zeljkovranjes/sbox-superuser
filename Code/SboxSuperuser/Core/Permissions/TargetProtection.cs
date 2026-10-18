@@ -4,6 +4,9 @@ namespace SboxSuperuser.Core.Permissions;
 
 internal static class TargetProtection
 {
+	internal const int OwnerLevel = 100;
+	internal const int MaximumGroupLevel = OwnerLevel - 1;
+
 	internal static int Level( PolicyGraph policy, OwnerSet owners, string steamId )
 	{
 		SteamIdentity.Validate( steamId, nameof( steamId ) );
@@ -11,7 +14,7 @@ internal static class TargetProtection
 		var level = 0;
 		if ( owners.Contains( steamId ) )
 		{
-			level = 100;
+			level = OwnerLevel;
 			if ( policy.Groups.ContainsKey( "admin" ) )
 			{
 				groups.UnionWith( policy.AncestorsOf( "admin" ) );

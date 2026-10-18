@@ -1,3 +1,5 @@
+using SboxSuperuser.Core.Permissions;
+
 namespace SboxSuperuser.Engine.Commands;
 
 internal sealed partial class AdministrationCommands
@@ -15,8 +17,8 @@ internal sealed partial class AdministrationCommands
 			? Array.Empty<string>() : arguments.Get<string>( "parents" ).Split( ',' ) ) );
 		Edit( "group.protection.set", "Set target protection. Example: admin group helpers protection set 5", new[]
 		{
-			Text( "group", "Group key" ), new CommandArgumentDescriptor( "level", "Nonnegative protection level", CommandArgumentKind.Integer,
-				minimum: 0, maximum: int.MaxValue, audit: CommandArgumentAudit.SafeValue )
+			Text( "group", "Group key" ), new CommandArgumentDescriptor( "level", "Protection level from 0 through 99", CommandArgumentKind.Integer,
+				minimum: 0, maximum: TargetProtection.MaximumGroupLevel, audit: CommandArgumentAudit.SafeValue )
 		}, arguments => PolicyChange.SetGroupProtection( arguments.Get<string>( "group" ), (int)arguments.Get<long>( "level" ) ) );
 		foreach ( var operation in new[] { "add", "remove" } )
 		{
