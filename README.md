@@ -18,7 +18,8 @@ This package is not published on sbox.game. Add this local library to a test gam
 2. For editor testing, enable **Allow Editor Testing**. Leave it off for dedicated-server validation.
 3. Enter Play mode and run `superuser_probe "quoted reason" tail` in the console.
 4. Check the `[Superuser T01]` output. Editor runs must say `mode=EditorTest` and show two arguments.
-5. Follow the [compatibility report](docs/T01-COMPATIBILITY.md) for storage, chat, admission and dedicated-server checks.
+5. From a connected client's chatbox, send `/superuser-probe`. Only that client should receive the private result.
+6. Follow the [compatibility report](docs/T01-COMPATIBILITY.md) for storage, admission and dedicated-server checks.
 
 ### In code
 
@@ -34,15 +35,16 @@ No administration facade exists in Task 1. Use the probe component and native di
 
 ## How it works
 
-The component calls internal engine adapters to observe native console, type discovery, storage and chat APIs. Production execution requires a dedicated host; an editor host additionally requires the testing switch. The native console probe records the engine-provided caller without granting authority. The chat probe consumes only the exact message `!superuser-probe` and attempts a host-authenticated reply to its sender. Checks and adapter decisions are recorded in the [Task 1 report](docs/T01-COMPATIBILITY.md).
+The component calls internal engine adapters to observe native console, type discovery, storage and chat APIs. Production execution requires a dedicated host; an editor host additionally requires the testing switch. The native console probe records the engine-provided caller without granting authority. The chat probe consumes only the exact message `/superuser-probe` and sends a host-authenticated reply to its sender. Checks and adapter decisions are recorded in the [Task 1 report](docs/T01-COMPATIBILITY.md).
 
 ## Multiplayer
 
-Dedicated servers are the only production target. Opt-in editor testing is development-only. Remote clients only receive the targeted diagnostic reply; player-hosted releases and host migration are unsupported. Dedicated runtime and two-client privacy validation are still blocked, not certified.
+Dedicated servers are the only production target. Opt-in editor testing is development-only. Dedicated startup, console and interrupted-file checks passed; two real clients verified private replies and admission in editor test mode. Dedicated multiplayer validation is Blocked by the unpublished test game's missing package record. Player-hosted releases and host migration are unsupported.
 
 ## Limitations
 
-- Task 1 is Blocked on outstanding runtime evidence; Task 2 has not started.
+- Task 1's compatibility probe and report are complete, with unavailable dedicated multiplayer evidence marked Blocked. Task 2 has not started.
+- Chat commands use `/`; the future administration root will be `/admin`. The current probe does not implement administration commands.
 - The probe is for isolated testing and should be removed from a production scene.
 - Do not enter credentials or sensitive arguments into diagnostic commands: bounded test arguments are logged.
 - Storage checks establish neither power-loss durability nor a completed recoverable store.
