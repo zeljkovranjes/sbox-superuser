@@ -4,8 +4,8 @@ namespace SboxSuperuser.Engine.Compatibility;
 
 internal static class ProbeDiscovery
 {
-	[ProbeMethod]
 	/// <summary>Returns a fixed value so discovery can verify invocation without side effects.</summary>
+	[ProbeMethod]
 	public static string Sentinel()
 	{
 		return "T01-discovery-ok";

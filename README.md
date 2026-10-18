@@ -1,47 +1,57 @@
-# sbox-superuser
+# Superuser
 
-What it does and who it is for, in one paragraph.
+Superuser currently provides Task 1 compatibility probes for a dedicated-server administration library. Add its probe component to an isolated test scene to check engine integration points; enable the editor testing switch when testing locally. Everything runs inside this one s&box library. Administration commands and UI are not implemented yet.
 
 ## Requirements
 
-None.
+An adopting s&box game and a dedicated server for production validation. Editor tests require explicit opt-in. No external executable, service or runtime installation is required by the library.
 
 ## Install
 
-Search for **sbox-superuser** in the s&box library manager, or add `notpointless.chomnr_sbox_superuser`.
+This package is not published on sbox.game. Add this local library to a test game's library references using the s&box editor. Its identity is `notpointless.chomnr_sbox_superuser`. Source is in the private [GitHub repository](https://github.com/zeljkovranjes/sbox-superuser).
 
 ## Quick start
 
 ### In the editor
 
-1. ...
+1. Start an empty test scene and add **Superuser Compatibility Probe** to one GameObject.
+2. For editor testing, enable **Allow Editor Testing**. Leave it off for dedicated-server validation.
+3. Enter Play mode and run `superuser_probe "quoted reason" tail` in the console.
+4. Check the `[Superuser T01]` output. Editor runs must say `mode=EditorTest` and show two arguments.
+5. Follow the [compatibility report](docs/T01-COMPATIBILITY.md) for storage, chat, admission and dedicated-server checks.
 
 ### In code
 
-```csharp
-```
+No administration facade exists in Task 1. Use the probe component and native diagnostic commands above; public contracts belong to Task 2.
 
 ## Options
 
 | Option | Default | What it does |
 |---|---|---|
+| Allow Editor Testing | `false` | Allows probe execution on an editor host; does not enable player-hosted release games. |
+| Probe Storage On Start | `false` | Exercises isolated files under `FileSystem.Data/superuser-t01/<mode>/` and preserves an existing baseline. |
+| Rejected Test Steam Id | Empty | Deliberately rejects only this test account at the admission callback. Empty accepts all connections. |
 
 ## How it works
 
-...
+The component calls internal engine adapters to observe native console, type discovery, storage and chat APIs. Production execution requires a dedicated host; an editor host additionally requires the testing switch. The native console probe records the engine-provided caller without granting authority. The chat probe consumes only the exact message `!superuser-probe` and attempts a host-authenticated reply to its sender. Checks and adapter decisions are recorded in the [Task 1 report](docs/T01-COMPATIBILITY.md).
 
 ## Multiplayer
 
-...
+Dedicated servers are the only production target. Opt-in editor testing is development-only. Remote clients only receive the targeted diagnostic reply; player-hosted releases and host migration are unsupported. Dedicated runtime and two-client privacy validation are still blocked, not certified.
 
 ## Limitations
 
-- ...
+- Task 1 is Blocked on outstanding runtime evidence; Task 2 has not started.
+- The probe is for isolated testing and should be removed from a production scene.
+- Do not enter credentials or sensitive arguments into diagnostic commands: bounded test arguments are logged.
+- Storage checks establish neither power-loss durability nor a completed recoverable store.
+- Future ImGui source can be staged in [dev/ui-source/sbox-imgui](dev/ui-source/sbox-imgui/README.md); no UI is integrated.
 
 ## Development
 
-`sbox-check`, then `dotnet test` each project in `tests\`.
+Run `sbox-check`, `dotnet build Code/chomnr_sbox_superuser.csproj` after the editor generates it, and `dotnet test tests/SboxSuperuser.Tests/SboxSuperuser.Tests.csproj`. The existing test project currently has no test cases; engine probes provide the relevant evidence. With the test scene playing, run `dev/verify-editor.cs` through the engine's `run_csharp` development tool. Read the report for exact commands and required observations.
 
 ## License
 
-...
+No license selected yet. No third-party UI code is included.
