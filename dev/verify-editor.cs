@@ -16,8 +16,10 @@ try
 	probe.Enabled = true;
 	probe.AllowEditorTesting = false;
 	ConsoleSystem.Run( "superuser_probe default-must-refuse" );
+	ConsoleSystem.Run( "superuser_probe_local" );
 
 	probe.AllowEditorTesting = true;
+	ConsoleSystem.Run( "superuser_probe_local" );
 	ConsoleSystem.Run( "superuser_probe \"quoted reason\" tail" );
 	ConsoleSystem.Run( "superuser_probe", "quoted reason", "tail" );
 	ConsoleSystem.Run( "superuser_probe" );
