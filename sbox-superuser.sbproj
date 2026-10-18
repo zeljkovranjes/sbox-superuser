@@ -14,8 +14,8 @@
     "EnableMcpCommunication": true
   },
   "Metadata": {
-    "Summary": "Bootstraps dedicated-server administration with authenticated identities, explicit owners and editor testing.",
-    "Description": "Provides trusted bootstrap, authenticated identities and explicit owner configuration inside one C# library. Add one Superuser Bootstrap to your game's network scene and explicitly enable its editor switch for testing. Public contracts and diagnostics are included; administration commands, permission resolution, durable storage and UI are not implemented yet.",
+    "Summary": "Provides host-local administration storage, authenticated identities and explicit owners for dedicated servers.",
+    "Description": "Provides host-local administration storage, authenticated identities and explicit owner configuration inside one C# library. Add one Superuser Bootstrap to your game's network scene and explicitly enable its editor switch for testing. Versioned transactions, retained backups and dedicated-local recovery are included; administration commands, permission resolution and UI are not implemented yet.",
     "WebsiteUrl": "https://github.com/zeljkovranjes/sbox-superuser",
     "Tags": [ "tools", "administration", "dedicated-server", "diagnostics" ],
     "Compiler": {

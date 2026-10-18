@@ -1,7 +1,7 @@
 # Changelog
 
 ## 2026-10-17
-Title: Trusted Bootstrap And Identity
+Title: Recoverable Host Storage
 ### Added
 # Diagnostics
 Compatibility probe - checks type discovery, caller identity and argument forwarding inside the library
@@ -20,6 +20,11 @@ Runtime - add one Superuser Bootstrap to initialize an authoritative dedicated s
 Identity - resolves live engine players and keeps trusted local dedicated-console callers on a separate route
 Owners - loads explicit host-local IDs with separate editor configuration; invalid or missing files grant no owners
 Diagnostics - reports runtime health, duplicate bootstraps and caller identity without accepting role arguments
+# Storage
+Versioned transactions - persists policy state and Unknown audit intents together before confirming a committed revision
+Backups - retains immutable generations with integrity checks and explicit schema validation
+Recovery - dedicated local console can inspect compatible backups and restore a selected version without deleting corrupt evidence
+Host isolation - separates editor and dedicated data and refuses retired runtime handles
 ### Improved
 # Diagnostics
 Chat probe - uses /superuser-probe in the chatbox; nonmatching messages pass through normally
@@ -30,7 +35,7 @@ Scene lifecycle - repeated initialization stays idempotent; duplicates suspend a
 ### Known Issues
 # Validation
 Dedicated multiplayer - the unpublished test game cannot load on joining clients; a published adopting game is needed for dedicated network validation
-Storage guarantees - interruption preserves the previous probe file; full recovery and power-loss guarantees are not implemented
+Storage guarantees - actual process interruption and restart recovery are verified; power-loss durability and cross-process writers are unsupported
 Administration - Task 1 provides diagnostics only; administration commands and UI are not implemented
-Foundation - dispatch, policy resolution, parsing, module management and storage interfaces remain contracts only
-Administration runtime - Task 3 implements bootstrap and identity; dispatch, policy resolution, parsing, module management and durable storage remain later tasks
+Administration runtime - dispatch, policy resolution, parsing and module management remain later tasks
+Storage retention - retains all committed generations; automatic pruning and audit outcomes remain later tasks
