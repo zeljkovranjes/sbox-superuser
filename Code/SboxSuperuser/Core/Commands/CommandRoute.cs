@@ -25,7 +25,12 @@ internal sealed record CommandRoute( string Command, IReadOnlyList<string> Argum
 			command += "." + tokens[ 2 ] + "." + tokens[ 3 ];
 			arguments = new[] { tokens[ 1 ] }.Concat( tokens.Skip( 4 ) ).ToArray();
 		}
-		else if ( tokens.Count >= 2 && command is "group" or "permissions" or "audit" or "modules" )
+		else if ( command == "settings" && tokens.Count >= 3 && tokens[ 1 ] is "get" or "set" or "reset" )
+		{
+			command += "." + tokens[ 1 ] + "." + tokens[ 2 ];
+			arguments = tokens.Skip( 3 ).ToArray();
+		}
+		else if ( tokens.Count >= 2 && command is "group" or "permissions" or "audit" or "modules" or "settings" )
 		{
 			command += "." + tokens[ 1 ];
 			arguments = tokens.Skip( 2 ).ToArray();
