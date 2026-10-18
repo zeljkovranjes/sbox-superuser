@@ -1,5 +1,5 @@
-# ImGui source staging
+# ImGui source
 
-Place source from [sbox-imgui](https://github.com/zeljkovranjes/sbox-imgui) here for a future admin UI.
+The reviewed [sbox-imgui](https://github.com/zeljkovranjes/sbox-imgui) source is now bundled in [the internal vendor folder](../../../Code/SboxSuperuser/Engine/Vendor/ImGui/PROVENANCE.md).
 
-This folder is outside `Code/` and is not compiled. Review the upstream license and dependencies before integration. The shipped runtime must remain one s&box library with no external service or executable.
+Use `dev/vendor-imgui.py` with the pinned checkout to regenerate it. The menu needs no separate installation or native executable.

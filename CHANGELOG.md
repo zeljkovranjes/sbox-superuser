@@ -1,8 +1,17 @@
 # Changelog
 
 ## 2026-10-18
-Title: Administration and an Example-First Guide
+Title: Optional Admin Menu and Custom Storage
 ### Added
+# Interface
+Moderation menu - bundled ImGui view includes searchable players, offline Steam ID lookup, roles, restrictions, history, confirmations and private activity
+Replacement views - typed queries and exact-target actions return correlated private results without exposing ImGui or unrestricted console execution
+Input ownership - configurable F6 binding and Escape close; removing the menu releases its panel and cursor while console and slash chat stay available
+# Storage
+Custom backends - trusted host setup can select storage before bootstrap; versioned writes, recovery, audit retention and unavailable outcomes keep their existing semantics
+Storage tutorial - includes a runnable adapter and setup component, exact placement instructions and database implementation requirements
+# Documentation
+Integration guide - documents the optional menu, replacement view and dedicated/editor storage selection; README includes the centered project SVG
 # Identity
 Project icon - adds a navy caped figure and shield as a scalable SVG, matching the Humanoid Retargeter logo style
 # Validation
