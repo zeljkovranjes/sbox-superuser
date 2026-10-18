@@ -13,6 +13,7 @@ internal sealed class BootstrapRuntime : IDisposable
 	internal OwnerConfigurationFile Owners { get; }
 	internal Storage.HostAdminStore Store { get; }
 	internal Authority.HostPolicyService Policy { get; }
+	internal Commands.CommandRegistry Commands { get; }
 
 	internal BootstrapState Health
 	{
@@ -55,6 +56,8 @@ internal sealed class BootstrapRuntime : IDisposable
 			ownerStatus, () => IsUsable,
 			error => Log.Warning( $"[Superuser] Authority validation failed; type={error.GetType().Name}; files preserved." ) );
 		Store.StorageChanged += Policy.OnStorageChanged;
+		Commands = new Commands.CommandRegistry( Policy.RegisteredPermissions, Policy.ReplaceRegisteredPermissions,
+			() => ThreadSafe.IsMainThread && IsUsable );
 	}
 
 	internal bool TryResolvePlayer( Connection connection, out ActorIdentity identity )

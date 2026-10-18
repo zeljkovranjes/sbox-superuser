@@ -22,6 +22,7 @@ internal sealed partial class HostPolicyService
 	internal StoreWriteStatus LastWriteStatus { get; private set; } = StoreWriteStatus.Unknown;
 	internal long PolicyRevision => _resolver.Policy.Revision;
 	internal long OwnerRevision => _ownerRevision;
+	internal IReadOnlyList<string> RegisteredPermissions => _resolver.RegisteredPermissions;
 	internal bool IsUsable => _available() && (PolicyStatus is StoreReadStatus.Found or StoreReadStatus.Missing)
 		&& (OwnerStatus is StoreReadStatus.Found or StoreReadStatus.Missing);
 	internal int OwnerCount => OwnerStatus == StoreReadStatus.Found ? _owners?.Ids.Count ?? 0 : 0;

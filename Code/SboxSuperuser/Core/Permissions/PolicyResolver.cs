@@ -9,6 +9,7 @@ internal sealed class PolicyResolver
 	private HashSet<string> _registered;
 	internal PolicyGraph Policy { get; private set; }
 	internal long RegistryRevision { get; private set; }
+	internal IReadOnlyList<string> RegisteredPermissions => Array.AsReadOnly( _registered.OrderBy( key => key, StringComparer.Ordinal ).ToArray() );
 
 	internal PolicyResolver( PolicyGraph policy, IEnumerable<string> registered )
 	{
