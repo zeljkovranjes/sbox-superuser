@@ -23,7 +23,9 @@ public static CommandResult Ping( CommandContext context )
 
 ## Register it
 
-From your game's async host setup, after `Superuser.GetDiagnostics().RuntimeId` has a value:
+For a runnable starter, copy [PingSetup.cs](../dev/fixtures/PingSetup.cs) into your game's Components layer, update its namespaces, and add one Ping Setup to the bootstrap scene. It waits for bootstrap and installs the module.
+
+If your game already has async host setup, use this after `Superuser.GetDiagnostics().RuntimeId` has a value instead:
 
 ```csharp
 var result = await Superuser.RegisterModulesAsync(

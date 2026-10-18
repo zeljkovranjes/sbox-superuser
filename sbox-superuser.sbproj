@@ -14,8 +14,8 @@
     "EnableMcpCommunication": true
   },
   "Metadata": {
-    "Summary": "Provides host-local administration storage, authenticated identities and explicit owners for dedicated servers.",
-    "Description": "Provides console and platform-chat administration, host-local records and explicit owners inside one C# library. Add one Superuser Bootstrap to your game's network scene and explicitly enable its editor switch for testing. Permissions, managed modules, typed dispatch and durable audit records are included. Custom chat, moderation and visual admin UI remain pending.",
+    "Summary": "Provides console and chat administration, permissions and moderation for dedicated servers.",
+    "Description": "Provides console and chat administration, permissions, moderation and host-local records inside one C# library. Add Superuser Bootstrap to your game's network scene and enable its editor switch for local testing. Register game commands through the public API and connect your own chat UI through authenticated hooks. Visual admin UI is deferred.",
     "WebsiteUrl": "https://github.com/zeljkovranjes/sbox-superuser",
     "Tags": [ "tools", "administration", "dedicated-server", "diagnostics" ],
     "Compiler": {
