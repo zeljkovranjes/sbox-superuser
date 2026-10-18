@@ -6,7 +6,7 @@ internal sealed class RequestQueue<T>
 	internal const int MaximumActorOutstanding = 8;
 	internal const int MaximumRemembered = 1024;
 	internal const int MaximumActorRemembered = 128;
-	private static readonly TimeSpan RetryLifetime = TimeSpan.FromMinutes( 5 );
+	private const int RetryLifetimeSeconds = 300;
 	private readonly object _gate = new();
 	private readonly Queue<RequestWork<T>> _pending = new();
 	private readonly Dictionary<RequestKey, RequestWork<T>> _remembered = new();
@@ -56,6 +56,17 @@ internal sealed class RequestQueue<T>
 		}
 
 		return new QueuedResult<T>( QueueAdmission.Accepted, work.Completion.Task );
+	}
+
+	internal QueuedResult<T> FindRetry( RequestKey key, string fingerprint )
+	{
+		lock ( _gate )
+		{
+			Prune();
+			return !_remembered.TryGetValue( key, out var existing ) ? null
+				: new QueuedResult<T>( existing.Fingerprint == fingerprint ? QueueAdmission.Duplicate : QueueAdmission.Conflict,
+					existing.Fingerprint == fingerprint ? existing.Completion.Task : null );
+		}
 	}
 
 	private async Task DrainAsync()
@@ -113,7 +124,7 @@ internal sealed class RequestQueue<T>
 	private void Prune()
 	{
 		var now = _clock();
-		foreach ( var key in _remembered.Where( pair => pair.Value.CompletedUtc.HasValue && now - pair.Value.CompletedUtc.Value >= RetryLifetime )
+		foreach ( var key in _remembered.Where( pair => pair.Value.CompletedUtc.HasValue && (now - pair.Value.CompletedUtc.Value).TotalSeconds >= RetryLifetimeSeconds )
 			.Select( pair => pair.Key ).ToArray() )
 		{
 			_remembered.Remove( key );

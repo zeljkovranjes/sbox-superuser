@@ -1,7 +1,7 @@
 namespace SboxSuperuser.Engine.Commands;
 
-// T09 boundary: implementations authenticate context, match request IDs, authorize at execution,
-// parse, serialize mutations and audit before returning. No implementation exists in T02.
+// Host-issued contexts only. The implementation reauthenticates before admission and execution;
+// public transports enter through the facade, never by deserializing a context.
 internal interface ICommandDispatcher
 {
 	Task<CommandResult> DispatchAsync( CommandContext context, CommandRequest request );
