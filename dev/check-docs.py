@@ -5,7 +5,7 @@ import re
 
 root = pathlib.Path(__file__).resolve().parent.parent
 files = [root / "README.md", root / "CHANGELOG.md"]
-files += list((root / "docs").glob("*.md"))
+files += list((root / "docs").rglob("*.md"))
 files += list((root / "dev" / "fixtures").glob("*.md"))
 files += list((root / "dev" / "samples").rglob("*.md"))
 files += list((root / "dev" / "ui-source").rglob("*.md"))
@@ -27,20 +27,21 @@ for path in files:
 
 normalize = lambda text: re.sub(r"\s+", "", text)
 ping = (root / "dev/fixtures/PingModule.cs").read_text(encoding="utf-8-sig")
-for path in ("README.md", "docs/commands-tutorial.md"):
+for path in ("README.md", "docs/README.md", "docs/tutorial.md"):
     if normalize(blocks[path][0]) not in normalize(ping):
         errors.append(f"Ping excerpt differs from compiled source: {path}")
 
 methods = [
-    ("async Task RegisterAsync()", blocks["docs/commands-tutorial.md"][1]),
-    ("void SubmitChat( string text )", blocks["docs/chat.md"][0]),
-    ("void HideOverlay()", blocks["docs/chat.md"][1]),
-    ("void RouteChat( Connection sender, string text, Guid requestId )", blocks["docs/chat.md"][2]),
+    ("async Task RegisterAsync()", blocks["docs/tutorial.md"][1]),
+    ("void SubmitChat( string text )", blocks["docs/reference/chat.md"][0]),
+    ("void HideOverlay()", blocks["docs/reference/chat.md"][1]),
+    ("void RouteChat( Connection sender, string text, Guid requestId )", blocks["docs/reference/chat.md"][2]),
     ("void ArenaDiagnostics()", blocks["dev/samples/arena/README.md"][0]),
     ("void ColonyDiagnostics()", blocks["dev/samples/colony/README.md"][0]),
-    ("void SearchPlayers()", blocks["docs/admin-menu.md"][0]),
-    ("void SubmitBan()", blocks["docs/admin-menu.md"][1]),
-    ("void ConfigureStorage()", blocks["docs/storage-tutorial.md"][0]),
+    ("void SearchPlayers()", blocks["docs/menu/replace.md"][0]),
+    ("void SubmitBan()", blocks["docs/menu/replace.md"][1]),
+    ("void SubmitNote()", blocks["docs/menu/replace.md"][2]),
+    ("void ConfigureStorage()", blocks["docs/reference/storage.md"][0]),
 ]
 source = "using Sandbox;\nusing SboxSuperuser;\n\nnamespace SuperuserExamples.Engine;\n\n"
 source += "/// <summary>Compiles the exact Markdown snippets for engine verification.</summary>\n"
@@ -55,5 +56,5 @@ if errors:
 output = root / "dev/out/DocumentationExamples.cs"
 output.parent.mkdir(parents=True, exist_ok=True)
 output.write_text(source, encoding="utf-8")
-print(f"Checked {len(files)} Markdown files; {len(methods) + 2} C# blocks covered by source or generated fixture.")
+print(f"Checked {len(files)} Markdown files; {len(methods) + 3} C# blocks covered by source or generated fixture.")
 print(output)

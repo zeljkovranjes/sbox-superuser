@@ -24,4 +24,4 @@ The parent `dev/verify-arena-sample.cs` and `verify-colony-sample.cs` scripts ex
 
 `verify-arena-dedicated.cs` and `verify-colony-dedicated.cs` run inside the respective actual dedicated processes. They create a clearly identified offline gameplay fixture, then call the real native console; they do not fabricate a live connection. They verify game effects, missing services, policy edits and moderation revision 3. Actual dedicated-client package deployment remains unverified because these games are unpublished.
 
-Stop Play or the process before editing source. Gameplay records are neither replicated nor persistent. Authentication, permissions, moderation and storage remain in the one Superuser library. See [validation](../../docs/validation.md) for engine results and [API and modules](../../docs/api.md) for supported lifetimes.
+Stop Play or the process before editing source. Gameplay records are neither replicated nor persistent. Authentication, permissions, moderation and storage remain in the one Superuser library. See [validation](../../docs/validation.md) for engine results and [modules](../../docs/reference/modules.md) for supported lifetimes.

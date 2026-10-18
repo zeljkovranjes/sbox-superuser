@@ -1,8 +1,8 @@
-# Command reference
+# Reference: console commands
 
-[Guide](README.md) · Previous: [Custom chat](chat.md) · Next: [Permissions](permissions.md)
-
-Use these forms in the console. In the chatbox, add `/`: `admin help` becomes `/admin help`. Replace angle-bracket values; square brackets indicate optional arguments.
+Use these forms in the console. In the chatbox, add `/`: `admin help` becomes
+`/admin help`. Replace angle-bracket values; square brackets indicate optional
+arguments.
 
 ## Discovery
 
@@ -17,7 +17,8 @@ Use these forms in the console. In the chatbox, add `/`: `admin help` becomes `/
 | `admin results [command-or-*] [cursor]` | Your own recorded results |
 | `admin audit query [command-or-*] [cursor]` | Audit pages; requires `admin.audit.read` |
 
-Use `admin help * 2` for another help page. Audit cursors come from the previous response and expire when the journal changes.
+Use `admin help * 2` for another help page. Audit cursors come from the previous
+response and expire when the journal changes.
 
 ## Access management
 
@@ -36,7 +37,8 @@ Only owners and the dedicated local console can edit policy.
 | `admin user <user> permission allow/deny/unset <key>` | Direct permission entry |
 | `admin permissions explain <user> <key> [page]` | Why a permission allows or denies |
 
-Other-user explanations require `admin.permissions.explain`. `<user>` accepts an exact Steam ID or an unambiguous online name.
+Other-user explanations require `admin.permissions.explain`. `<user>` accepts an
+exact Steam ID or an unambiguous online name.
 
 ## Moderation
 
@@ -48,14 +50,25 @@ Other-user explanations require `admin.permissions.explain`. `<user>` accepts an
 | `admin warn <user> <reason>` | `admin.players.warn` |
 | `admin mute <user> <duration> <reason>` | `admin.players.mute` |
 | `admin unmute <user> [reason]` | `admin.players.unmute` |
+| `admin note <user> <text>` | `admin.players.note` |
 | `admin moderation history <user> [page]` | `admin.players.history` |
 
-Quote reasons containing spaces. Durations are explicit: `30m`, `2h`, `7d` or `permanent`. Kick needs an online player; the other operations support offline Steam IDs.
+Quote reasons containing spaces. Durations are explicit: `30m`, `2h`, `7d` or
+`permanent`. Kick needs an online player; the other operations support offline
+Steam IDs.
 
-Bans persist before disconnect. Expiry retains its original UTC timestamp after restart. Repeated revocation returns NoChange when nothing is active. Warnings do not escalate automatically. Text mute covers integrated chat, not voice or unrelated channels.
+Bans persist before disconnect. Expiry retains its original UTC timestamp after
+restart. Repeated revocation returns NoChange when nothing is active. Warnings
+do not escalate automatically. Text mute covers integrated chat, not voice or
+unrelated channels.
 
 ## Settings
 
-After the game registers [native bindings](settings.md), use `admin settings list`, `admin settings get <key>`, `admin settings set <key> <value>` and `admin settings reset <key>`. Each binding has an explicit permission.
+After the game registers [native bindings](reference/settings.md), use `admin
+settings list`, `admin settings get <key>`, `admin settings set <key> <value>`
+and `admin settings reset <key>`. Each binding has an explicit permission.
 
-For health when normal dispatch cannot write audit records, use local `superuser_status`, `superuser_authority_status` and `superuser_audit_status`. Owner and storage recovery are [dedicated-local operations](recovery.md), not chat commands.
+For health when normal dispatch cannot write audit records, use local
+`superuser_status`, `superuser_authority_status` and `superuser_audit_status`.
+Owner and storage recovery are [dedicated-local
+operations](reference/recovery.md), not chat commands.

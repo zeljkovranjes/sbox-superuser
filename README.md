@@ -1,22 +1,58 @@
 # Superuser
 
+***Administration for s&box dedicated servers.***
+
+[<img alt="github" src="https://img.shields.io/badge/github-zeljkovranjes/sbox--superuser-8da0cb?style=for-the-badge&labelColor=555555&logo=github" height="20">](https://github.com/zeljkovranjes/sbox-superuser)
+
 <p align="center">
   <img src="docs/logo.svg" width="160" alt="Superuser — navy caped figure and shield">
 </p>
 
-Administration for s&box dedicated servers, with console commands, slash chat and an optional moderation menu. Commands, permissions, moderation and storage run inside one C# library.
+This library gives an s&box game a complete administration layer &mdash;
+commands, permissions, moderation, audit and storage &mdash; running inside the
+game's own dedicated server process. Players reach it through the console, slash
+commands in chat, or an optional in-game moderation menu.
 
-Add the local library `notpointless.chomnr_sbox_superuser` to your game, then add **Superuser Bootstrap** to its network scene. Enable **Allow Editor Testing** when testing in the editor.
+![The Superuser admin menu in game: active bans and mutes with time left, recent chat, commands, the audit log and About](docs/admin-menu.png)
+
+Add the local library to your game, then one **Superuser Bootstrap** to its
+network scene:
+
+```text
+notpointless.chomnr_sbox_superuser
+```
+
+*Engine support: verified on s&box 26.10.13a*<br>
+*[Release notes](CHANGELOG.md)*
+
+<br>
 
 ## Guide
 
-See the [guide](docs/README.md) for setup, commands, custom chat and [custom storage](docs/storage-tutorial.md).
+Please see **[docs](docs/README.md)** for a tutorial, reference material, and
+example code.
 
-For the bundled menu, add **Superuser Admin Menu** to the client scene and press **F6**. Its key is configurable. Disable or remove that component to use your own UI; console and chat keep working. See [the menu guide](docs/admin-menu.md).
+<br>
+
+## Overview
+
+Every request carries the engine's own record of who sent it. The host decides
+what that player may do, records the attempt before acting, runs the command and
+replies privately to the sender. Nothing about a player's authority is taken
+from the message itself.
+
+Superuser does not know what a "player" means in your game. Gameplay commands
+come from your code, registered as modules with their own permission keys; the
+library supplies routing, authorization, the audit trail and storage around them.
+Two [sample games](dev/samples/README.md) with nothing in common &mdash; one built
+on pawns, one on a roster &mdash; use it unchanged.
+
+<br>
 
 ## Example
 
-A command returns a result. Superuser checks the caller's permission and sends the reply privately.
+A command returns a result. Superuser checks the caller's permission and sends
+the reply privately.
 
 ```csharp
 [AdminCommand( Name = "ping", Description = "Reply with Pong!", Permission = "example.ping",
@@ -27,20 +63,71 @@ public static CommandResult Ping( CommandContext context )
 }
 ```
 
-This method belongs to the [complete ping module](dev/fixtures/PingModule.cs). Follow [your first command](docs/commands-tutorial.md) to register it, then enter `/admin ping` in the chatbox or `admin ping` in the console.
+This method belongs to the [complete ping module](dev/fixtures/PingModule.cs).
+Follow the [tutorial](docs/tutorial.md) to register it, then enter `/admin ping`
+in the chatbox or `admin ping` in the console.
+
+<br>
 
 ## Details
 
-- **Commands** use the same dispatcher from console, platform chat and your own chat UI.
-- **Permissions** use exact keys, groups and explicit owners. Policy changes are owner-only; owners cannot punish each other.
-- **Moderation** includes kick, ban, warnings and text mute, with stored history.
-- **Core API** is `Superuser`: dispatch commands, check permissions, register modules, select storage and request private admin views. See the [API reference](docs/api.md).
-- **Game code** supplies its own player actions. The [samples](dev/samples/README.md) show component-based players and a roster without pawns.
+- **Commands** use one dispatcher for the console, platform chat, your own chat
+  backend and the admin menu. Typed arguments, private replies, retries by
+  request ID. [Reference](docs/reference/commands.md).
 
-[Command reference](docs/commands.md) · [Recovery](docs/recovery.md) · [Changelog](CHANGELOG.md)
+- **Permissions** are exact keys on groups and players, denied until granted.
+  Owners are configured by the host; policy changes are owner-only, and owners
+  cannot punish each other. [Reference](docs/reference/permissions.md).
 
-## License
+- **Moderation** covers kick, ban, warnings, text mute and staff notes, with
+  persistent history and original UTC expiry kept across restarts.
+
+- **Audit** records every attempt before it runs and its outcome after. An
+  outcome that cannot be confirmed is Unknown, never success.
+
+- **Storage** is versioned and recoverable, local by default, replaceable with
+  your own backend. [Reference](docs/reference/storage.md).
+
+- **The `Superuser` facade** is the whole public API: dispatch commands, check
+  permissions, register modules, select storage and request private admin
+  views. [Reference](docs/reference/facade.md).
+
+<br>
+
+## Admin menu
+
+Add **Superuser Admin Menu** on clients and press **F6**. Disable it to use your
+own interface; console and chat keep working.
+
+<table>
+<tr><th>Window</th><th>What it does</th></tr>
+<tr><td>Players</td><td>Search, warnings, the selected player's restrictions, actions, notes and recent chat</td></tr>
+<tr><td>Bans &amp; mutes</td><td>Every active restriction across all players, with time left and revoke buttons</td></tr>
+<tr><td>Chat</td><td>The last 100 public messages, kept in server memory only</td></tr>
+<tr><td>Commands</td><td>Any permitted command, including your game's own, from a generated form</td></tr>
+<tr><td>Activity</td><td>The audit log, filtered by command, actor and outcome</td></tr>
+<tr><td>Permissions</td><td>Owners edit groups, members and permission entries</td></tr>
+</table>
+
+Windows can be pinned to stay on screen while you play; layout and pins survive a
+restart. [Reference](docs/menu.md).
+
+<br>
+
+## Remaining work
+
+Dedicated **remote-client** deployment has not been verified yet, because the
+test games lack the package record it requires. Voice moderation, player-hosted production
+servers and host migration are not supported.
+
+Please report anything that is awkward to integrate or behaves differently on
+your engine version.
+
+<br>
+
+#### License
 
 No license selected.
 
-Bundled ImGui code retains its MIT license. See [third-party notices](THIRD_PARTY_NOTICES.md).
+Bundled ImGui code retains its MIT license. See
+[third-party notices](THIRD_PARTY_NOTICES.md).
