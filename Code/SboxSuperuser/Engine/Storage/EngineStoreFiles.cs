@@ -30,7 +30,11 @@ internal sealed class EngineStoreFiles : IStoreFiles
 
 	public void CreateDirectory( string directory )
 	{
-		Access( () => { FileSystem.Data.CreateDirectory( directory ); return true; } );
+		Access( () =>
+		{
+			FileSystem.Data.CreateDirectory( directory );
+			return true;
+		} );
 	}
 
 	public IReadOnlyList<string> ListFiles( string directory )
@@ -50,6 +54,23 @@ internal sealed class EngineStoreFiles : IStoreFiles
 	}
 
 	public async Task WriteNewAsync( string path, string content, CancellationToken cancellation )
+	{
+		try
+		{
+			await WriteStreamAsync( path, content, cancellation );
+		}
+		catch ( OperationCanceledException )
+		{
+			throw;
+		}
+		catch ( Exception error )
+		{
+			Log.Warning( $"[Superuser] Storage stream failed; type={error.GetType().Name}" );
+			throw new IOException( "Host-local storage stream failed." );
+		}
+	}
+
+	private async Task WriteStreamAsync( string path, string content, CancellationToken cancellation )
 	{
 		cancellation.ThrowIfCancellationRequested();
 		var bytes = Encoding.UTF8.GetBytes( content );

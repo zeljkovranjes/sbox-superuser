@@ -29,7 +29,10 @@ public sealed class PolicyTransaction
 	/// <summary>Creates an expected-revision write; persistence is performed only by the store.</summary>
 	public StoreWriteRequest CreateWriteRequest( StoreKey key, long expectedRevision )
 	{
-		if ( expectedRevision < 0 || expectedRevision == long.MaxValue ) throw new ArgumentOutOfRangeException( nameof( expectedRevision ) );
+		if ( expectedRevision < 0 || expectedRevision == long.MaxValue )
+		{
+			throw new ArgumentOutOfRangeException( nameof( expectedRevision ) );
+		}
 		return new StoreWriteRequest( key, new VersionedStoreDocument( 1, expectedRevision + 1, _payload ), expectedRevision );
 	}
 }

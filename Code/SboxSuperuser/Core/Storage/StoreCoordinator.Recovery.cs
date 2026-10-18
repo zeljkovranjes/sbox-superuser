@@ -33,8 +33,14 @@ internal sealed partial class StoreCoordinator
 
 					backups.Add( document );
 				}
-				catch ( UnsupportedStoreSchemaException ) { }
-				catch ( Exception error ) when ( IsDataError( error ) ) { }
+				catch ( UnsupportedStoreSchemaException )
+				{
+					// Incompatible records remain on disk but cannot be offered for restore.
+				}
+				catch ( Exception error ) when ( IsDataError( error ) )
+				{
+					// Retain damaged evidence. ReadCurrent independently reports the active head's health.
+				}
 			}
 
 			return Task.FromResult( ReadCurrent( directory, 1 ) );

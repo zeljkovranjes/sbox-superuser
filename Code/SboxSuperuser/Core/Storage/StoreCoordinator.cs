@@ -26,21 +26,41 @@ internal sealed partial class StoreCoordinator
 		var entered = false;
 		try
 		{
-			if ( !_available() ) return Record( new StorageOutcome( StorageStatus.Unavailable ) );
+			if ( !_available() )
+			{
+				return Record( new StorageOutcome( StorageStatus.Unavailable ) );
+			}
 			await _gate.WaitAsync( cancellation );
 			entered = true;
 			cancellation.ThrowIfCancellationRequested();
-			if ( !_available() ) return Record( new StorageOutcome( StorageStatus.Unavailable ) );
+			if ( !_available() )
+			{
+				return Record( new StorageOutcome( StorageStatus.Unavailable ) );
+			}
 			return Record( await operation() );
 		}
-		catch ( OperationCanceledException ) { return Record( new StorageOutcome( StorageStatus.Cancelled ) ); }
-		catch ( UnsupportedStoreSchemaException ) { return Record( new StorageOutcome( StorageStatus.UnsupportedSchema ) ); }
-		catch ( Exception error ) when ( IsDataError( error ) ) { return Record( new StorageOutcome( StorageStatus.Corrupt ) ); }
-		catch ( IOException ) { return Record( new StorageOutcome( StorageStatus.Unavailable ) ); }
-		catch ( UnauthorizedAccessException ) { return Record( new StorageOutcome( StorageStatus.Unavailable ) ); }
+		catch ( OperationCanceledException )
+		{
+			return Record( new StorageOutcome( StorageStatus.Cancelled ) );
+		}
+		catch ( UnsupportedStoreSchemaException )
+		{
+			return Record( new StorageOutcome( StorageStatus.UnsupportedSchema ) );
+		}
+		catch ( Exception error ) when ( IsDataError( error ) )
+		{
+			return Record( new StorageOutcome( StorageStatus.Corrupt ) );
+		}
+		catch ( Exception error ) when ( error is IOException or UnauthorizedAccessException )
+		{
+			return Record( new StorageOutcome( StorageStatus.Unavailable ) );
+		}
 		finally
 		{
-			if ( entered ) _gate.Release();
+			if ( entered )
+			{
+				_gate.Release();
+			}
 		}
 	}
 
@@ -52,12 +72,22 @@ internal sealed partial class StoreCoordinator
 
 	private StorageOutcome ReadCurrent( string directory, int schema )
 	{
-		if ( schema != 1 ) return new StorageOutcome( StorageStatus.UnsupportedSchema );
-		if ( !_files.DirectoryExists( directory ) ) return new StorageOutcome( StorageStatus.Missing );
+		if ( schema != 1 )
+		{
+			return new StorageOutcome( StorageStatus.UnsupportedSchema );
+		}
+
+		if ( !_files.DirectoryExists( directory ) )
+		{
+			return new StorageOutcome( StorageStatus.Missing );
+		}
 		var names = Names( directory );
 		var commits = names.Where( name => name.StartsWith( "c-", StringComparison.Ordinal ) )
 			.OrderByDescending( StoreFormat.RevisionFromName ).ToArray();
-		if ( commits.Length == 0 ) return new StorageOutcome( StorageStatus.Corrupt );
+		if ( commits.Length == 0 )
+		{
+			return new StorageOutcome( StorageStatus.Corrupt );
+		}
 		var revision = StoreFormat.RevisionFromName( commits[ 0 ] );
 		if ( commits.Count( name => StoreFormat.RevisionFromName( name ) == revision ) != 1 )
 		{
@@ -86,7 +116,10 @@ internal sealed partial class StoreCoordinator
 	private StoredRevision Decode( string directory, string commitName )
 	{
 		var generationPath = $"{directory}/g-{commitName.Substring( 2 )}";
-		if ( !_files.FileExists( generationPath ) ) throw new FormatException( "Committed generation is missing." );
+		if ( !_files.FileExists( generationPath ) )
+		{
+			throw new FormatException( "Committed generation is missing." );
+		}
 		return StoreFormat.Decode( commitName, _files.Read( $"{directory}/{commitName}" ), _files.Read( generationPath ) );
 	}
 

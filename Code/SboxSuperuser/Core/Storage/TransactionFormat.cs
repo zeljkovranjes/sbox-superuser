@@ -19,7 +19,10 @@ internal static class TransactionFormat
 		var root = document.RootElement;
 		StoreFormat.RequireFields( root, "state", "auditIntents" );
 		var state = root.GetProperty( "state" );
-		if ( state.ValueKind != JsonValueKind.Object ) throw new FormatException( "State must be an object." );
+		if ( state.ValueKind != JsonValueKind.Object )
+		{
+			throw new FormatException( "State must be an object." );
+		}
 		RejectDuplicateFields( state );
 		var intents = root.GetProperty( "auditIntents" );
 		if ( intents.ValueKind != JsonValueKind.Array || intents.GetArrayLength() is < 1 or > 256 )
@@ -38,22 +41,7 @@ internal static class TransactionFormat
 				throw new FormatException( "Intent and request IDs must be explicit; intent IDs must be unique." );
 			}
 
-			var subject = intent.GetProperty( "actorSubject" ).GetString();
-			var origin = intent.GetProperty( "origin" ).GetString();
-			switch ( intent.GetProperty( "actorKind" ).GetString() )
-			{
-				case "Player" when origin is "Console" or "Chat":
-					SteamIdentity.Validate( subject, "actorSubject" );
-					break;
-				case "DedicatedConsole" when origin == "Console" && subject == "dedicated-console":
-					break;
-				case "InternalService" when origin == "InternalService":
-					ContractGuard.Key( subject, "actorSubject" );
-					break;
-				default:
-					throw new FormatException( "Invalid recorded actor or origin." );
-			}
-
+			ValidateActor( intent );
 			ContractGuard.Key( intent.GetProperty( "command" ).GetString(), "command" );
 			if ( intent.GetProperty( "outcome" ).GetString() != "Unknown"
 				|| !DateTimeOffset.TryParseExact( intent.GetProperty( "createdUtc" ).GetString(), "O",
@@ -62,22 +50,59 @@ internal static class TransactionFormat
 				throw new FormatException( "Intent must have a UTC timestamp and Unknown outcome." );
 			}
 
-			var arguments = intent.GetProperty( "safeArguments" );
-			if ( arguments.ValueKind != JsonValueKind.Object ) throw new FormatException( "Expected safe argument fields." );
-			RejectDuplicateFields( arguments );
-			if ( arguments.EnumerateObject().Count() > 32 ) throw new FormatException( "Too many safe argument fields." );
-			foreach ( var argument in arguments.EnumerateObject() )
+			ValidateArguments( intent.GetProperty( "safeArguments" ) );
+			var targets = intent.GetProperty( "targets" );
+			if ( targets.ValueKind != JsonValueKind.Array || targets.GetArrayLength() > 64 )
 			{
-				ContractGuard.Key( argument.Name, "safeArguments" );
-				if ( argument.Value.ValueKind != JsonValueKind.String || argument.Value.GetString().Length > 256 )
-				{
-					throw new FormatException( "Safe arguments must be bounded strings." );
-				}
+				throw new FormatException( "Invalid targets." );
 			}
 
-			var targets = intent.GetProperty( "targets" );
-			if ( targets.ValueKind != JsonValueKind.Array || targets.GetArrayLength() > 64 ) throw new FormatException( "Invalid targets." );
-			foreach ( var target in targets.EnumerateArray() ) SteamIdentity.Validate( target.GetString(), "targets" );
+			foreach ( var target in targets.EnumerateArray() )
+			{
+				SteamIdentity.Validate( target.GetString(), "targets" );
+			}
+		}
+	}
+
+	private static void ValidateActor( JsonElement intent )
+	{
+		var subject = intent.GetProperty( "actorSubject" ).GetString();
+		var origin = intent.GetProperty( "origin" ).GetString();
+		switch ( intent.GetProperty( "actorKind" ).GetString() )
+		{
+			case "Player" when origin is "Console" or "Chat":
+				SteamIdentity.Validate( subject, "actorSubject" );
+				break;
+			case "DedicatedConsole" when origin == "Console" && subject == "dedicated-console":
+				break;
+			case "InternalService" when origin == "InternalService":
+				ContractGuard.Key( subject, "actorSubject" );
+				break;
+			default:
+				throw new FormatException( "Invalid recorded actor or origin." );
+		}
+	}
+
+	private static void ValidateArguments( JsonElement arguments )
+	{
+		if ( arguments.ValueKind != JsonValueKind.Object )
+		{
+			throw new FormatException( "Expected safe argument fields." );
+		}
+
+		RejectDuplicateFields( arguments );
+		if ( arguments.EnumerateObject().Count() > 32 )
+		{
+			throw new FormatException( "Too many safe argument fields." );
+		}
+
+		foreach ( var argument in arguments.EnumerateObject() )
+		{
+			ContractGuard.Key( argument.Name, "safeArguments" );
+			if ( argument.Value.ValueKind != JsonValueKind.String || argument.Value.GetString().Length > 256 )
+			{
+				throw new FormatException( "Safe arguments must be bounded strings." );
+			}
 		}
 	}
 
@@ -88,13 +113,19 @@ internal static class TransactionFormat
 			var names = new HashSet<string>( StringComparer.Ordinal );
 			foreach ( var property in element.EnumerateObject() )
 			{
-				if ( !names.Add( property.Name ) ) throw new FormatException( "Duplicate state field." );
+				if ( !names.Add( property.Name ) )
+				{
+					throw new FormatException( "Duplicate state field." );
+				}
 				RejectDuplicateFields( property.Value );
 			}
 		}
 		else if ( element.ValueKind == JsonValueKind.Array )
 		{
-			foreach ( var child in element.EnumerateArray() ) RejectDuplicateFields( child );
+			foreach ( var child in element.EnumerateArray() )
+			{
+				RejectDuplicateFields( child );
+			}
 		}
 	}
 }

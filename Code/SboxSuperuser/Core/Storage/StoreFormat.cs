@@ -67,7 +67,10 @@ internal static class StoreFormat
 		}
 
 		var schema = data.GetProperty( "schemaVersion" ).GetInt32();
-		if ( schema != 1 ) throw new UnsupportedStoreSchemaException();
+		if ( schema != 1 )
+		{
+			throw new UnsupportedStoreSchemaException();
+		}
 		var payload = data.GetProperty( "payload" ).GetString();
 		TransactionFormat.Validate( payload );
 		return new StoredRevision( id, schema, revision, payload );
@@ -75,7 +78,10 @@ internal static class StoreFormat
 
 	internal static void RequireFields( JsonElement value, params string[] fields )
 	{
-		if ( value.ValueKind != JsonValueKind.Object ) throw new FormatException( "Expected an object." );
+		if ( value.ValueKind != JsonValueKind.Object )
+		{
+			throw new FormatException( "Expected an object." );
+		}
 		var names = new HashSet<string>( StringComparer.Ordinal );
 		foreach ( var property in value.EnumerateObject() )
 		{
@@ -85,6 +91,9 @@ internal static class StoreFormat
 			}
 		}
 
-		if ( names.Count != fields.Length ) throw new FormatException( "Missing record field." );
+		if ( names.Count != fields.Length )
+		{
+			throw new FormatException( "Missing record field." );
+		}
 	}
 }
