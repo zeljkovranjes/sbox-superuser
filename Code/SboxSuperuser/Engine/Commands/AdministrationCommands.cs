@@ -12,18 +12,21 @@ internal sealed partial class AdministrationCommands : IDisposable
 	private readonly HostCommandDispatcher _dispatcher;
 	private readonly Func<CommandResult> _diagnostics;
 	private readonly CommandRegistrationScope _scope;
+	private readonly Modules.ModuleManager _modules;
 
 	internal AdministrationCommands( HostPolicyService policy, HostAuditService audit, CommandRegistry registry,
-		HostCommandDispatcher dispatcher, Func<CommandResult> diagnostics )
+		HostCommandDispatcher dispatcher, Func<CommandResult> diagnostics, Modules.ModuleManager modules = null )
 	{
 		_policy = policy;
 		_audit = audit;
 		_registry = registry;
 		_dispatcher = dispatcher;
 		_diagnostics = diagnostics;
-		_scope = new CommandRegistrationScope( registry, Module );
+		_modules = modules;
+		_scope = new CommandRegistrationScope( registry, Module, managed: true );
 		RegisterDiscovery();
 		RegisterAccess();
+		RegisterModules();
 		_scope.Commit();
 	}
 

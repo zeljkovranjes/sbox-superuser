@@ -20,6 +20,7 @@ internal sealed class BootstrapRuntime : IDisposable
 	internal Audit.HostAuditService Audit { get; }
 	internal Core.Commands.ConsoleRootState ConsoleRoot { get; }
 	internal Commands.AdministrationCommands Administration { get; }
+	internal Modules.ModuleManager Modules { get; }
 
 	internal BootstrapState Health
 	{
@@ -80,7 +81,10 @@ internal sealed class BootstrapRuntime : IDisposable
 		Dispatcher = new Commands.HostCommandDispatcher( Policy, Commands, () => ThreadSafe.IsMainThread && IsUsable,
 			OnlinePlayers, error => Log.Warning( $"[Superuser] Command execution failed; type={error.GetType().Name}; outcome may be Unknown." ), audit: Audit );
 		ConsoleRoot = new Core.Commands.ConsoleRootState( commandRoot, TypeLibrary.GetMemberAttributes<ConVarAttribute>().Select( attribute => attribute.Name ) );
-		Administration = new Commands.AdministrationCommands( Policy, Audit, Commands, Dispatcher, ConsoleDiagnostics );
+		Modules = new Modules.ModuleManager( Commands, Policy, () => ThreadSafe.IsMainThread && IsUsable,
+			error => Log.Warning( $"[Superuser] Module lifecycle failed; type={error.GetType().Name}; inspect module status." ),
+			CommandDiscovery.AttributeCommandDiscovery.Discover );
+		Administration = new Commands.AdministrationCommands( Policy, Audit, Commands, Dispatcher, ConsoleDiagnostics, Modules );
 		if ( !ConsoleRoot.IsAvailable )
 		{
 			Log.Warning( $"[Superuser] {ConsoleRoot.Message}" );
@@ -182,6 +186,7 @@ internal sealed class BootstrapRuntime : IDisposable
 	/// <summary>Revokes this runtime so retained references cannot resolve identities.</summary>
 	public void Dispose()
 	{
+		Modules.Dispose();
 		Administration.Dispose();
 		_disposed = true;
 		Dispatcher.Dispose();

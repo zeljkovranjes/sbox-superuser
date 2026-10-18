@@ -13,9 +13,9 @@ internal sealed partial class AdministrationCommands
 			( _, _ ) => Task.FromResult( new CommandResult( CommandStatus.Success, "Superuser API 1; in-process dedicated-server administration." ) ) );
 		Register( "diagnostics", "Show host authority, audit and transport health. Example: admin diagnostics", "admin.security.manage",
 			Array.Empty<CommandArgumentDescriptor>(), ( context, _ ) => Task.FromResult( IsOwner( context ) ? _diagnostics() : Denied() ) );
-		Register( "modules.list", "List registered module IDs. Example: admin modules list", "admin.security.manage", new[] { Page() },
+		Register( "modules.list", "List module lifecycle states. Example: admin modules list", "admin.security.manage", new[] { Page() },
 			( context, arguments ) => Task.FromResult( IsOwner( context )
-				? Rows( _registry.Descriptors.Select( item => item.ModuleId ).Distinct().Order(), PageNumber( arguments ), "Registered command modules." ) : Denied() ) );
+				? Rows( ModuleRows(), PageNumber( arguments ), "Installed modules and direct command registrations." ) : Denied() ) );
 		var filters = new[] { Text( "command", "Exact command key or * for all", true ), Text( "cursor", "Opaque revision:sequence from the previous page", true ) };
 		Register( "audit.query", "Read permitted audit records. Example: admin audit query *", "admin.audit.read", filters,
 			( context, arguments ) => AuditAsync( context, arguments, false ), auditQuery: true );

@@ -2,7 +2,7 @@ using SboxSuperuser.Core.Contracts;
 
 namespace SboxSuperuser;
 
-/// <summary>A dependency on a module's exact contract API version; graph checks belong to T12.</summary>
+/// <summary>A dependency on a module's exact contract API version, validated before installing any candidate.</summary>
 public sealed class ModuleDependency
 {
 	/// <summary>Gets the stable dependency key.</summary>
