@@ -1,6 +1,6 @@
 # T18: Two adopting games
 
-Status: **Runtime checks complete; final checks pending.** Arena represents a player with a scene component and health. Colony represents a player with a scene-owned supply record and no pawn component. Both reference the same library; all its runtime source, including Core, is unchanged from T17. Original executable sample sources live under `dev/samples`, outside shipped runtime code.
+Status: **Complete.** Arena represents a player with a scene component and health. Colony represents a player with a scene-owned supply record and no pawn component. Both reference the same library; all its runtime source, including Core, is unchanged from T17. Original executable sample sources live under `dev/samples`, outside shipped runtime code.
 
 ## Executable integrations
 
@@ -25,4 +25,6 @@ The library runtime diff against T17 commit `f2e5973` is empty. These examples u
 
 Both fresh game data roots were backed up before launch: `superuser-t18-arena/20261018-021702.zip` and `superuser-t18-colony/20261018-021703.zip` under `E:/06-um-data/backups` (empty original roots). Saved scene editor opt-in remains false; verification switches and test owners are runtime/disposable data only. These examples are not complete games, persistent gameplay systems, replicated player demos or visual admin UI. Dedicated-client deployment retains the T01 package-record limitation. No release player-host or migration support is claimed.
 
-Initial commits: `77be705`, `09a4395`, `6c64321`, `830d543`, `2d78c26`. Next task after final checks: T19 security, recovery, privacy, concurrency and declared load validation.
+Generated builds and actual engine whitelist checks pass for both games. Both game structure/Core checks pass. Their scaffolded test projects contain no test cases; no engine test is represented as a mocked unit-test pass. The unchanged library retains its 230 contract + 75 Core baseline. Owned dedicated processes were stopped, editor Play was stopped without saving test switches, and all test data was archived under each game's `dev/out/t18-runtime-evidence`; both data roots are empty again. Generated editor configuration/compiled scene products remain local and outside the deliverable sources.
+
+Initial commits: `77be705`, `09a4395`, `6c64321`, `830d543`, `2d78c26`, `61d603d`. Standalone local game commits: Arena `34a8d33`, Colony `19b12f3`. Next: T19 security, recovery, privacy, concurrency and declared load validation.

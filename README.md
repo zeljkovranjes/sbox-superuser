@@ -23,6 +23,7 @@ This package is not published on sbox.game. Add this local library to a test gam
 7. Host code can obtain `Superuser.GetStore()` for versioned transactions. Follow the [storage and recovery guide](docs/T04-STORAGE.md); editor and dedicated records are isolated.
 8. With platform chat enabled, enter `/admin help` in the in-game chatbox. Replies are private. See [chat setup](docs/T13-PLATFORM-CHAT.md).
 9. For your own chatbox, use the [custom chat hooks and examples](docs/T14-CUSTOM-CHAT.md). Choose platform submission or an authenticated independent backend for each message.
+10. For a game-specific command, run either [independent sample game](dev/samples/README.md). Arena uses pawn components; Colony uses roster records. Both demonstrate exact permission grants and optional gameplay services.
 
 ### In code
 
@@ -64,7 +65,7 @@ Dedicated servers are the only production target. Opt-in editor testing is devel
 
 ## Limitations
 
-- Tasks 1–17 are implemented. Two-game portability, load validation and release packaging remain pending; visual admin UI is deferred.
+- Tasks 1–18 are implemented. Security/load validation and release packaging remain pending; visual admin UI is deferred.
 - Stop Play or the dedicated process before changing source. Managed module reload, scene replacement and process restart are verified; arbitrary live source edits are unsupported. A structural reload can report `RestartRequired`; method-only fast reload does not reliably trigger that guard. See the [lifecycle support matrix](docs/T17-LIFECYCLE.md).
 - Task 1's unavailable dedicated multiplayer evidence remains marked Blocked; Task 2 does not certify that deployment.
 - Chat commands use `/admin` by default; `!` is ordinary text. The compatibility probe remains separate from administration commands.

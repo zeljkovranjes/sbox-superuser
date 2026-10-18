@@ -3,6 +3,9 @@
 ## 2026-10-18
 Title: Persistent Moderation and Verified Lifetimes
 ### Added
+# Integrations
+Independent games - executable arena and colony examples map stable player IDs to different gameplay representations without changing the library
+Optional capabilities - samples demonstrate default-denied permissions, explicit grants and Unsupported results when game services are absent
 # Console
 Operator commands - native admin help, access management, diagnostics and private audit queries use the authoritative dispatcher
 Configured roots - bootstrap supports a logical root with a fixed native fallback and reports visible managed-name collisions
