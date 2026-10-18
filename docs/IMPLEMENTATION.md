@@ -10,10 +10,10 @@ The specification is [version 0.2](sbox-admin-specification.docx). Current autho
 | T04 Versioned durable storage | Complete | [T04](T04-STORAGE.md) |
 | T05 Permission resolver and groups | Complete | [T05](T05-PERMISSIONS.md) |
 | T06 Target protection and policy administration | Complete | [T06](T06-AUTHORITY.md) |
-| T07 Command registration and discovery | Next | Not started |
-| T08 Argument parsing and targeting | Pending T07 | Not started |
+| T07 Command registration and discovery | Complete | [T07](T07-COMMANDS.md) |
+| T08 Argument parsing and targeting | Next | Not started |
 | T09 Authoritative dispatcher | Pending T07/T08 | Not started |
 | T10 Audit and durable outcomes | Pending T09 | Not started |
 | T11–T20 | Outside current execution scope | Not started |
 
-Current tests: 97 passing contract/Core cases. T05/T06 records distinguish plain-.NET tests from actual engine execution, editor-host checks and actual dedicated-server recovery/restart. Historical task reports describe their completion point; this ledger tracks current progress. No generic native `admin` root, general chat dispatcher, moderation enforcement or UI is implemented yet.
+Current tests: 110 passing contract/Core cases. Task records distinguish plain-.NET tests from actual engine execution, editor-host checks and actual dedicated-server recovery/restart. Historical task reports describe their completion point; this ledger tracks current progress. No generic native `admin` root, general chat dispatcher, moderation enforcement or UI is implemented yet.

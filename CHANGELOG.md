@@ -1,7 +1,7 @@
 # Changelog
 
 ## 2026-10-17
-Title: Owner Policy And Target Protection
+Title: Typed Command Registration
 ### Added
 # Diagnostics
 Compatibility probe - checks type discovery, caller identity and argument forwarding inside the library
@@ -34,6 +34,10 @@ Policy administration - only current owners and dedicated console authority may 
 Target protection - uses stored offline roles, refuses equal ranks and punitive self-targeting, and keeps permissions separate
 Owner recovery - dedicated-local owner changes retain versions, protect the final owner and require explicit recovery to clear all owners
 Degraded authority - corrupt managed ownership never falls back to bootstrap or cached owners; storage recovery invalidates permission caches
+# Commands
+Registration - validates module-owned commands and aliases atomically; replacement and disposal revoke old entry points
+Discovery - supports public static typed handlers through TypeLibrary with explicit registration fallback and a game capability example
+Metadata - validates argument order, numeric bounds, enum choices and explicit player target policies before registration
 ### Improved
 # Diagnostics
 Chat probe - uses /superuser-probe in the chatbox; nonmatching messages pass through normally

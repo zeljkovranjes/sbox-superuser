@@ -59,7 +59,7 @@ Dedicated servers are the only production target. Opt-in editor testing is devel
 
 ## Limitations
 
-- Tasks 1–6 are implemented. No dispatcher, parser, module loader, moderation enforcement or UI is installed.
+- Tasks 1–7 are implemented. No dispatcher, parser, module loader, moderation enforcement or UI is installed.
 - Task 1's unavailable dedicated multiplayer evidence remains marked Blocked; Task 2 does not certify that deployment.
 - Chat commands use `/`; the future administration root will be `/admin`. The current probe does not implement administration commands.
 - The probe is for isolated testing and should be removed from a production scene.
@@ -82,6 +82,9 @@ Task 5 adds [immutable policy and permission resolution](docs/T05-PERMISSIONS.md
 
 Task 6 adds [owner-only policy administration, offline target protection and local owner recovery](docs/T06-AUTHORITY.md), with 97 tests in total. Use `Superuser.ApplyPolicyChangeAsync`, `ExplainPermissionAsync`, `CheckPunitiveTargetAsync` and `GetAuthorityDiagnostics` from authenticated host integrations. An explicit dedicated-local owner change creates managed ownership; thereafter the managed store takes precedence over the bootstrap owner file.
 
+Task 7 adds [atomic command registration and typed discovery](docs/T07-COMMANDS.md), with 110 tests in total. Begin a module registration scope, declare permissions and commands, commit, and retain it until shutdown. The compiled dog sample demonstrates an optional game capability.
+
 ## License
+
 
 No license selected yet. No third-party UI code is included.
