@@ -1,7 +1,7 @@
 # Changelog
 
 ## 2026-10-18
-Title: Console, Chat and Native Settings
+Title: Persistent Moderation and Native Settings
 ### Added
 # Console
 Operator commands - native admin help, access management, diagnostics and private audit queries use the authoritative dispatcher
@@ -25,6 +25,12 @@ Explicit bindings - allowlisted native settings and commands use typed permissio
 Setting commands - list, get, set and reset report actual native values with verified write readback
 Persistence ownership - engine Saved variables stay engine-owned; framework values survive dedicated restart with distinct pending state
 Failure recovery - native clamping and interrupted storage writes preserve the previous committed setting and report unconfirmed outcomes honestly
+# Moderation
+Actions - kick, ban, warnings, text mute and private history use current permissions and target protection
+Admission - committed bans reject connections before gameplay; unavailable moderation history fails closed
+Text mute - platform and independent chat enforce restrictions while slash commands retain private feedback
+Persistent history - UTC expiry survives dedicated restart and linked revocations retain original records
+Failure handling - failed ban writes leave players connected; explicit backup recovery restores history without resetting sanctions
 ### Improved
 # Audit
 Completion checks - verifies attributable Unknown outcomes across an actual dedicated-server interruption and restart

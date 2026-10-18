@@ -19,10 +19,10 @@ The specification is [version 0.2](sbox-admin-specification.docx). Current autho
 | T13 Platform chat | Complete | [T13](T13-PLATFORM-CHAT.md) |
 | T14 Custom chat hooks | Complete | [T14](T14-CUSTOM-CHAT.md) |
 | T15 Native bindings | Complete | [T15](T15-NATIVE-BINDINGS.md) |
-| T16 Moderation and admission | In progress | [T16](T16-MODERATION.md) |
+| T16 Moderation and admission | Complete | [T16](T16-MODERATION.md) |
 | T17 Lifecycle validation | Not started | Depends on T12–T16 |
 | T18 Two game integrations | Not started | Depends on T17 |
 | T19 Security, recovery and load | Not started | Depends on T18 |
 | T20 Unpublished release candidate | Not started | Depends on T19 |
 
-Current baseline: 222 passing contract cases and 65 Core cases. Task records distinguish plain-.NET tests from actual engine execution, editor-host checks and actual dedicated-server recovery/restart. Historical task reports describe their completion point; this ledger tracks current progress. T01–T15 are implemented, retaining the recorded dedicated-client deployment limitation. T16 is the next executable task.
+Current baseline: 230 passing contract cases and 75 Core cases. Task records distinguish plain-.NET tests from actual engine execution, editor-host checks and actual dedicated-server recovery/restart. Historical task reports describe their completion point; this ledger tracks current progress. T01–T16 are implemented, retaining the recorded dedicated-client deployment limitation. T17 is the next executable task.

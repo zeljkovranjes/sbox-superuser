@@ -1,6 +1,6 @@
 # T16: Moderation and admission
 
-Status: **Implemented; final checks in progress.** Required administration code persists moderation inside the same library and uses the verified engine connection and chat hooks. No voice mute, external service or player-controller dependency is included.
+Status: **Complete.** Required administration code persists moderation inside the same library and uses the verified engine connection and chat hooks. No voice mute, external service or player-controller dependency is included.
 
 ## Commands
 
@@ -56,3 +56,5 @@ Back up the isolated game data first. `setup-moderation-host.cs` requires no exi
 `verify-moderation-ban-host.cs` expects connected B with test identity90071996842377218. Relaunch that same test identity while banned and inspect both server and client logs; it must not reach OnConnected. Unban it, reconnect and run `verify-moderation-kick-host.cs`. `verify-moderation-storage-failure.cs` interrupts a real write and requires A still connected. `inject-moderation-schema-failure.cs` records its recovery backup, then installs a deliberately unsupported module schema; test a new connection while degraded and run `recover-moderation-schema.cs`. Finally run `verify-moderation-authority.cs` for equal-rank and queued-revocation checks.
 
 On an actual dedicated fixture run `seed-moderation-dedicated.cs`, restart the owned process with the same data root, then run `verify-moderation-dedicated-restart.cs` within the one-hour restriction. These development scripts are not shipped game features. Restore the original owner file, policy, bootstrap options, client overlays and runtime objects after testing; preserve generated files as evidence. Saved scene edits are unnecessary.
+
+Final verification: 230 contract and 75 Core cases pass (18 new T16 cases; all existing tests untouched). Both generated runtime builds have zero warnings/errors, actual editor whitelist compilation succeeds, and both package standards checks pass. The lab test project has no cases. Pre-release lint has zero failures and two ignored-path warnings (local journal and generated engine XML). Temporary owner configuration is absent again, editor opt-in is false with bootstrap disabled, client overlays are restored and owned runtime chat objects removed. New test files were archived under the lab's dev/out/t16-moderation-evidence; all 43 original data files and the saved scene remain unchanged. Owned dedicated test processes were stopped by exact PID. T17 is next; no publication occurred.
