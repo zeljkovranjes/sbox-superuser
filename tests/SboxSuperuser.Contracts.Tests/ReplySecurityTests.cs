@@ -14,7 +14,13 @@ public sealed class ReplySecurityTests
 		Assert.Throws<ArgumentException>( () => new CommandResult( CommandStatus.Success, payload ) );
 		Assert.Throws<ArgumentException>( () => new CommandResult( CommandStatus.Success, "Done",
 			new Dictionary<string, string> { [ "row1" ] = payload } ) );
+		Assert.Throws<ArgumentException>( () => new CommandResult( CommandStatus.Success, "Done",
+			new Dictionary<string, string> { [ payload ] = "value" } ) );
 		Assert.False( PrivateReplyValidation.IsValid( Guid.NewGuid(), CommandStatus.Success,
 			payload, Array.Empty<string>(), Array.Empty<string>() ) );
+		Assert.False( PrivateReplyValidation.IsValid( Guid.NewGuid(), CommandStatus.Success,
+			"Done", new[] { "row1" }, new[] { payload } ) );
+		Assert.False( PrivateReplyValidation.IsValid( Guid.NewGuid(), CommandStatus.Success,
+			"Done", new[] { payload }, new[] { "value" } ) );
 	}
 }
