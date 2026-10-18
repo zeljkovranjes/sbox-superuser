@@ -1,6 +1,6 @@
 # T02: Library foundation and public contracts
 
-Status: **Implemented; final completion audit pending**. Scope is data contracts, interfaces and structural invariants only. T03 onward remain not started.
+Status: **Complete**. Scope is data contracts, interfaces and structural invariants only. T03 onward remain not started.
 
 Public integration types live in `Code/SboxSuperuser/Api/`, using the root `SboxSuperuser` namespace per repository conventions. They are engine-independent boundary types, not a callable administration service. Internal structural rules live in Core by feature; Engine holds transport/invocation boundaries. Future Core systems must not depend on Api or Engine: adapters translate public contracts to internal domain inputs.
 
@@ -50,7 +50,20 @@ Engine **26.10.13a**, installed Steam build **25964806**, 2026-10-17. The isolat
 - `dev/verify-contracts.cs` executed inside s&box using exported types and produced `[Superuser T02] PASS`; it constructs metadata and checks outcomes without creating runtime systems.
 - `dev/verify-editor.cs` replayed T01 default-off, disabled, duplicate, quoted/zero/too-many argument and local-entry observations. Discovery, native settings and existing storage readback also passed on editor startup.
 - Generated runtime project built with zero warnings/errors. New engine-free contract suite passed **20 tests**, covering malformed permission/identity values, immutable snapshots, authority-free payloads, typed argument access, duration semantics, explicit outcomes and storage revision/failure invariants.
-- The original test project still has zero test cases; its command must still be run, with no fabricated pass count. No existing tests were modified.
+- The original test project still has zero test cases; its command completed, with no fabricated pass count. No existing tests were modified.
 - Dedicated multiplayer remains Blocked in the T01 record due to the unpublished adopting game's package lookup. That deployment is not required to prove T02's contracts or editor whitelist compilation; no T02 blocker is currently known.
 
 Reproduce with `sbox-check`, runtime `dotnet build`, and `dotnet test` for both test projects. Open the isolated game and use `sbox-cli --connect <pid> --call run_csharp` with the absolute path to `dev/verify-contracts.cs`; play its scene before running `dev/verify-editor.cs`. Capture compile_status and read_console. The development CLI is never invoked by the library.
+
+## Completion audit
+
+| Requirement | Final evidence |
+|---|---|
+| Structure and requested contract areas | Exported contract map matches Api source; internal feature boundaries and Core guards exist. No empty feature folders or fake runtime implementations. |
+| One library and game independence | PackageReferences remains empty; runtime stays under Code/SboxSuperuser. Exact contracts compile in plain .NET without engine/player dependencies. Dev harness is excluded from shipped runtime. |
+| Actual s&box compilation | Final compile_status: library and adopting game succeeded with zero diagnostics; exported constructors ran in-engine and logged PASS. |
+| Preserve Task 1 | Baseline diff against 2c69ca7 is empty for probes and existing editor script; runtime replay passed and final active probe count was one. |
+| Validation and conventions | sbox-check and runtime build passed; 20 new tests passed; original empty test project untouched. Publication lint: zero failures, one ignored generated engine XML warning. No generated binaries tracked. |
+| Documentation and scope | README, metadata, GitHub description/topics, changelog and this record agree on foundation-only support. No Task 3 work. No Task 2 blockers. |
+
+The owned validation editor was stopped; the user's existing editor was left running. Changes are committed to the private repository. T01's dedicated multiplayer limitation remains unchanged.
