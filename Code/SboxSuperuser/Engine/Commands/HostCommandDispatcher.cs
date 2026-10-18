@@ -28,7 +28,7 @@ internal sealed partial class HostCommandDispatcher : ICommandDispatcher, IDispo
 		_audit = audit;
 		_queue = new RequestQueue<CommandResult>( clock ?? (() => DateTimeOffset.UtcNow), Result( CommandStatus.Cancelled, "Cancelled before execution." ) );
 		_controlQueue = new RequestQueue<CommandResult>( clock ?? (() => DateTimeOffset.UtcNow),
-			Result( CommandStatus.Cancelled, "Cancelled before execution." ), 8, 2, 64, 8 );
+			Result( CommandStatus.Cancelled, "Cancelled before execution." ), 8, 2, 128, 32 );
 	}
 
 	internal async Task<CommandResult> SubmitAsync( Func<ActorIdentity> authenticate, CommandOrigin origin, CommandRequest request,

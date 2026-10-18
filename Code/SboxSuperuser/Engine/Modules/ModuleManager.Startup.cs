@@ -59,8 +59,8 @@ internal sealed partial class ModuleManager
 	private async Task<bool> WithinDeadlineAsync( Task work, CancellationToken cancellation )
 	{
 		// Task.WhenAny overloads are blocked by the engine whitelist. Yield in bounded timer slices.
-		var expires = DateTimeOffset.UtcNow + _deadline;
-		while ( !work.IsCompleted && !cancellation.IsCancellationRequested && DateTimeOffset.UtcNow < expires )
+		var timer = System.Diagnostics.Stopwatch.StartNew();
+		while ( !work.IsCompleted && !cancellation.IsCancellationRequested && timer.Elapsed < _deadline )
 		{
 			await Task.Delay( 10 );
 		}

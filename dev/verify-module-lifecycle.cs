@@ -41,13 +41,14 @@ async Task<SboxSuperuser.CommandStatus> Run( string command, params string[] arg
 }
 var pulses = new SuperuserCompatibilityLab.Engine.Modules.SamplePulseSource();
 var sample = new SuperuserCompatibilityLab.Engine.Modules.SampleCounterModule( pulses );
+var held = new SuperuserCompatibilityLab.Engine.Modules.HeldCommandModule();
 try
 {
 	if ( Game.IsEditor ) FileSystem.Data.WriteAllText( ownersPath, "{\"schemaVersion\":1,\"owners\":[\"" + Connection.Local.SteamId + "\"]}" );
 	bootstrap.Enabled = false;
 	bootstrap.AllowEditorTesting = Game.IsEditor;
 	bootstrap.Enabled = true;
-	Require( (await SboxSuperuser.Superuser.RegisterModulesAsync( new SboxSuperuser.IAdminModule[] { sample }, cancellationToken )).Status == SboxSuperuser.CommandStatus.Success, "Sample startup failed." );
+	Require( (await SboxSuperuser.Superuser.RegisterModulesAsync( new SboxSuperuser.IAdminModule[] { sample, held }, cancellationToken )).Status == SboxSuperuser.CommandStatus.Success, "Sample startup failed." );
 	var store = SboxSuperuser.Superuser.GetStore();
 	var key = new SboxSuperuser.StoreKey( "sample.counter", "t12-check" );
 	var previous = await store.ReadAsync( key, 1, cancellationToken );
@@ -75,6 +76,18 @@ try
 	}
 	Require( await Run( "modules.disable", "superuser.core" ) == SboxSuperuser.CommandStatus.Denied, "Required core disabled." );
 	Require( await Run( "modules.disable", "superuser.administration" ) == SboxSuperuser.CommandStatus.Denied, "Required console disabled." );
+	ConsoleSystem.Run( "admin", "sample.hold" );
+	for ( var attempt = 0; !held.Entered && attempt < 100; attempt++ ) await Task.Delay( 20, cancellationToken );
+	Require( held.Entered, "Held command did not enter." );
+	var started = DateTimeOffset.UtcNow;
+	Require( await Run( "modules.disable", "sample.held" ) == SboxSuperuser.CommandStatus.Unknown, "Uncooperative handler was incorrectly reported drained." );
+	var drainSeconds = (DateTimeOffset.UtcNow - started).TotalSeconds;
+	Require( drainSeconds < 8 && held.CancellationSeen && held.Stops == 0, "Disable failed to bound the wait or cleaned up before execution ended." );
+	Require( await Run( "modules.enable", "sample.held" ) == SboxSuperuser.CommandStatus.Conflict, "Quarantined generation overlapped a restart." );
+	held.Release();
+	for ( var attempt = 0; held.Stops == 0 && attempt < 100; attempt++ ) await Task.Delay( 20, cancellationToken );
+	Require( held.Stops == 1, "Released command did not finish cleanup." );
+	Require( (await Query( "sample.hold" )).Entries.First().Outcome == SboxSuperuser.CommandStatus.Unknown, "Interrupted mutation was not audited Unknown." );
 	var failure = new SuperuserCompatibilityLab.Engine.Modules.FailingStartupModule( pulses );
 	Require( (await SboxSuperuser.Superuser.RegisterModulesAsync( new SboxSuperuser.IAdminModule[] { failure }, cancellationToken )).Status == SboxSuperuser.CommandStatus.Failed, "Injected startup unexpectedly passed." );
 	Require( pulses.Listeners == 1, "Failed startup leaked a listener." );
@@ -82,10 +95,11 @@ try
 	Require( await Run( "modules.list" ) == SboxSuperuser.CommandStatus.Success, "Module list failed." );
 	var states = SboxSuperuser.Superuser.GetModuleStatuses().Select( item => new { item.Descriptor.Id, item.State } ).ToArray();
 	Log.Info( "[T12] PASS: native module management, five reloads, one listener and execution, data retention, required security and startup rollback." );
-	return new { Pass = true, Dedicated = Application.IsDedicatedServer, sample.Executions, sample.Pulses, sample.Stops, states };
+	return new { Pass = true, Dedicated = Application.IsDedicatedServer, sample.Executions, sample.Pulses, sample.Stops, drainSeconds, states };
 }
 finally
 {
+	held.Release();
 	bootstrap.Enabled = false;
 	if ( Game.IsEditor )
 	{
