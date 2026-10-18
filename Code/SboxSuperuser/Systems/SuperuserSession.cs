@@ -1,0 +1,121 @@
+using Sandbox;
+using SboxSuperuser.Core.Bootstrap;
+using SboxSuperuser.Engine.Bootstrap;
+
+namespace SboxSuperuser.Systems;
+
+internal sealed class SuperuserSession : GameObjectSystem<SuperuserSession>
+{
+	private readonly BootstrapRegistrations _registrations = new();
+	private BootstrapRuntime _runtime;
+	private BootstrapState _state;
+	private bool _disposed;
+
+	public SuperuserSession( Scene scene ) : base( scene )
+	{
+		Listen( Stage.StartUpdate, -100, Reconcile, nameof( SuperuserSession ) );
+	}
+
+	internal void Attach( Guid componentId, bool allowEditorTesting )
+	{
+		if ( _disposed ) return;
+		_registrations.Attach( componentId, allowEditorTesting );
+		Reconcile();
+	}
+
+	internal void Detach( Guid componentId )
+	{
+		_registrations.Detach( componentId );
+		Reconcile();
+	}
+
+	internal BootstrapRuntime GetRuntime()
+	{
+		Reconcile();
+		return _runtime;
+	}
+
+	internal BootstrapDiagnostics GetDiagnostics()
+	{
+		Reconcile();
+		return new BootstrapDiagnostics( _state, _runtime?.Id, _registrations.Count,
+			_runtime?.Owners.Configuration?.Count ?? 0, _runtime?.Owners.Path,
+			_runtime?.Owners.Message ?? _state.ToString() );
+	}
+
+	private void Reconcile()
+	{
+		if ( _disposed ) return;
+		if ( _registrations.Count == 0 )
+		{
+			Stop( BootstrapState.Disabled );
+			return;
+		}
+
+		if ( !Scene.IsValid() || Scene != Game.ActiveScene || !Networking.IsHost
+			|| !Networking.IsActive || Networking.IsDisconnecting
+			|| (!Application.IsDedicatedServer && (!Game.IsEditor || !_registrations.AllowsEditorTesting)) )
+		{
+			Stop( _registrations.Count > 1 ? BootstrapState.DuplicateBootstrap : BootstrapState.Unsupported );
+			return;
+		}
+
+		if ( _registrations.Count > 1 )
+		{
+			Stop( BootstrapState.DuplicateBootstrap );
+			return;
+		}
+
+		if ( _runtime is not null && !_runtime.IsUsable )
+		{
+			Stop( BootstrapState.Unsupported );
+		}
+
+		if ( _runtime is not null ) return;
+
+		// Only on initialization: retire inactive scene runtimes before starting this one.
+		// No static registry, per-frame scene scan or retained cross-scene subscription.
+		foreach ( var otherScene in Sandbox.Scene.All )
+		{
+			if ( otherScene == Scene ) continue;
+			foreach ( var other in otherScene.GetSystems().OfType<SuperuserSession>() )
+			{
+				other.Stop( BootstrapState.Unsupported );
+			}
+		}
+
+		_runtime = new BootstrapRuntime( Scene, _registrations.AllowsEditorTesting );
+		SetState( _runtime.Owners.State );
+		Log.Info( $"[Superuser] Runtime {_runtime.Id} initialized; owners={_runtime.Owners.Configuration?.Count ?? 0}; file={_runtime.Owners.Path}" );
+	}
+
+	private void Stop( BootstrapState state )
+	{
+		if ( _runtime is not null )
+		{
+			Log.Info( $"[Superuser] Runtime {_runtime.Id} stopped." );
+			_runtime.Dispose();
+			_runtime = null;
+		}
+
+		SetState( state );
+	}
+
+	private void SetState( BootstrapState state )
+	{
+		if ( _state == state ) return;
+		_state = state;
+		if ( state == BootstrapState.DuplicateBootstrap )
+		{
+			Log.Warning( "[Superuser] Duplicate bootstrap detected; identity and owner access suspended. Keep one enabled bootstrap." );
+		}
+	}
+
+	public override void Dispose()
+	{
+		_disposed = true;
+		Stop( BootstrapState.Disposed );
+		_registrations.Clear();
+		base.Dispose();
+	}
+}
