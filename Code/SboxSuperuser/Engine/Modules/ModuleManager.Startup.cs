@@ -58,10 +58,12 @@ internal sealed partial class ModuleManager
 
 	private async Task<bool> WithinDeadlineAsync( Task work, CancellationToken cancellation )
 	{
-		using var timer = CancellationTokenSource.CreateLinkedTokenSource( cancellation );
-		var delay = Task.Delay( _deadline, timer.Token );
-		await Task.WhenAny( work, delay );
-		timer.Cancel();
+		// Task.WhenAny overloads are blocked by the engine whitelist. Yield in bounded timer slices.
+		var expires = DateTimeOffset.UtcNow + _deadline;
+		while ( !work.IsCompleted && !cancellation.IsCancellationRequested && DateTimeOffset.UtcNow < expires )
+		{
+			await Task.Delay( 10 );
+		}
 		return work.IsCompleted;
 	}
 }
