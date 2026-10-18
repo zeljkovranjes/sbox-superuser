@@ -40,7 +40,7 @@ internal sealed partial class HostModerationService
 				candidate = _ledger.Append( entry );
 				state = ModerationCodec.WriteState( candidate );
 			}
-			catch ( Exception error ) when ( error is ArgumentException or InvalidOperationException or OverflowException )
+			catch ( Exception error ) when ( error is ArgumentException or InvalidOperationException )
 			{
 				return new CommandResult( CommandStatus.InvalidArguments, "Reason must be printable and 1–256 characters; moderation history is limited to 512 records and 384000 encoded bytes." );
 			}

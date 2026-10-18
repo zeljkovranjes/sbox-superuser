@@ -48,7 +48,9 @@ internal static class ModerationCodec
 				expiresUtc = entry.ExpiresUtc?.ToString( "O", CultureInfo.InvariantCulture ), revokes = entry.Revokes
 			} ).ToArray()
 		} );
-		if ( Encoding.UTF8.GetByteCount( state ) > 384000 ) throw new InvalidOperationException( "Encoded moderation history capacity exceeded." );
+		// A maximum-size revocation must remain writable even when other notes exhaust the byte budget.
+		if ( Encoding.UTF8.GetByteCount( state ) + ledger.ReservedRevocations * 3072 > 384000 )
+			throw new InvalidOperationException( "Encoded moderation history capacity exceeded, including reserved revocations." );
 		return state;
 	}
 }

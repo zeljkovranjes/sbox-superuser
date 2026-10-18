@@ -6,6 +6,7 @@ internal sealed class ModerationLedger
 	private readonly Dictionary<(string Target, ModerationKind Kind), ModerationEntry> _active = new();
 	internal IReadOnlyList<ModerationEntry> Entries { get; }
 	internal long Revision { get; }
+	internal int ReservedRevocations => Entries.Count == 0 ? 0 : _active.Values.Count( entry => !entry.ExpiresUtc.HasValue || entry.ExpiresUtc > Entries[ ^1 ].CreatedUtc );
 
 	internal ModerationLedger( long revision, IEnumerable<ModerationEntry> entries )
 	{
@@ -35,6 +36,9 @@ internal sealed class ModerationLedger
 		}
 		Revision = revision;
 		Entries = Array.AsReadOnly( snapshot );
+		// Every active restriction keeps room for its eventual revocation, even when other history fills up.
+		if ( snapshot.Length + ReservedRevocations > MaximumRecords )
+			throw new ArgumentException( "Moderation capacity reserves one revocation record per active restriction." );
 	}
 
 	internal ModerationEntry Active( string target, ModerationKind kind, DateTimeOffset now )
@@ -43,5 +47,9 @@ internal sealed class ModerationLedger
 			&& (!entry.ExpiresUtc.HasValue || entry.ExpiresUtc > now) ? entry : null;
 	}
 
-	internal ModerationLedger Append( ModerationEntry entry ) => new( checked( Revision + 1 ), Entries.Append( entry ) );
+	internal ModerationLedger Append( ModerationEntry entry )
+	{
+		if ( Revision == long.MaxValue ) throw new InvalidOperationException( "Moderation revision limit reached." );
+		return new( Revision + 1, Entries.Append( entry ) );
+	}
 }

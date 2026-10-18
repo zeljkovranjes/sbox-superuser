@@ -30,6 +30,9 @@ internal sealed class ModerationEntry
 		else if ( actorKind != "DedicatedConsole" || actorSubject != "dedicated-console" )
 			throw new ArgumentException( "Invalid moderation actor." );
 		if ( origin is not ("Console" or "Chat" or "InternalService")
+			|| actorKind == "Player" && origin == "InternalService"
+			|| actorKind == "DedicatedConsole" && origin != "Console"
+			|| actorKind == "InternalService" && origin != "InternalService"
 			|| actorSubject.Length > 96 || string.IsNullOrWhiteSpace( reason ) || reason.Length > 256 || reason.Any( char.IsControl ) )
 			throw new ArgumentException( "Moderation requires a valid origin and a reason of 1–256 printable characters." );
 		if ( createdUtc.Offset != TimeSpan.Zero || expiresUtc.HasValue && (expiresUtc.Value.Offset != TimeSpan.Zero || expiresUtc <= createdUtc)
