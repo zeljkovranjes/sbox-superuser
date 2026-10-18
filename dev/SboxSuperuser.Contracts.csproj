@@ -18,6 +18,7 @@
     <Compile Include="../Code/SboxSuperuser/Engine/Authority/*.cs" />
     <Compile Include="../Code/SboxSuperuser/Engine/Audit/*.cs" />
     <Compile Include="../Code/SboxSuperuser/Engine/Modules/*.cs" />
+    <Compile Include="../Code/SboxSuperuser/Engine/NativeSettings/NativeValue.cs" />
     <InternalsVisibleTo Include="SboxSuperuser.Contracts.Tests" />
   </ItemGroup>
 </Project>
