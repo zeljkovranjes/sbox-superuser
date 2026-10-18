@@ -47,7 +47,7 @@ Navigation - replaces implementation history and task labels with a linked guide
 Examples - verifies the guide snippets in a fresh game, including native dedicated ping and private client chat
 # Audit
 Completion checks - verifies attributable Unknown outcomes across an actual dedicated-server interruption and restart
-Validation - all 311 contract and Core tests pass and the actual engine references accept the library
+Validation - all 314 contract and Core tests pass and the actual engine references accept the library
 ### Fixed
 # Security
 Owner protection - group ranks stop at 99 so a policy-editing owner cannot outrank and punish another owner

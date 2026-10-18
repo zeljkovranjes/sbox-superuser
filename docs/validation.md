@@ -16,7 +16,7 @@ Plain .NET builds do not apply the engine whitelist. Check the adopting game in 
 
 ## Verified behavior
 
-On engine **26.10.13a**, Steam build **25964806**, all **236 contract and 75 Core tests** passed. Existing tests were preserved. The generated library build and actual engine assembly references compile with zero warnings/errors.
+On engine **26.10.13a**, Steam build **25964806**, all **239 contract and 75 Core tests** passed. Existing tests were preserved. The generated library build and actual engine assembly references compile with zero warnings/errors.
 
 | Check | Evidence |
 |---|---|
