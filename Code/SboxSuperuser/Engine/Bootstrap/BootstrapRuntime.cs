@@ -11,6 +11,7 @@ internal sealed class BootstrapRuntime : IDisposable
 
 	internal Guid Id { get; } = Guid.NewGuid();
 	internal OwnerConfigurationFile Owners { get; }
+	internal Storage.HostAdminStore Store { get; }
 
 	internal bool IsUsable => !_disposed && _scene.IsValid() && _scene == Game.ActiveScene
 		&& Networking.IsActive && Networking.IsHost && _host is not null && _host.IsActive
@@ -23,6 +24,7 @@ internal sealed class BootstrapRuntime : IDisposable
 		_host = Connection.Host;
 		_allowEditorTesting = allowEditorTesting;
 		Owners = new OwnerConfigurationFile( Application.IsDedicatedServer );
+		Store = new Storage.HostAdminStore( Application.IsDedicatedServer, () => IsUsable );
 	}
 
 	internal bool TryResolvePlayer( Connection connection, out ActorIdentity identity )
