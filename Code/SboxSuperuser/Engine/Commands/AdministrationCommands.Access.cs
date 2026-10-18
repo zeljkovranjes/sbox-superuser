@@ -10,8 +10,8 @@ internal sealed partial class AdministrationCommands
 			arguments => PolicyChange.DeleteGroup( arguments.Get<string>( "group" ) ) );
 		Edit( "group.parents.set", "Replace group parents. Example: admin group helpers parents set player", new[]
 		{
-			Text( "group", "Group key" ), Text( "parents", "Comma-separated parent keys, or none to clear" )
-		}, arguments => PolicyChange.SetParents( arguments.Get<string>( "group" ), arguments.Get<string>( "parents" ) == "none"
+			Text( "group", "Group key" ), Text( "parents", "Comma-separated parent keys; an empty quoted value clears parents" )
+		}, arguments => PolicyChange.SetParents( arguments.Get<string>( "group" ), arguments.Get<string>( "parents" ).Length == 0
 			? Array.Empty<string>() : arguments.Get<string>( "parents" ).Split( ',' ) ) );
 		Edit( "group.protection.set", "Set target protection. Example: admin group helpers protection set 5", new[]
 		{

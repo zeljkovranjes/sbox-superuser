@@ -1,7 +1,13 @@
 # Changelog
 
 ## 2026-10-18
-Title: Verified Durable Audit
+Title: Console Administration
+### Added
+# Console
+Operator commands - native admin help, access management, diagnostics and private audit queries use the authoritative dispatcher
+Configured roots - bootstrap supports a logical root with a fixed native fallback and reports visible managed-name collisions
+Private replies - authenticated remote console results go only to the requesting connection; retries retain one correlated audit record
+Recovery diagnostics - local audit health remains inspectable when command auditing cannot write
 ### Improved
 # Audit
 Completion checks - verifies attributable Unknown outcomes across an actual dedicated-server interruption and restart

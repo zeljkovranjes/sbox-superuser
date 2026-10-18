@@ -1,6 +1,6 @@
 # Superuser
 
-Superuser provides host-local administration storage, authenticated identities and explicit owner configuration for dedicated servers. Add one Superuser Bootstrap to your game's network scene; enable its editor switch for local testing. Permissions, typed command dispatch and durable audit records run in the same s&box C# library. Native administration commands, general chat integration and UI remain pending.
+Superuser provides console administration, host-local records and explicit owner configuration for dedicated servers. Add one Superuser Bootstrap to your game's network scene; enable its editor switch for local testing. Permissions, access commands, typed dispatch and durable audit records run in the same s&box C# library. General chat integration, moderation and UI remain pending.
 
 ## Requirements
 
@@ -17,7 +17,7 @@ This package is not published on sbox.game. Add this local library to a test gam
 1. Add one **Superuser Bootstrap** to your game's network scene, or use the isolated [bootstrap fixture](dev/fixtures/README.md).
 2. Enable **Allow Editor Testing** for editor-host tests. Leave it off for dedicated hosting.
 3. Configure explicit owner Steam IDs in `FileSystem.Data/superuser/editor-owners.json` for editor testing, or `superuser/owners.json` for dedicated hosting. Start with the [empty example](dev/fixtures/owners.example.json); no owner is inferred automatically.
-4. Enter Play and run `superuser_status` and `superuser_identity` in the console. The second command accepts no arguments.
+4. Enter Play and run `admin help` in the console. An explicitly configured owner can run `admin diagnostics` and `admin group list`. `superuser_status` and `superuser_identity` remain local troubleshooting entries.
 5. Reload the scene or disable/re-enable bootstrap after editing owner configuration. See [bootstrap setup](docs/T03-BOOTSTRAP.md) for failures and dedicated-console diagnostics.
 6. For Task 1 checks, additionally add **Superuser Compatibility Probe** and opt into its editor mode. Its commands remain `superuser_probe`, `superuser_probe_local` and `/superuser-probe` in the chatbox.
 7. Host code can obtain `Superuser.GetStore()` for versioned transactions. Follow the [storage and recovery guide](docs/T04-STORAGE.md); editor and dedicated records are isolated.
@@ -44,6 +44,7 @@ The dedicated console's local connection is not a player; use `superuser_local_i
 | Option | Default | What it does |
 |---|---|---|
 | Allow Editor Testing | `false` | Allows bootstrap or probe execution on an editor host; does not enable player-hosted release games. |
+| Command Root | `admin` | Logical administration root. Other names use `superuser <root> <command>` in console; re-enable bootstrap to apply. |
 | Probe Storage On Start | `false` | Exercises isolated files under `FileSystem.Data/superuser-t01/<mode>/` and preserves an existing baseline. |
 | Rejected Test Steam Id | Empty | Deliberately rejects only this test account at the admission callback. Empty accepts all connections. |
 | Audit maximum records | `512` | Owner-configured retained rows, from 1–4096, also subject to a 384000-byte state limit. |
@@ -61,9 +62,10 @@ Dedicated servers are the only production target. Opt-in editor testing is devel
 
 ## Limitations
 
-- Tasks 1–10 are implemented. No native admin root, general chat ingress, module loader, moderation enforcement or UI is installed.
+- Tasks 1–11 are implemented. General chat ingress, module lifecycle management, moderation enforcement and UI remain pending.
 - Task 1's unavailable dedicated multiplayer evidence remains marked Blocked; Task 2 does not certify that deployment.
 - Chat commands use `/`; the future administration root will be `/admin`. The current probe does not implement administration commands.
+- Native dynamic registration and full engine-name enumeration are unavailable. Visible managed-name collisions are reported; see the [console guide](docs/T11-CONSOLE.md) for the fixed transport and configured-root fallback.
 - The probe is for isolated testing and should be removed from a production scene.
 - Do not enter credentials or sensitive arguments into diagnostic commands: bounded test arguments are logged.
 - Storage requires one host process per data root. Process interruption/restart recovery is verified; filesystem flush-to-device and power-loss durability are not guaranteed.
@@ -91,6 +93,8 @@ Task 8 adds [strict argument parsing, player targeting and generated syntax](doc
 Task 9 adds [authoritative dispatch](docs/T09-DISPATCH.md). Host adapters call `ExecuteCommandAsync` with the live engine caller; trusted host code can issue revocable `CommandService` handles. Module registrations explicitly approve game capabilities.
 
 Task 10 adds [durable audit intents and outcomes](docs/T10-AUDIT.md). Use `QueryAuditAsync` for permission-filtered pages, `ConfigureAuditRetentionAsync` for owner-only settings and `GetAuditDiagnostics` for host-local health. The current suites contain 180 contract and 32 Core cases. Editor storage-failure checks and an actual dedicated-process interruption/restart verify the outcome guarantees.
+
+Task 11 adds [native console commands and permission-filtered help](docs/T11-CONSOLE.md). Run `admin help`, `admin help group.create`, or `superuser <configured-root> help`. Access edits require owner authority and audit queries remain private. The current suites contain 186 contract and 44 Core cases; actual dedicated console and two-client editor checks passed.
 
 ## License
 

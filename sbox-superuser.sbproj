@@ -15,7 +15,7 @@
   },
   "Metadata": {
     "Summary": "Provides host-local administration storage, authenticated identities and explicit owners for dedicated servers.",
-    "Description": "Provides host-local administration storage, authenticated identities and explicit owner configuration inside one C# library. Add one Superuser Bootstrap to your game's network scene and explicitly enable its editor switch for testing. Permissions, typed command dispatch and durable audit records are included. Native administration commands, general chat integration and UI remain pending.",
+    "Description": "Provides console administration, host-local records and explicit owner configuration inside one C# library. Add one Superuser Bootstrap to your game's network scene and explicitly enable its editor switch for testing. Permissions, access commands, typed dispatch and durable audit records are included. General chat integration, moderation and UI remain pending.",
     "WebsiteUrl": "https://github.com/zeljkovranjes/sbox-superuser",
     "Tags": [ "tools", "administration", "dedicated-server", "diagnostics" ],
     "Compiler": {
