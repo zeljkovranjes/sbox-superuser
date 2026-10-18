@@ -18,3 +18,9 @@ This fixture has no player controller or administration logic. Do not ship its d
 `owners.example.json` grants nobody. Copy it to the adopting game's FileSystem.Data as `superuser/owners.json` for dedicated hosting, or `superuser/editor-owners.json` for editor testing. Add only the explicit decimal Steam IDs you intend to make owners. Restart bootstrap after editing the file. Owner files stay host-local and are never copied into scene properties.
 
 Run `superuser_status`, `superuser_identity` and, only on an actual dedicated console, `superuser_local_identity`. The player diagnostic accepts no arguments. These commands observe identity; they do not dispatch administration actions. See [T03](../../docs/T03-BOOTSTRAP.md) for verification scripts and limits.
+
+## Task 7 command fixtures
+
+Copy `IDogSpawner.cs` and `DogMood.cs` into the adopting game's `Api/`, and `DogCommands.cs`, `InvalidCommandSamples.cs`, `EmptyCommandServices.cs` into `Engine/Commands/`. Keep the `SuperuserCompatibilityLab` namespace or adjust it consistently for your game. These files are development fixtures, not additional runtime libraries.
+
+Run `dev/verify-command-discovery.cs` through `run_csharp` after the game compiles. It invokes handlers in the actual library/game assemblies, including expected failures. The dog command returns Unsupported without a game-provided `IDogSpawner`; no dog assets are supplied. In a playing editor host, `dev/verify-command-registration-host.cs` checks the public host API and restores the editor switch.
