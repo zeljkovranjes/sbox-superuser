@@ -294,7 +294,7 @@ internal sealed partial class AdminMenuRenderer
 			if ( index % perRow != 0 ) ImGui.SameLine();
 			var action = details.Actions[ index ];
 			if ( ToneButton( ActionLabel( action ), AdminMenuTheme.Tone( action ), new Vector2( width, ImGui.GetFrameHeight() * 1.2f ) ) ) Model.Prepare( action );
-			ImGui.SetItemTooltip( "{0}", ActionHint( action ) );
+			if ( ImGui.IsItemHovered( ImGuiHoveredFlags.ForTooltip | ImGuiHoveredFlags.AllowWhenDisabled ) ) ImGui.SetTooltip( "{0}", ActionHint( action ) );
 		}
 		ImGui.EndDisabled();
 		DrawConfirmation();
@@ -312,7 +312,7 @@ internal sealed partial class AdminMenuRenderer
 		var target = name is null ? confirmation.SteamId : $"{name}  ({confirmation.SteamId})";
 		var pad = new Vector2( 16, 14 ) * scale;
 		var key = pad.x + 80 * scale;
-		var wrap = ImGui.GetContentRegionAvail().x - pad.x * 2 - key;
+		var wrap = MathF.Max( 1, ImGui.GetContentRegionAvail().x - pad.x * 2 - key );
 		ImGui.PushFont( null, AdminMenuTheme.HeadingSize );
 		var heading = ImGui.GetTextLineHeightWithSpacing();
 		ImGui.PopFont();

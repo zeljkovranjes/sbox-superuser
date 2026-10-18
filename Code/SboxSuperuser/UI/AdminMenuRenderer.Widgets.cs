@@ -106,7 +106,8 @@ internal sealed partial class AdminMenuRenderer
 		var draw = ImGui.GetWindowDrawList();
 		var rounding = ImGui.GetStyle().FrameRounding;
 		draw.AddRectFilled( min, min + size, ImGui.GetColorU32( AdminMenuTheme.Fade( tone, 0.12f ) ), rounding );
-		draw.AddRectFilled( min, new Vector2( min.x + edge, min.y + size.y ), ImGui.GetColorU32( tone ), rounding, ImDrawFlags.RoundCornersLeft );
+		// Inset the edge so its narrow radius stays inside the fill's rounded corners.
+		draw.AddRectFilled( new Vector2( min.x, min.y + rounding / 2 ), new Vector2( min.x + edge, min.y + size.y - rounding / 2 ), ImGui.GetColorU32( tone ), edge / 2 );
 		draw.AddText( 0, min + new Vector2( pad.x + edge, pad.y ), ImGui.GetColorU32( AdminMenuTheme.Text ), text, wrap );
 		ImGui.Dummy( size );
 	}
