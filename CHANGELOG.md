@@ -1,7 +1,7 @@
 # Changelog
 
 ## 2026-10-18
-Title: Persistent Moderation and Native Settings
+Title: Persistent Moderation and Verified Lifetimes
 ### Added
 # Console
 Operator commands - native admin help, access management, diagnostics and private audit queries use the authoritative dispatcher
@@ -12,6 +12,8 @@ Recovery diagnostics - local audit health remains inspectable when command audit
 Managed lifetimes - validates dependencies and API versions, stages startup atomically and cleans up tracked subscriptions
 Owner controls - module enable and disable retain stored data and protect required security services
 Bounded shutdown - removes entry points immediately, signals cancellation and prevents restart while old work remains active
+Scene transitions - dedicated scene replacement retires old authority, removes listeners and preserves policy and moderation records
+Source reload recovery - structural replacement retires runtime authority and requires a fresh session; stop before editing source because method-only reload does not reliably trigger this guard
 Removable sample - verifies repeated module reload and failure rollback in the editor and an actual dedicated server
 # Chat
 Slash commands - platform chat consumes exact /admin commands before dispatch and sends results only to the requester
@@ -20,6 +22,7 @@ Chat validation - two real clients verify ordinary-chat pass-through, private er
 Custom chat hooks - independent backends consume commands before broadcast and receive authenticated private results through a scene event
 Chat examples - compiled platform and independent chatboxes demonstrate private feedback, request retries and ordinary-message checks
 Result fallback - disabled views unsubscribe automatically and failing observers preserve the platform notification fallback
+Unavailable sessions - enabled eligible bootstrap keeps player chat private while administration is unavailable
 # Settings
 Explicit bindings - allowlisted native settings and commands use typed permissions and retain native restrictions
 Setting commands - list, get, set and reset report actual native values with verified write readback

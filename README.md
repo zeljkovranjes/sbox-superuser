@@ -64,7 +64,8 @@ Dedicated servers are the only production target. Opt-in editor testing is devel
 
 ## Limitations
 
-- Tasks 1–16 are implemented. Lifecycle certification, two-game portability, load validation and release packaging remain pending; visual admin UI is deferred.
+- Tasks 1–17 are implemented. Two-game portability, load validation and release packaging remain pending; visual admin UI is deferred.
+- Stop Play or the dedicated process before changing source. Managed module reload, scene replacement and process restart are verified; arbitrary live source edits are unsupported. A structural reload can report `RestartRequired`; method-only fast reload does not reliably trigger that guard. See the [lifecycle support matrix](docs/T17-LIFECYCLE.md).
 - Task 1's unavailable dedicated multiplayer evidence remains marked Blocked; Task 2 does not certify that deployment.
 - Chat commands use `/admin` by default; `!` is ordinary text. The compatibility probe remains separate from administration commands.
 - Native dynamic registration and full engine-name enumeration are unavailable. Visible managed-name collisions are reported; see the [console guide](docs/T11-CONSOLE.md) for the fixed transport and configured-root fallback.
@@ -98,7 +99,7 @@ Task 10 adds [durable audit intents and outcomes](docs/T10-AUDIT.md). Use `Query
 
 Task 11 adds [native console commands and permission-filtered help](docs/T11-CONSOLE.md). Run `admin help`, `admin help group.create`, or `superuser <configured-root> help`. Access edits require owner authority and audit queries remain private. The current suites contain 186 contract and 44 Core cases; actual dedicated console and two-client editor checks passed.
 
-Task 12 adds [managed module lifetimes](docs/T12-MODULES.md). Trusted host setup calls `RegisterModulesAsync`; owners use `admin modules list`, `admin modules enable <id>` and `admin modules disable <id>`. Failed startup rolls back registrations, listeners are tracked for cleanup, and timed-out work prevents overlapping restart. The current suites contain 198 contract and 49 Core cases. Editor and actual dedicated checks cover five reloads, persisted data retention and bounded cancellation. Arbitrary source hot reload remains a T17 verification item.
+Task 12 adds [managed module lifetimes](docs/T12-MODULES.md). Trusted host setup calls `RegisterModulesAsync`; owners use `admin modules list`, `admin modules enable <id>` and `admin modules disable <id>`. Failed startup rolls back registrations, listeners are tracked for cleanup, and timed-out work prevents overlapping restart. The current suites contain 198 contract and 49 Core cases. Editor and actual dedicated checks cover five reloads, persisted data retention and bounded cancellation. [T17](docs/T17-LIFECYCLE.md) records the limits of live source replacement.
 
 Task 13 adds [platform chat commands](docs/T13-PLATFORM-CHAT.md) through the same dispatcher. Two actual editor clients verify synchronous command consumption, private successes/errors and one request per submission. The current suites contain 207 contract and 61 Core cases. Platform rate limits remain active; `/` is the only admin chat prefix.
 
