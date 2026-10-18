@@ -91,7 +91,7 @@ internal sealed class SuperuserSession : GameObjectSystem<SuperuserSession>
 				continue;
 			}
 
-			otherScene.GetSystem<SuperuserSession>().Stop( BootstrapState.Unsupported );
+			otherScene.GetSystem<SuperuserSession>()?.Stop( BootstrapState.Unsupported );
 		}
 
 		_runtime = new BootstrapRuntime( Scene, _registrations.AllowsEditorTesting );
