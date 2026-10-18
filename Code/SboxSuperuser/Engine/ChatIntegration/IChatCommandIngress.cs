@@ -1,4 +1,4 @@
-namespace SboxSuperuser.Engine.Chat;
+namespace SboxSuperuser.Engine.ChatIntegration;
 
 // T13 boundary: sender must come from the host's authenticated transport, never message fields.
 // True means consumed (including errors), not execution success; suppress before asynchronous work.
