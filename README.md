@@ -114,17 +114,6 @@ restart. [Reference](docs/menu.md).
 
 <br>
 
-## Remaining work
-
-Dedicated **remote-client** deployment has not been verified yet, because the
-test games lack the package record it requires. Voice moderation, player-hosted production
-servers and host migration are not supported.
-
-Please report anything that is awkward to integrate or behaves differently on
-your engine version.
-
-<br>
-
 #### License
 
 No license selected.
