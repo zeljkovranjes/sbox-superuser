@@ -56,6 +56,17 @@ public sealed class CommandRegistrationScope : IModuleRegistration, IDisposable
 		_commands[ _commands.Count - 1 ] = _commands[ _commands.Count - 1 ] with { RecordsAudit = false };
 	}
 
+	internal void RegisterLifecycleControl( CommandDescriptor descriptor, CommandHandler handler )
+	{
+		if ( ModuleId != "superuser.administration" || descriptor.Name is not ("modules.enable" or "modules.disable")
+			|| descriptor.ExecutionPolicy != CommandExecutionPolicy.Mutation )
+		{
+			throw new ArgumentException( "Only built-in module lifecycle operations may use the reserved control queue." );
+		}
+		RegisterCommand( descriptor, handler );
+		_commands[ _commands.Count - 1 ] = _commands[ _commands.Count - 1 ] with { IsLifecycleControl = true };
+	}
+
 	/// <summary>Stages an exact permission key without granting it to any actor.</summary>
 	public void RegisterPermission( PermissionDescriptor descriptor )
 	{

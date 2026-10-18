@@ -14,7 +14,7 @@ internal sealed partial class AdministrationCommands
 			Register( "modules." + operation, $"{operation} an installed module. Example: admin modules {operation} sample.counter",
 				"admin.security.manage", new[] { Text( "module", "Exact installed module ID" ) },
 				( context, arguments ) => _modules.SetEnabledAsync( () => Authenticate( context ), arguments.Get<string>( "module" ),
-					enabled, context.Cancellation ), mutation: true );
+					enabled, context.Cancellation ), mutation: true, lifecycleControl: true );
 		}
 	}
 

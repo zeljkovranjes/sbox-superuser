@@ -5,4 +5,5 @@ internal sealed record RegisteredCommand( CommandDescriptor Descriptor, CommandH
 	internal CommandCapabilities Capabilities { get; init; } = CommandCapabilities.Empty;
 	internal bool RecordsAudit { get; init; } = true;
 	internal Modules.ModuleExecution Execution { get; init; }
+	internal bool IsLifecycleControl { get; init; }
 }

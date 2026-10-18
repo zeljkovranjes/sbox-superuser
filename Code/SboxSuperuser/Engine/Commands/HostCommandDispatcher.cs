@@ -13,6 +13,7 @@ internal sealed partial class HostCommandDispatcher : ICommandDispatcher, IDispo
 	private readonly Action<Exception> _report;
 	private readonly CancellationTokenSource _lifetime = new();
 	private readonly RequestQueue<CommandResult> _queue;
+	private readonly RequestQueue<CommandResult> _controlQueue;
 	private bool _disposed;
 	private readonly IAuditWriter _audit;
 
@@ -26,6 +27,8 @@ internal sealed partial class HostCommandDispatcher : ICommandDispatcher, IDispo
 		_report = report;
 		_audit = audit;
 		_queue = new RequestQueue<CommandResult>( clock ?? (() => DateTimeOffset.UtcNow), Result( CommandStatus.Cancelled, "Cancelled before execution." ) );
+		_controlQueue = new RequestQueue<CommandResult>( clock ?? (() => DateTimeOffset.UtcNow),
+			Result( CommandStatus.Cancelled, "Cancelled before execution." ), 8, 2, 64, 8 );
 	}
 
 	internal async Task<CommandResult> SubmitAsync( Func<ActorIdentity> authenticate, CommandOrigin origin, CommandRequest request,
@@ -93,7 +96,7 @@ internal sealed partial class HostCommandDispatcher : ICommandDispatcher, IDispo
 
 			var key = new RequestKey( (int)context.Actor.Kind, context.Actor.SubjectId, (int)context.Origin, context.RequestId );
 			var fingerprint = RequestFingerprint.Compute( request.Command, request.Arguments );
-			var retry = _queue.FindRetry( key, fingerprint );
+			var retry = _queue.FindRetry( key, fingerprint ) ?? _controlQueue.FindRetry( key, fingerprint );
 			if ( retry is not null )
 			{
 				audit.Handled = retry.Admission != QueueAdmission.Conflict;
@@ -119,6 +122,11 @@ internal sealed partial class HostCommandDispatcher : ICommandDispatcher, IDispo
 			{
 				return Result( CommandStatus.Denied, "Permission denied." );
 			}
+			if ( command.IsLifecycleControl && context.Actor.Kind != ActorKind.DedicatedConsole
+				&& (context.Actor.Kind != ActorKind.Player || !_policy.IsOwner( context.Actor.SubjectId )) )
+			{
+				return Result( CommandStatus.Denied, "Module lifecycle requires current owner or dedicated console authority." );
+			}
 
 			var parsed = CommandArgumentParser.Parse( command.Descriptor, request.Arguments, _players() );
 			if ( !parsed.IsSuccess )
@@ -132,7 +140,8 @@ internal sealed partial class HostCommandDispatcher : ICommandDispatcher, IDispo
 				command.Execution?.Cancellation ?? CancellationToken.None );
 			var executionContext = new CommandContext( context.Actor, context.Origin, context.RequestId, moduleCancellation.Token, context.Services );
 			Task<CommandResult> Execute() => ExecuteAuditedAsync( executionContext, services, request.Command, command, parsed.Arguments, audit );
-			var admission = _queue.Submit( key, fingerprint,
+			var queue = command.IsLifecycleControl ? _controlQueue : _queue;
+			var admission = queue.Submit( key, fingerprint,
 				() => command.Execution is null ? Execute() : command.Execution.RunAsync( Execute ), moduleCancellation.Token );
 			return admission.Admission switch
 			{

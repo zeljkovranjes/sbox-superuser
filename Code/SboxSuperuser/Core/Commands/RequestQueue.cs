@@ -14,11 +14,21 @@ internal sealed class RequestQueue<T>
 	private readonly T _cancelled;
 	private bool _draining;
 	private int _outstanding;
+	private readonly int _maximumOutstanding;
+	private readonly int _maximumActorOutstanding;
+	private readonly int _maximumRemembered;
+	private readonly int _maximumActorRemembered;
 
-	internal RequestQueue( Func<DateTimeOffset> clock, T cancelled )
+	internal RequestQueue( Func<DateTimeOffset> clock, T cancelled, int maximumOutstanding = MaximumOutstanding,
+		int maximumActorOutstanding = MaximumActorOutstanding, int maximumRemembered = MaximumRemembered,
+		int maximumActorRemembered = MaximumActorRemembered )
 	{
 		_clock = clock;
 		_cancelled = cancelled;
+		_maximumOutstanding = maximumOutstanding;
+		_maximumActorOutstanding = maximumActorOutstanding;
+		_maximumRemembered = maximumRemembered;
+		_maximumActorRemembered = maximumActorRemembered;
 	}
 
 	internal QueuedResult<T> Submit( RequestKey key, string fingerprint, Func<Task<T>> execute, CancellationToken cancellation )
@@ -35,8 +45,8 @@ internal sealed class RequestQueue<T>
 			}
 
 			var actorEntries = _remembered.Values.Where( value => value.Key.ActorKind == key.ActorKind && value.Key.SubjectId == key.SubjectId ).ToArray();
-			if ( _outstanding >= MaximumOutstanding || _remembered.Count >= MaximumRemembered || actorEntries.Length >= MaximumActorRemembered
-				|| actorEntries.Count( value => !value.CompletedUtc.HasValue ) >= MaximumActorOutstanding )
+			if ( _outstanding >= _maximumOutstanding || _remembered.Count >= _maximumRemembered || actorEntries.Length >= _maximumActorRemembered
+				|| actorEntries.Count( value => !value.CompletedUtc.HasValue ) >= _maximumActorOutstanding )
 			{
 				return new QueuedResult<T>( QueueAdmission.Busy, null );
 			}

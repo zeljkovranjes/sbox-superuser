@@ -31,11 +31,15 @@ internal sealed partial class AdministrationCommands : IDisposable
 	}
 
 	private void Register( string name, string description, string permission, CommandArgumentDescriptor[] arguments,
-		CommandHandler handler, bool mutation = false, bool auditQuery = false )
+		CommandHandler handler, bool mutation = false, bool auditQuery = false, bool lifecycleControl = false )
 	{
 		var descriptor = new CommandDescriptor( name, description, permission, Module, arguments,
 			executionPolicy: mutation ? CommandExecutionPolicy.Mutation : CommandExecutionPolicy.ReadOnly );
-		if ( auditQuery )
+		if ( lifecycleControl )
+		{
+			_scope.RegisterLifecycleControl( descriptor, handler );
+		}
+		else if ( auditQuery )
 		{
 			_scope.RegisterAuditQuery( descriptor, handler );
 		}
