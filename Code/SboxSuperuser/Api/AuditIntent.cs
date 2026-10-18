@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Text.Json;
 using SboxSuperuser.Core.Contracts;
@@ -32,7 +31,14 @@ public sealed class AuditIntent
 			safeArguments = arguments, targets = targetCopy,
 			createdUtc = createdUtc.ToString( "O", CultureInfo.InvariantCulture ), outcome = "Unknown"
 		} );
-		Core.Storage.TransactionFormat.Validate( "{\"state\":{},\"auditIntents\":[" + _json + "]}" );
+		try
+		{
+			Core.Storage.TransactionFormat.Validate( "{\"state\":{},\"auditIntents\":[" + _json + "]}" );
+		}
+		catch ( Exception error ) when ( error is FormatException or JsonException or InvalidOperationException )
+		{
+			throw new ArgumentException( "Audit intent fields are invalid.", nameof( id ), error );
+		}
 	}
 
 	internal string ToJson() => _json;

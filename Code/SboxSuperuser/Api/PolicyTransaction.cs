@@ -1,5 +1,6 @@
 using SboxSuperuser.Core.Contracts;
 using SboxSuperuser.Core.Storage;
+using System.Text.Json;
 
 namespace SboxSuperuser;
 
@@ -11,10 +12,18 @@ public sealed class PolicyTransaction
 	/// <summary>Snapshots JSON state and intents; module-specific policy validation remains the module's responsibility.</summary>
 	public PolicyTransaction( string stateJson, IEnumerable<AuditIntent> auditIntents )
 	{
+		ArgumentNullException.ThrowIfNull( stateJson );
 		var intents = ContractGuard.Copy( auditIntents, nameof( auditIntents ) );
 		_payload = "{\"state\":" + stateJson + ",\"auditIntents\":["
 			+ string.Join( ",", intents.Select( intent => intent.ToJson() ) ) + "]}";
-		TransactionFormat.Validate( _payload );
+		try
+		{
+			TransactionFormat.Validate( _payload );
+		}
+		catch ( Exception error ) when ( error is FormatException or JsonException or InvalidOperationException )
+		{
+			throw new ArgumentException( "State or audit intents violate the transaction schema.", nameof( stateJson ), error );
+		}
 	}
 
 	/// <summary>Creates an expected-revision write; persistence is performed only by the store.</summary>
