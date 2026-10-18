@@ -45,12 +45,12 @@ Failure handling - failed ban writes leave players connected; explicit backup re
 Getting started - short Markdown chapters cover setup, a working ping command, custom chat and core APIs
 Navigation - replaces implementation history and task labels with a linked guide and concise example-first README
 Examples - verifies the guide snippets in a fresh game, including native dedicated ping and private client chat
+# Audit
+Completion checks - verifies attributable Unknown outcomes across an actual dedicated-server interruption and restart
+Validation - all 307 contract and Core tests pass and the actual engine whitelist accepts the library
 ### Fixed
 # Documentation
 Logger examples - uses the engine's global Log in sample snippets so they compile in the adopting game
-# Audit
-Completion checks - verifies attributable Unknown outcomes across an actual dedicated-server interruption and restart
-Validation - all 212 tests pass and the engine whitelist accepts audit cleanup; Tasks 5–10 are complete
 
 ## 2026-10-17
 Title: Durable Administration Audit

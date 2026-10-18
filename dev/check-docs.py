@@ -13,7 +13,7 @@ errors = []
 blocks = {}
 for path in files:
     text = path.read_text(encoding="utf-8-sig")
-    if re.search(r"\bT\d{2}\b|\b[Tt]ask[ -]+\d+", text):
+    if re.search(r"\bT\d{2}\b|\b[Tt]asks?[ -]+\d+", text):
         errors.append(f"Task label: {path.relative_to(root)}")
     for target in re.findall(r"\[[^\]]*\]\(([^)]+)\)", text):
         if re.match(r"https?://|#", target):
