@@ -6,6 +6,20 @@ namespace SboxSuperuser;
 
 public static partial class Superuser
 {
+	[ConCmd( "superuser_audit_status" )]
+	private static void NativeAuditStatus()
+	{
+		var health = GetAuditDiagnostics();
+		if ( health is null )
+		{
+			Log.Info( "[Superuser] Audit diagnostics require an eligible host-local runtime." );
+			return;
+		}
+
+		// Host-local recovery diagnostics must remain readable when required command auditing is unavailable.
+		Log.Info( $"[Superuser] auditDegraded={health.IsDegraded}; read={health.ReadStatus}; write={health.LastWriteStatus}; revision={health.Revision}; retained={health.RetainedCount}; retentionPending={health.RetentionPending}" );
+	}
+
 	[ConCmd( "admin" )]
 	private static void NativeAdministration( params string[] arguments ) => LaunchConsole( "admin", arguments );
 

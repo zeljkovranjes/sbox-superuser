@@ -97,6 +97,8 @@ internal sealed class BootstrapRuntime : IDisposable
 		[ "ownerSource" ] = Policy.OwnerSource,
 		[ "audit" ] = Audit.Diagnostics().ReadStatus.ToString(),
 		[ "auditDegraded" ] = Audit.IsDegraded.ToString(),
+		[ "auditWrite" ] = Audit.Diagnostics().LastWriteStatus.ToString(),
+		[ "retentionPending" ] = Audit.Diagnostics().RetentionPending.ToString(),
 		[ "migration" ] = "Player-hosted release games and host migration are unsupported."
 	} );
 

@@ -15,7 +15,7 @@ internal sealed partial class AdministrationCommands
 			Array.Empty<CommandArgumentDescriptor>(), ( context, _ ) => Task.FromResult( IsOwner( context ) ? _diagnostics() : Denied() ) );
 		Register( "modules.list", "List registered module IDs. Example: admin modules list", "admin.security.manage", new[] { Page() },
 			( context, arguments ) => Task.FromResult( IsOwner( context )
-				? Rows( _registry.Descriptors.Select( item => item.ModuleId ).Distinct().Order(), PageNumber( arguments ), "Registered modules; lifecycle management follows in T12." ) : Denied() ) );
+				? Rows( _registry.Descriptors.Select( item => item.ModuleId ).Distinct().Order(), PageNumber( arguments ), "Registered command modules." ) : Denied() ) );
 		var filters = new[] { Text( "command", "Exact command key or * for all", true ), Text( "cursor", "Opaque revision:sequence from the previous page", true ) };
 		Register( "audit.query", "Read permitted audit records. Example: admin audit query *", "admin.audit.read", filters,
 			( context, arguments ) => AuditAsync( context, arguments, false ), auditQuery: true );

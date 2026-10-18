@@ -6,7 +6,8 @@ internal static class ConsoleReplies
 {
 	internal static void Send( Connection recipient, bool dedicatedLocal, Guid requestId, CommandResult result )
 	{
-		if ( dedicatedLocal && Application.IsDedicatedServer )
+		if ( Application.IsDedicatedServer && (dedicatedLocal || recipient is not null
+			&& ReferenceEquals( recipient, Connection.Host ) && recipient.SteamId == 0) )
 		{
 			Print( requestId, result.Status, result.Message, result.Data.Keys.ToArray(), result.Data.Values.ToArray() );
 			return;
