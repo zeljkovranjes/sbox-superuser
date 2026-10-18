@@ -14,15 +14,20 @@ public sealed class CommandRegistrationScope : IModuleRegistration, IDisposable
 	private readonly Guid _token = Guid.NewGuid();
 	private bool _committed;
 	private bool _disposed;
+	private readonly bool _managed;
+	private readonly List<IDisposable> _subscriptions = new();
+	internal Engine.Modules.ModuleExecution Execution { get; }
 
 	/// <summary>Gets the module that owns this registration batch.</summary>
 	public string ModuleId { get; }
 
-	internal CommandRegistrationScope( CommandRegistry registry, string moduleId, Action<CommandRegistrationScope> discover = null )
+	internal CommandRegistrationScope( CommandRegistry registry, string moduleId, Action<CommandRegistrationScope> discover = null, bool managed = false )
 	{
 		_registry = registry;
 		ModuleId = ContractGuard.Key( moduleId, nameof( moduleId ) );
 		_discover = discover;
+		_managed = managed;
+		Execution = managed ? new Engine.Modules.ModuleExecution() : null;
 	}
 
 	/// <summary>Stages immutable metadata and an explicit typed handler.</summary>
@@ -90,7 +95,7 @@ public sealed class CommandRegistrationScope : IModuleRegistration, IDisposable
 	{
 		EnsureStaging();
 		var capabilities = new CommandCapabilities( _services );
-		_registry.Replace( ModuleId, _token, _commands.Select( command => command with { Capabilities = capabilities } ).ToArray(), _permissions );
+		_registry.Replace( ModuleId, _token, _commands.Select( command => command with { Capabilities = capabilities, Execution = Execution } ).ToArray(), _permissions, _managed );
 		_committed = true;
 	}
 
@@ -105,6 +110,18 @@ public sealed class CommandRegistrationScope : IModuleRegistration, IDisposable
 		}
 	}
 
+	/// <summary>Tracks a subscription for cleanup; rejected late registrations are disposed immediately.</summary>
+	public void Track( IDisposable subscription )
+	{
+		ArgumentNullException.ThrowIfNull( subscription );
+		if ( _disposed || _committed || _subscriptions.Count >= 128 )
+		{
+			subscription.Dispose();
+			throw new InvalidOperationException( "Subscriptions must be staged before commit, with at most 128 per module." );
+		}
+		_subscriptions.Add( subscription );
+	}
+
 	/// <summary>Removes this scope's active entries; disposing an older replaced scope has no effect.</summary>
 	public void Dispose()
 	{
@@ -113,12 +130,43 @@ public sealed class CommandRegistrationScope : IModuleRegistration, IDisposable
 			return;
 		}
 
-		if ( _committed )
-		{
-			_registry.Remove( ModuleId, _token );
-		}
-
 		_disposed = true;
+		var failures = new List<Exception>();
+		try
+		{
+			if ( _committed )
+			{
+				_registry.Remove( ModuleId, _token );
+			}
+		}
+		catch ( Exception error )
+		{
+			failures.Add( error );
+		}
+		try
+		{
+			Execution?.Stop();
+		}
+		catch ( Exception error )
+		{
+			failures.Add( error );
+		}
+		foreach ( var subscription in _subscriptions.AsEnumerable().Reverse() )
+		{
+			try
+			{
+				subscription.Dispose();
+			}
+			catch ( Exception error )
+			{
+				failures.Add( error );
+			}
+		}
+		_subscriptions.Clear();
+		if ( failures.Count > 0 )
+		{
+			throw new AggregateException( "Module cleanup failed; all tracked resources were attempted.", failures );
+		}
 	}
 
 	private void EnsureStaging()

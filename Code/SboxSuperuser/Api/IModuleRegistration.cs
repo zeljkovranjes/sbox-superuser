@@ -11,4 +11,13 @@ public interface IModuleRegistration
 
 	/// <summary>Declares a permission owned by this module; no grant is performed.</summary>
 	void RegisterPermission( PermissionDescriptor descriptor );
+
+	/// <summary>Tracks a listener or resource for reverse-order disposal on rollback or shutdown.</summary>
+	void Track( IDisposable subscription );
+
+	/// <summary>Approves an exact game capability type for this module's handlers.</summary>
+	void RegisterService<T>( T service ) where T : class;
+
+	/// <summary>Stages attributed commands through the verified engine discovery adapter.</summary>
+	void DiscoverCommands();
 }

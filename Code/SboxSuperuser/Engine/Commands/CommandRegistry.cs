@@ -9,6 +9,9 @@ internal sealed class CommandRegistry
 	private Dictionary<string, Guid> _modules = new( StringComparer.Ordinal );
 	private readonly Action<IEnumerable<string>> _publishPermissions;
 	private readonly Func<bool> _available;
+	private readonly HashSet<string> _managed = new( StringComparer.Ordinal );
+	internal bool HasModule( string id ) => _modules.ContainsKey( id ) || _managed.Contains( id );
+	internal void ReserveModule( string id ) => _managed.Add( id );
 
 	internal CommandRegistry( IEnumerable<string> reservedPermissions, Action<IEnumerable<string>> publishPermissions, Func<bool> available )
 	{
@@ -25,9 +28,13 @@ internal sealed class CommandRegistry
 	internal IReadOnlyList<CommandDescriptor> Descriptors => Array.AsReadOnly( _commands.Values
 		.Distinct().Select( value => value.Descriptor ).OrderBy( value => value.Name, StringComparer.Ordinal ).ToArray() );
 
-	internal void Replace( string moduleId, Guid token, IReadOnlyList<RegisteredCommand> commands, IReadOnlyList<PermissionDescriptor> permissions )
+	internal void Replace( string moduleId, Guid token, IReadOnlyList<RegisteredCommand> commands, IReadOnlyList<PermissionDescriptor> permissions, bool managed = false )
 	{
 		EnsureAvailable( moduleId );
+		if ( _managed.Contains( moduleId ) && !managed )
+		{
+			throw new InvalidOperationException( $"Module '{moduleId}' is owned by the lifecycle manager." );
+		}
 		var nextPermissions = _permissions.Where( pair => pair.Value != moduleId ).ToDictionary( pair => pair.Key, pair => pair.Value, StringComparer.Ordinal );
 		foreach ( var permission in permissions )
 		{

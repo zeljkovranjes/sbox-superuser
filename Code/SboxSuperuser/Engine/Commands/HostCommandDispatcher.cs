@@ -128,8 +128,12 @@ internal sealed partial class HostCommandDispatcher : ICommandDispatcher, IDispo
 			}
 
 			audit.Action = CreateAuditAction( context, command.Descriptor, parsed.Arguments );
+			using var moduleCancellation = CancellationTokenSource.CreateLinkedTokenSource( context.Cancellation,
+				command.Execution?.Cancellation ?? CancellationToken.None );
+			var executionContext = new CommandContext( context.Actor, context.Origin, context.RequestId, moduleCancellation.Token, context.Services );
+			Task<CommandResult> Execute() => ExecuteAuditedAsync( executionContext, services, request.Command, command, parsed.Arguments, audit );
 			var admission = _queue.Submit( key, fingerprint,
-				() => ExecuteAuditedAsync( context, services, request.Command, command, parsed.Arguments, audit ), context.Cancellation );
+				() => command.Execution is null ? Execute() : command.Execution.RunAsync( Execute ), moduleCancellation.Token );
 			return admission.Admission switch
 			{
 				QueueAdmission.Conflict => Result( CommandStatus.Conflict, "This request ID was already used with a different payload." ),
