@@ -38,6 +38,9 @@ methods = [
     ("void RouteChat( Connection sender, string text, Guid requestId )", blocks["docs/chat.md"][2]),
     ("void ArenaDiagnostics()", blocks["dev/samples/arena/README.md"][0]),
     ("void ColonyDiagnostics()", blocks["dev/samples/colony/README.md"][0]),
+    ("void SearchPlayers()", blocks["docs/admin-menu.md"][0]),
+    ("void SubmitBan()", blocks["docs/admin-menu.md"][1]),
+    ("void ConfigureStorage()", blocks["docs/storage-tutorial.md"][0]),
 ]
 source = "using Sandbox;\nusing SboxSuperuser;\n\nnamespace SuperuserExamples.Engine;\n\n"
 source += "/// <summary>Compiles the exact Markdown snippets for engine verification.</summary>\n"
@@ -52,5 +55,5 @@ if errors:
 output = root / "dev/out/DocumentationExamples.cs"
 output.parent.mkdir(parents=True, exist_ok=True)
 output.write_text(source, encoding="utf-8")
-print(f"Checked {len(files)} Markdown files; eight C# blocks covered by source or generated fixture.")
+print(f"Checked {len(files)} Markdown files; {len(methods) + 2} C# blocks covered by source or generated fixture.")
 print(output)

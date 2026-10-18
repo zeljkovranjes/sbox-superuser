@@ -4,6 +4,8 @@
 
 Data belongs to the adopting game's `FileSystem.Data`. Editor and dedicated records are separated under `superuser/store/editor/` and `superuser/store/dedicated/`.
 
+This page describes the default local backend. For a replacement, follow [custom storage](storage-tutorial.md) and its provider's backup procedures. The same local recovery commands call the selected backend.
+
 ## Back up
 
 Stop the host, then copy the entire `superuser/` directory. Include owner configuration, generation files and commit markers. Keep backups private: they contain policy, moderation and audit records.
