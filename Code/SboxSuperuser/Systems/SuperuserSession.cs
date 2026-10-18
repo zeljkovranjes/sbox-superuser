@@ -12,6 +12,14 @@ internal sealed partial class SuperuserSession : GameObjectSystem<SuperuserSessi
 	private bool _disposed;
 	private bool _stopping;
 	private bool _restartRequired;
+	private Func<AdminStorageContext, IAdminStorageBackend> _storageFactory;
+
+	internal void ConfigureStorage( Func<AdminStorageContext, IAdminStorageBackend> factory )
+	{
+		if ( _runtime is not null || _registrations.Count != 0 || _disposed || _stopping || _restartRequired )
+			throw new InvalidOperationException( "Configure storage before enabling any bootstrap in a fresh scene." );
+		_storageFactory = factory;
+	}
 
 	/// <summary>Creates the scene-owned coordinator and one lifecycle callback.</summary>
 	public SuperuserSession( Scene scene ) : base( scene )
@@ -104,7 +112,7 @@ internal sealed partial class SuperuserSession : GameObjectSystem<SuperuserSessi
 			otherScene.GetSystem<SuperuserSession>()?.Stop( BootstrapState.Unsupported );
 		}
 
-		_runtime = new BootstrapRuntime( Scene, _registrations.AllowsEditorTesting, _registrations.CommandRoot );
+		_runtime = new BootstrapRuntime( Scene, _registrations.AllowsEditorTesting, _registrations.CommandRoot, _storageFactory );
 		SetState( _runtime.Health );
 		Log.Info( $"[Superuser] Runtime {_runtime.Id} initialized; owners={_runtime.Owners.Configuration?.Count ?? 0}; file={_runtime.Owners.Path}" );
 	}

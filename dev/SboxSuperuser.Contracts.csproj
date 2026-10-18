@@ -15,6 +15,7 @@
     <Compile Include="../Code/SboxSuperuser/Engine/Admin/HostAdminQueries.cs" />
     <Compile Include="../Code/SboxSuperuser/Engine/Admin/AdminRequestGate.cs" />
     <Compile Include="../Code/SboxSuperuser/Engine/Admin/AdminMenuModel.cs" />
+    <Compile Include="../Code/SboxSuperuser/Engine/Storage/ConfiguredAdminStore.cs" />
     <Compile Include="../Code/SboxSuperuser/Engine/Commands/*.cs" />
     <Compile Include="../Code/SboxSuperuser/Engine/ChatIntegration/*.cs" />
     <Compile Include="../Code/SboxSuperuser/Engine/Permissions/*.cs" />

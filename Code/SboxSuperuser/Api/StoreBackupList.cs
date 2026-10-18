@@ -15,11 +15,16 @@ public sealed class StoreBackupList
 	/// <summary>Gets whether more than 100 compatible backups exist.</summary>
 	public bool HasMore { get; }
 
-	internal StoreBackupList( StoreReadStatus status, long headRevision, IEnumerable<StoreBackup> backups, bool hasMore )
+	/// <summary>Creates a bounded backup inspection result for a custom backend.</summary>
+	public StoreBackupList( StoreReadStatus status, long headRevision, IEnumerable<StoreBackup> backups, bool hasMore )
 	{
-		Status = status;
+		Status = Core.Contracts.ContractGuard.EnumValue( status, nameof( status ) );
+		if ( headRevision < 0 ) throw new ArgumentOutOfRangeException( nameof( headRevision ) );
+		var copy = Core.Contracts.ContractGuard.Copy( backups, nameof( backups ) );
+		if ( copy.Count > 100 || copy.Any( backup => backup.Revision > headRevision ) )
+			throw new ArgumentException( "At most 100 backups at or before the observed head are supported." );
 		HeadRevision = headRevision;
-		Backups = Array.AsReadOnly( backups.ToArray() );
+		Backups = copy;
 		HasMore = hasMore;
 	}
 }

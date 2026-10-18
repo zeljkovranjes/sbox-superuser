@@ -13,7 +13,7 @@ internal sealed partial class BootstrapRuntime : IDisposable
 
 	internal Guid Id { get; } = Guid.NewGuid();
 	internal OwnerConfigurationFile Owners { get; }
-	internal Storage.HostAdminStore Store { get; }
+	internal Storage.ConfiguredAdminStore Store { get; }
 	internal Authority.HostPolicyService Policy { get; }
 	internal Commands.CommandRegistry Commands { get; }
 	internal Commands.HostCommandDispatcher Dispatcher { get; }
@@ -61,13 +61,27 @@ internal sealed partial class BootstrapRuntime : IDisposable
 		&& ReferenceEquals( _host, Connection.Host )
 		&& (Application.IsDedicatedServer || (Game.IsEditor && _allowEditorTesting));
 
-	internal BootstrapRuntime( Scene scene, bool allowEditorTesting, string commandRoot = "admin" )
+	internal BootstrapRuntime( Scene scene, bool allowEditorTesting, string commandRoot = "admin",
+		Func<AdminStorageContext, IAdminStorageBackend> storageFactory = null )
 	{
 		_scene = scene;
 		_host = Connection.Host;
 		_allowEditorTesting = allowEditorTesting;
 		Owners = new OwnerConfigurationFile( Application.IsDedicatedServer );
-		Store = new Storage.HostAdminStore( Application.IsDedicatedServer, () => IsUsable );
+		var localStore = new Storage.HostAdminStore( Application.IsDedicatedServer, () => IsUsable );
+		IAdminStorageBackend backend = localStore;
+		try
+		{
+			if ( storageFactory is not null ) backend = storageFactory( new AdminStorageContext( Application.IsDedicatedServer, localStore ) );
+			if ( backend is null ) throw new InvalidOperationException( "The storage factory returned null." );
+		}
+		catch ( Exception error )
+		{
+			backend = null;
+			Log.Warning( $"[Superuser] Storage factory failed; type={error.GetType().Name}; no local fallback was selected." );
+		}
+		Store = new Storage.ConfiguredAdminStore( backend, () => ThreadSafe.IsMainThread && IsUsable,
+			error => Log.Warning( $"[Superuser] Storage adapter failed; type={error.GetType().Name}." ) );
 		Audit = new Audit.HostAuditService( Store, () => ThreadSafe.IsMainThread && IsUsable,
 			error => Log.Warning( $"[Superuser] Audit storage degraded; type={error.GetType().Name}; files preserved." ) );
 		Store.StorageChanged += Audit.OnStorageChanged;
