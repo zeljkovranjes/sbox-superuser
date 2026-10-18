@@ -3,6 +3,7 @@ namespace SboxSuperuser.Core.Storage;
 internal interface IStoreFiles
 {
 	bool DirectoryExists( string directory );
+	bool FileExists( string path );
 	void CreateDirectory( string directory );
 	IReadOnlyList<string> ListFiles( string directory );
 	string Read( string path );
