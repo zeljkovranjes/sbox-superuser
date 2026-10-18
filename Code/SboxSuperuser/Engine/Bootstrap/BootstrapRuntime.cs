@@ -66,6 +66,7 @@ internal sealed class BootstrapRuntime : IDisposable
 		return true;
 	}
 
+	/// <summary>Revokes this runtime so retained references cannot resolve identities.</summary>
 	public void Dispose()
 	{
 		_disposed = true;

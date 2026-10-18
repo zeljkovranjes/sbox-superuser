@@ -11,6 +11,7 @@ internal sealed class SuperuserSession : GameObjectSystem<SuperuserSession>
 	private BootstrapState _state;
 	private bool _disposed;
 
+	/// <summary>Creates the scene-owned coordinator and one lifecycle callback.</summary>
 	public SuperuserSession( Scene scene ) : base( scene )
 	{
 		Listen( Stage.StartUpdate, -100, Reconcile, nameof( SuperuserSession ) );
@@ -124,6 +125,7 @@ internal sealed class SuperuserSession : GameObjectSystem<SuperuserSession>
 		}
 	}
 
+	/// <summary>Retires the runtime and releases scene registrations.</summary>
 	public override void Dispose()
 	{
 		_disposed = true;

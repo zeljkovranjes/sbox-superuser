@@ -6,7 +6,23 @@ internal sealed class BootstrapRegistrations
 
 	internal int Count => _entries.Count;
 
-	internal bool AllowsEditorTesting => Count == 1 && _entries.Values.First();
+	internal bool AllowsEditorTesting
+	{
+		get
+		{
+			if ( Count != 1 )
+			{
+				return false;
+			}
+
+			foreach ( var entry in _entries )
+			{
+				return entry.Value;
+			}
+
+			return false;
+		}
+	}
 
 	internal void Attach( Guid id, bool allowEditorTesting )
 	{
