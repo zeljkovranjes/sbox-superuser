@@ -7,7 +7,7 @@ internal static class ProbeChat
 {
 	internal static void Observe( ChatMessageEvent message )
 	{
-		if ( message.Suppress || message.Sender is null || message.Message != "!superuser-probe" )
+		if ( message.Suppress || message.Sender is null || message.Message != "/superuser-probe" )
 		{
 			return;
 		}
