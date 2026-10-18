@@ -4,7 +4,7 @@ using SboxSuperuser.Core.Permissions;
 namespace SboxSuperuser;
 
 /// <summary>Immutable revisioned user/group policy with validated references and acyclic inheritance.</summary>
-public sealed class PolicySnapshot
+public sealed partial class PolicySnapshot
 {
 	internal PolicyGraph Graph { get; }
 
