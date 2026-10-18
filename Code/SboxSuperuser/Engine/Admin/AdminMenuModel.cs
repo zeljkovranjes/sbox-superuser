@@ -7,11 +7,13 @@ internal sealed class AdminMenuModel
 	private Guid _playersRequest;
 	private Guid _detailsRequest;
 	private Guid _activityRequest;
+	private Guid _aboutRequest;
 	private Guid _actionRequest;
 	private DateTimeOffset _refreshAfter;
 	internal AdminReply Players { get; private set; }
 	internal AdminReply Details { get; private set; }
 	internal AdminReply Activity { get; private set; }
+	internal AdminReply About { get; private set; }
 	internal AdminActionRequest Confirmation { get; private set; }
 	internal string Feedback { get; private set; } = "";
 	/// <summary>Outcome behind Feedback; null while an action waits for the host.</summary>
@@ -21,9 +23,14 @@ internal sealed class AdminMenuModel
 	internal int PlayerPage;
 	internal int HistoryPage;
 	internal string Search = "";
-	internal string Lookup = "";
 	internal string Reason = "";
 	internal string Duration = "30m";
+
+	/// <summary>Activity filters; empty text and a null outcome match everything.</summary>
+	internal string ActivityCommand = "";
+	internal string ActivityActor = "";
+	internal CommandStatus? ActivityOutcome;
+	internal int ActivityPage;
 
 	internal AdminMenuModel( Func<AdminQuery, Guid> query, Func<AdminActionRequest, Guid> action )
 	{
@@ -44,8 +51,23 @@ internal sealed class AdminMenuModel
 			if ( _playersRequest == Guid.Empty ) _playersRequest = _query( new AdminQuery( AdminQueryKind.Players, Search, PlayerPage ) );
 			if ( Selected.Length != 0 && _detailsRequest == Guid.Empty )
 				_detailsRequest = _query( new AdminQuery( AdminQueryKind.Player, Selected, HistoryPage ) );
-			if ( _activityRequest == Guid.Empty ) _activityRequest = _query( new AdminQuery( AdminQueryKind.Activity ) );
+			if ( _activityRequest == Guid.Empty )
+				_activityRequest = _query( new AdminQuery( ActivityCommand, ActivityActor, ActivityOutcome, ActivityPage ) );
 		} );
+	}
+
+	/// <summary>Reloads activity now, after its filters or page changed.</summary>
+	internal void RefreshActivity()
+	{
+		if ( _activityRequest != Guid.Empty ) return;
+		Try( () => _activityRequest = _query( new AdminQuery( ActivityCommand, ActivityActor, ActivityOutcome, ActivityPage ) ) );
+	}
+
+	/// <summary>Asks the host for About details once; they do not change during a session.</summary>
+	internal void RequestAbout()
+	{
+		if ( About is not null || _aboutRequest != Guid.Empty ) return;
+		Try( () => _aboutRequest = _query( new AdminQuery( AdminQueryKind.About ) ) );
 	}
 
 	internal void Select( string steamId )
@@ -105,6 +127,11 @@ internal sealed class AdminMenuModel
 		{
 			_activityRequest = Guid.Empty;
 			Activity = reply;
+		}
+		else if ( reply.RequestId == _aboutRequest )
+		{
+			_aboutRequest = Guid.Empty;
+			About = reply;
 		}
 		else if ( reply.RequestId == _actionRequest )
 		{

@@ -10,6 +10,10 @@ internal sealed class AdminInputPanel : RootPanel
 	private readonly ImGuiIO _io;
 	internal Action Close { get; set; }
 
+	/// <summary>The menu's open key; pressing it again closes the menu unless a text field is being edited.</summary>
+	internal string OpenKey { get; set; }
+	internal Action Toggle { get; set; }
+
 	internal AdminInputPanel( ImGuiIO io )
 	{
 		_io = io;
@@ -26,6 +30,13 @@ internal sealed class AdminInputPanel : RootPanel
 	public override void OnButtonEvent( ButtonEvent e )
 	{
 		if ( e.Button == "escape" && e.Pressed ) Close?.Invoke();
+		// This panel takes every key while the menu is open, so the game never sees the open key itself.
+		if ( e.Pressed && !_io.WantTextInput && string.Equals( e.Button, OpenKey, StringComparison.OrdinalIgnoreCase ) )
+		{
+			Toggle?.Invoke();
+			e.StopPropagation = true;
+			return;
+		}
 		switch ( e.Button )
 		{
 			case "mouseleft": _io.AddMouseButtonEvent( 0, e.Pressed ); break;

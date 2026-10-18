@@ -5,7 +5,22 @@ Title: Optional Admin Menu and Custom Storage
 ### Added
 # Interface
 Moderation menu - bundled ImGui view includes searchable players, offline Steam ID lookup, roles, restrictions, history, confirmations and private activity
-Menu redesign - Players and Activity tabs, a navy theme, colored outcome banners and badges, player rows with exact IDs, duration presets, table history and a highlighted confirmation panel
+Menu redesign - stock Dear ImGui look: Players and Activity sections on a top menu bar open movable windows; Players shows one table with the selected player below it, and a full Steam ID search opens offline players
+Player shortcuts - right-click a player to copy their Steam ID or name or start a kick, mute or ban; recent reasons and the last duration are remembered per machine
+About window - version, author, package and source link; owners also see installed modules and server status
+Menu navigation - Superuser, Moderation and Server menus group the windows; open windows are checked
+Bans & mutes - every active ban and text mute across all players, with Unban and Unmute that ask for a reason
+Commands window - run any permitted command, including game module commands, from a form built from its arguments
+Permissions window - owners edit groups, members and permission entries and check why a player has access; every edit is confirmed and audited
+Activity filters - filter by command, actor and outcome, and page through older records
+Player notes - private staff notes kept in moderation history through the new note command and admin.players.note permission
+Warning counts - the player table shows each player's warnings to staff who can read history
+Keyboard - Ctrl+F jumps to player search; Up and Down move through the player list
+Recent chat - moderators see the last 100 public messages, kept only in server memory and never saved; needs the new admin.chat.read permission
+Time remaining - active bans and mutes show how long they have left, such as in 2h 14m
+Result pop-ups - finished actions appear briefly in the bottom-right corner
+Replacement API - RequestAdminCommand and the Commands, Restrictions, Permissions and filtered activity queries
+Pinned windows - a title-bar pin keeps a window on screen while the menu is closed; open windows, pins and positions are saved per machine and return after a restart
 Replacement views - typed queries and exact-target actions return correlated private results without exposing ImGui or unrestricted console execution
 Input ownership - configurable F6 binding and Escape close; removing the menu releases its panel and cursor while console and slash chat stay available
 # Storage
@@ -13,6 +28,8 @@ Custom backends - trusted host setup can select storage before bootstrap; versio
 Storage tutorial - includes a runnable adapter and setup component, exact placement instructions and database implementation requirements
 # Documentation
 Integration guide - documents the optional menu, replacement view and dedicated/editor storage selection; README includes the centered project SVG
+README screenshot - the top of the README shows the admin menu in game
+Documentation structure - the README and docs follow one contents page with concepts, a tutorial, running guides and reference chapters for the host API, console commands and each admin menu window
 # Identity
 Project icon - adds a navy caped figure and shield as a scalable SVG, matching the Humanoid Retargeter logo style
 # Validation
@@ -65,6 +82,9 @@ Validation - all 314 contract and Core tests pass and the actual engine referenc
 Owner protection - group ranks stop at 99 so a policy-editing owner cannot outrank and punish another owner
 Private results - command messages and fields reject control characters that could forge extra console or chat lines
 Reply routing - remote console replies require the original connection to remain in the live connection set
+# Interface
+Open key - pressing it again while the menu is open now closes the menu, unless you are typing in a text field
+Escape - cancels a pending confirmation before it closes the menu
 # Documentation
 Logger examples - uses the engine's global Log in sample snippets so they compile in the adopting game
 
