@@ -10,7 +10,8 @@
   <ItemGroup>
     <Compile Include="../Code/SboxSuperuser/Assembly.cs" />
     <Compile Include="../Code/SboxSuperuser/Core/**/*.cs" />
-    <Compile Include="../Code/SboxSuperuser/Api/**/*.cs" />
+    <!-- The scene-event contract is checked against the actual engine, without a Sandbox mock. -->
+    <Compile Include="../Code/SboxSuperuser/Api/**/*.cs" Exclude="../Code/SboxSuperuser/Api/IAdminChatResultEvent.cs" />
     <Compile Include="../Code/SboxSuperuser/Engine/Commands/*.cs" />
     <Compile Include="../Code/SboxSuperuser/Engine/ChatIntegration/*.cs" />
     <Compile Include="../Code/SboxSuperuser/Engine/Permissions/*.cs" />
