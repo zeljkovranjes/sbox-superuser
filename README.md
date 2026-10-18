@@ -26,7 +26,7 @@ This method belongs to the [complete ping module](dev/fixtures/PingModule.cs). F
 ## Details
 
 - **Commands** use the same dispatcher from console, platform chat and your own chat UI.
-- **Permissions** use exact keys, groups and explicit owners. Policy changes are owner-only.
+- **Permissions** use exact keys, groups and explicit owners. Policy changes are owner-only; owners cannot punish each other.
 - **Moderation** includes kick, ban, warnings and text mute, with stored history.
 - **Core API** is `Superuser`: dispatch commands, check permissions, register modules and read host-local records. See the [API reference](docs/api.md).
 - **Game code** supplies its own player actions. The [samples](dev/samples/README.md) show component-based players and a roster without pawns.
