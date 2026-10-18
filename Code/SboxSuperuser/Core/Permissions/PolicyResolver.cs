@@ -71,4 +71,10 @@ internal sealed class PolicyResolver
 		_cache.Add( key, result );
 		return result;
 	}
+
+	internal bool IsRegistered( string permission )
+	{
+		ContractGuard.Key( permission, nameof( permission ) );
+		return _registered.Contains( permission );
+	}
 }
