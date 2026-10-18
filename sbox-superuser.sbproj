@@ -1,0 +1,25 @@
+{
+  "Title": "sbox-superuser",
+  "Type": "library",
+  "Org": "notpointless",
+  "Ident": "chomnr_sbox_superuser",
+  "Schema": 1,
+  "IncludeSourceFiles": true,
+  "Resources": null,
+  "PackageReferences": [],
+  "EditorReferences": null,
+  "Mounts": null,
+  "IsStandaloneOnly": false,
+  "AI": {
+    "EnableMcpCommunication": true
+  },
+  "Metadata": {
+    "Summary": "",
+    "Description": "",
+    "WebsiteUrl": "https://github.com/zeljkovranjes/sbox-superuser",
+    "Tags": [],
+    "Compiler": {
+      "ReleaseMode": "Release"
+    }
+  }
+}
