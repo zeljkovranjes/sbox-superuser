@@ -65,7 +65,7 @@ Dedicated servers are the only production target. Opt-in editor testing is devel
 
 ## Limitations
 
-- Tasks 1–18 are implemented. Security/load validation and release packaging remain pending; visual admin UI is deferred.
+- Tasks 1–19 are implemented. [Security/load validation](docs/T19-VALIDATION.md) records measured workloads and support limits; release packaging remains pending and visual admin UI is deferred.
 - Stop Play or the dedicated process before changing source. Managed module reload, scene replacement and process restart are verified; arbitrary live source edits are unsupported. A structural reload can report `RestartRequired`; method-only fast reload does not reliably trigger that guard. See the [lifecycle support matrix](docs/T17-LIFECYCLE.md).
 - Task 1's unavailable dedicated multiplayer evidence remains marked Blocked; Task 2 does not certify that deployment.
 - Chat commands use `/admin` by default; `!` is ordinary text. The compatibility probe remains separate from administration commands.

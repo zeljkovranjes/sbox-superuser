@@ -3,6 +3,9 @@
 ## 2026-10-18
 Title: Persistent Moderation and Verified Lifetimes
 ### Added
+# Validation
+Measured limits - actual dedicated pressure and persistence workloads now have a recorded environment, timings and bounded-capacity evidence
+Security checks - repeated two-client privacy and injected storage failures confirm private errors and no disconnect after a failed ban write
 # Integrations
 Independent games - executable arena and colony examples map stable player IDs to different gameplay representations without changing the library
 Optional capabilities - samples demonstrate default-denied permissions, explicit grants and Unsupported results when game services are absent
