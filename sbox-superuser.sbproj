@@ -1,5 +1,5 @@
 {
-  "Title": "sbox-superuser",
+  "Title": "Superuser",
   "Type": "library",
   "Org": "notpointless",
   "Ident": "chomnr_sbox_superuser",
@@ -14,10 +14,10 @@
     "EnableMcpCommunication": true
   },
   "Metadata": {
-    "Summary": "",
-    "Description": "",
+    "Summary": "Checks administration integration points for dedicated servers, with opt-in editor testing.",
+    "Description": "Probes s&box administration integration points inside one library. Add the compatibility probe component to a test scene on a dedicated server, or explicitly enable editor testing. Administration features are not implemented yet.",
     "WebsiteUrl": "https://github.com/zeljkovranjes/sbox-superuser",
-    "Tags": [],
+    "Tags": [ "tools", "administration", "dedicated-server", "diagnostics" ],
     "Compiler": {
       "ReleaseMode": "Release"
     }
