@@ -1,7 +1,7 @@
 # Changelog
 
 ## 2026-10-17
-Title: Command Parsing And Targeting
+Title: Authoritative Command Dispatch
 ### Added
 # Diagnostics
 Compatibility probe - checks type discovery, caller identity and argument forwarding inside the library
@@ -42,6 +42,11 @@ Metadata - validates argument order, numeric bounds, enum choices and explicit p
 Arguments - accepts bounded quoted text and invariant typed values while rejecting malformed, extra and oversized input
 Player selection - exact IDs remain authoritative; duplicate display names return choices without selecting a target
 Syntax help - derives required, optional and remainder arguments plus constraints from command descriptors
+# Dispatch
+Execution - authenticates live callers and rechecks queued permission, registration and target validity before invoking handlers
+Queue and retries - bounds outstanding work and deduplicates actor-scoped request IDs without repeating mutations
+Cancellation - distinguishes unstarted cancellation from interrupted mutations with Unknown outcomes and safe errors
+Capabilities - scopes approved game services to modules and supports explicitly limited, revocable internal callers
 ### Improved
 # Diagnostics
 Chat probe - uses /superuser-probe in the chatbox; nonmatching messages pass through normally
@@ -54,5 +59,5 @@ Scene lifecycle - repeated initialization stays idempotent; duplicates suspend a
 Dedicated multiplayer - the unpublished test game cannot load on joining clients; a published adopting game is needed for dedicated network validation
 Storage guarantees - actual process interruption and restart recovery are verified; power-loss durability and cross-process writers are unsupported
 Administration - Task 1 provides diagnostics only; administration commands and UI are not implemented
-Administration runtime - dispatch and module management remain later tasks
+Administration runtime - native console/chat ingress and module management remain later tasks
 Storage retention - retains all committed generations; automatic pruning and audit outcomes remain later tasks

@@ -1,6 +1,6 @@
 # T09: Authoritative command dispatch
 
-Status: **Behavior verified; final package checks pending.** Continue with T10 durable audit after this task. No Task 11 native root or general chat ingress.
+Status: **Complete.** Continue with T10 durable audit after this task. No Task 11 native root or general chat ingress.
 
 ## Execution boundary
 
@@ -35,3 +35,5 @@ Actual editor 26.10.13a PID 21804 ran `dev/verify-dispatch-editor.cs`: the publi
 Actual dedicated PID 16676 ran `dev/verify-dispatch-dedicated.cs` with bootstrap editor opt-in off. The engine's separate dedicated-local identity reached the dispatcher, while its local host connection failed the player route. Retry, serial service execution, offline dedicated target protection and safe exceptions passed. Counter mutations: 3. Trusted development reflection reaches the internal local-console boundary because the general native root belongs to T11. The owned process was stopped by exact PID afterward. Neither test performed moderation or changed security policy.
 
 T10 must add durable intent/outcome evidence before this runtime is ready for production mutations. Dedicated-client transport remains unverified for the unpublished adopting game, as recorded in T01; these were host-local dispatcher tests, not dedicated multiplayer certification.
+
+Final checks: both generated runtime builds passed with zero warnings/errors, both package checks passed, all 186 library tests passed, and the final editor whitelist and dispatch rerun passed after cleanup changes. The adopting test project remains empty.

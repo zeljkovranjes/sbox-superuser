@@ -1,6 +1,6 @@
 # Superuser
 
-Superuser provides host-local administration storage, authenticated identities and explicit owner configuration for dedicated servers. Add one Superuser Bootstrap to your game's network scene; enable its editor switch for local testing. Versioned transactions, retained backups, permission evaluation and dedicated-local recovery run in the same s&box C# library. Command dispatch and UI are not implemented yet.
+Superuser provides host-local administration storage, authenticated identities and explicit owner configuration for dedicated servers. Add one Superuser Bootstrap to your game's network scene; enable its editor switch for local testing. Versioned transactions, retained backups, permissions, typed commands and authoritative dispatch run in the same s&box C# library. Durable action audit and UI remain pending.
 
 ## Requirements
 
@@ -59,7 +59,7 @@ Dedicated servers are the only production target. Opt-in editor testing is devel
 
 ## Limitations
 
-- Tasks 1–8 are implemented. No dispatcher, module loader, moderation enforcement or UI is installed.
+- Tasks 1–9 are implemented. No native admin root, general chat ingress, module loader, moderation enforcement or UI is installed.
 - Task 1's unavailable dedicated multiplayer evidence remains marked Blocked; Task 2 does not certify that deployment.
 - Chat commands use `/`; the future administration root will be `/admin`. The current probe does not implement administration commands.
 - The probe is for isolated testing and should be removed from a production scene.
@@ -85,6 +85,8 @@ Task 6 adds [owner-only policy administration, offline target protection and loc
 Task 7 adds [atomic command registration and typed discovery](docs/T07-COMMANDS.md), with 110 tests in total. Begin a module registration scope, declare permissions and commands, commit, and retain it until shutdown. The compiled dog sample demonstrates an optional game capability.
 
 Task 8 adds [strict argument parsing, player targeting and generated syntax](docs/T08-PARSING.md). The suites contain 138 contract and 20 Core cases. Use `TokenizeCommandText`, `ParseCommandArguments` and `GetCommandSyntax`; parsing grants no execution authority.
+
+Task 9 adds [authoritative dispatch](docs/T09-DISPATCH.md), with 157 contract and 29 Core cases. Host adapters call `ExecuteCommandAsync` with the live engine caller; trusted host code can issue revocable `CommandService` handles. Module registrations explicitly approve game capabilities. Durable action audit remains T10.
 
 ## License
 
