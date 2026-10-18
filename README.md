@@ -1,6 +1,6 @@
 # Superuser
 
-Superuser currently provides Task 1 compatibility probes for a dedicated-server administration library. Add its probe component to an isolated test scene to check engine integration points; enable the editor testing switch when testing locally. Everything runs inside this one s&box library. Administration commands and UI are not implemented yet.
+Superuser provides public administration contracts and compatibility probes for dedicated servers. Use the exported types to describe integrations, and add the probe component to an isolated scene for engine checks with explicit editor opt-in. Everything runs inside one s&box C# library. Runtime administration systems and UI are not implemented yet.
 
 ## Requirements
 
@@ -23,7 +23,18 @@ This package is not published on sbox.game. Add this local library to a test gam
 
 ### In code
 
-No administration facade exists in Task 1. Use the probe component and native diagnostic commands above; public contracts belong to Task 2.
+Task 2 exports metadata and interfaces in `SboxSuperuser`. This creates a descriptor only; no command is registered or executed:
+
+```csharp
+using SboxSuperuser;
+
+var descriptor = new CommandDescriptor(
+	"example.inspect", "Inspect the game's optional example service.",
+	"example.inspect", "example",
+	executionPolicy: CommandExecutionPolicy.ReadOnly );
+```
+
+No administration facade exists yet. See the [contract notes](docs/T02-CONTRACTS.md) for signatures, ownership and deferred behavior.
 
 ## Options
 
@@ -35,7 +46,7 @@ No administration facade exists in Task 1. Use the probe component and native di
 
 ## How it works
 
-The component calls internal engine adapters to observe native console, type discovery, storage and chat APIs. Production execution requires a dedicated host; an editor host additionally requires the testing switch. The native console probe records the engine-provided caller without granting authority. The chat probe consumes only the exact message `/superuser-probe` and sends a host-authenticated reply to its sender. Checks and adapter decisions are recorded in the [Task 1 report](docs/T01-COMPATIBILITY.md).
+Public contracts describe commands, arguments, identities, results, permissions, modules and versioned storage without providing runtime implementations. Internal engine boundaries keep untrusted request payloads separate from host-issued context; structural rules remain independent of s&box. The unchanged probe component checks engine APIs and consumes only `/superuser-probe` for a targeted diagnostic reply. Production execution requires a dedicated host; editor testing requires explicit opt-in. See the [Task 1 findings](docs/T01-COMPATIBILITY.md) and [Task 2 contract record](docs/T02-CONTRACTS.md).
 
 ## Multiplayer
 
@@ -43,7 +54,8 @@ Dedicated servers are the only production target. Opt-in editor testing is devel
 
 ## Limitations
 
-- Task 1's compatibility probe and report are complete, with unavailable dedicated multiplayer evidence marked Blocked. Task 2 has not started.
+- Task 2 delivers contracts only. No bootstrap, dispatcher, parser, permission resolver, module loader or durable store is installed.
+- Task 1's unavailable dedicated multiplayer evidence remains marked Blocked; Task 2 does not certify that deployment.
 - Chat commands use `/`; the future administration root will be `/admin`. The current probe does not implement administration commands.
 - The probe is for isolated testing and should be removed from a production scene.
 - Do not enter credentials or sensitive arguments into diagnostic commands: bounded test arguments are logged.
@@ -52,7 +64,7 @@ Dedicated servers are the only production target. Opt-in editor testing is devel
 
 ## Development
 
-Run `sbox-check`, `dotnet build Code/chomnr_sbox_superuser.csproj` after the editor generates it, and `dotnet test tests/SboxSuperuser.Tests/SboxSuperuser.Tests.csproj`. The existing test project currently has no test cases; engine probes provide the relevant evidence. With the test scene playing, run `dev/verify-editor.cs` through the engine's `run_csharp` development tool. Read the report for exact commands and required observations.
+Run `sbox-check` and `dotnet build Code/chomnr_sbox_superuser.csproj` after the editor generates it. Run both test projects: `dotnet test tests/SboxSuperuser.Contracts.Tests/SboxSuperuser.Contracts.Tests.csproj` and `dotnet test tests/SboxSuperuser.Tests/SboxSuperuser.Tests.csproj`. The original project has no test cases; the new contract suite verifies structural invariants through an engine-free harness. Run `dev/verify-contracts.cs` through the engine's `run_csharp` tool, and `dev/verify-editor.cs` with the isolated test scene playing. Plain .NET compilation does not replace the engine whitelist check.
 
 ## License
 

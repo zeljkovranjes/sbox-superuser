@@ -14,8 +14,8 @@
     "EnableMcpCommunication": true
   },
   "Metadata": {
-    "Summary": "Checks administration integration points for dedicated servers, with opt-in editor testing.",
-    "Description": "Probes s&box administration integration points inside one library. Add the compatibility probe component to a test scene on a dedicated server, or explicitly enable editor testing. Administration features are not implemented yet.",
+    "Summary": "Defines administration contracts and compatibility probes for dedicated servers, with opt-in editor testing.",
+    "Description": "Provides public administration contracts and compatibility probes inside one C# library. Use exported metadata to describe integrations and add the probe to an isolated dedicated-server scene, or explicitly enable editor testing. Runtime administration systems and UI are not implemented yet.",
     "WebsiteUrl": "https://github.com/zeljkovranjes/sbox-superuser",
     "Tags": [ "tools", "administration", "dedicated-server", "diagnostics" ],
     "Compiler": {

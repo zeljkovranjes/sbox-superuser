@@ -1,6 +1,6 @@
 # T01: Engine compatibility
 
-Status: **Probe and compatibility report complete, with unavailable evidence marked Blocked below.** This satisfies the T01 report deliverable; it is not production certification. T02–T20 are **Not started**.
+Status: **Probe and compatibility report complete, with unavailable evidence marked Blocked below.** This is the historical T01 record, not production certification. Subsequent foundation work is recorded in [T02](T02-CONTRACTS.md); T03–T20 remain not started.
 
 Source: [specification 0.2](sbox-admin-specification.docx). User amendments: actual dedicated servers only in production, explicit editor testing switch, `/` chat prefix (future `/admin`), and [sbox-imgui](https://github.com/zeljkovranjes/sbox-imgui) for future UI. Its staging folder is `dev/ui-source/sbox-imgui/`; no UI is implemented.
 
@@ -69,7 +69,7 @@ Dedicated baseline before and after actual interruption: `T01:df8a7eb11d974261a1
 ## Validation and scope
 
 - Engine whitelist compilation and runtime .NET builds: library and adopting game passed with zero errors/warnings. Both workspace/Core checks passed. `git diff --check` passed; publication lint found zero failures and one path warning in ignored generated engine XML, which is not tracked.
-- Existing test projects contain **no test cases**. Their commands are run, but no unit-test pass count is claimed. Existing tests were not changed.
+- At T01 completion the existing test project contained **no test cases**. Its command was run, but no unit-test pass count was claimed. T02 adds a separate contract test project.
 - No editor code is shipped. Runtime is under `Code/SboxSuperuser`; fixtures and trusted development scripts remain under `dev/`.
 - [GitHub repository](https://github.com/zeljkovranjes/sbox-superuser) is private. No engine binaries, generated build output or extracted game assets are tracked. No sbox.game publication.
-- No permission model, dispatcher, administrative store, moderation commands, UI or Task 2 contracts were implemented.
+- During T01 no permission model, dispatcher, administrative store, moderation commands, UI or Task 2 contracts were implemented.
