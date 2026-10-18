@@ -211,6 +211,98 @@ public sealed class StorageTests
 	}
 
 	[Fact]
+	public async Task AmbiguousHighestRevisionFailsClosed()
+	{
+		var files = new MemoryStoreFiles();
+		var store = Store( files );
+		await Write( store, 0 );
+		var duplicate = new StoredRevision( Guid.NewGuid(), 1, 1, Payload() );
+		var generation = StoreFormat.Generation( duplicate );
+		files.Files.Add( $"{Directory}/g-{StoreFormat.Stem( duplicate )}.json", generation );
+		files.Files.Add( $"{Directory}/c-{StoreFormat.Stem( duplicate )}.json", StoreFormat.Commit( duplicate, generation ) );
+		Assert.Equal( StorageStatus.Corrupt, (await store.ReadAsync( Directory, 1, NoCancellation )).Status );
+		Assert.Equal( StorageStatus.Corrupt, (await Write( store, 0 )).Status );
+		Assert.Equal( 2, (await store.GetBackupsAsync( Directory, NoCancellation )).Documents.Count );
+	}
+
+	[Fact]
+	public async Task NoValidBackupNeverBecomesMissingOrEmptyPolicy()
+	{
+		var files = new MemoryStoreFiles();
+		var store = Store( files );
+		await Write( store, 0 );
+		await Write( store, 1 );
+		foreach ( var path in files.Files.Keys.ToArray() ) files.Files[ path ] = "{broken";
+		var backups = await store.GetBackupsAsync( Directory, NoCancellation );
+		Assert.Equal( StorageStatus.Corrupt, backups.Status );
+		Assert.Empty( backups.Documents );
+		Assert.Equal( StorageStatus.Corrupt, (await Write( store, 0 )).Status );
+		Assert.Equal( 4, files.Files.Count );
+		Assert.All( files.Files.Values, text => Assert.Equal( "{broken", text ) );
+	}
+
+	[Fact]
+	public async Task BackupInspectionIsBoundedWithoutPruningHistory()
+	{
+		var files = new MemoryStoreFiles();
+		var store = Store( files );
+		for ( var revision = 0; revision < 101; revision++ )
+		{
+			Assert.Equal( StorageStatus.Committed, (await Write( store, revision )).Status );
+		}
+		var backups = await store.GetBackupsAsync( Directory, NoCancellation );
+		Assert.Equal( 100, backups.Documents.Count );
+		Assert.True( backups.HasMore );
+		Assert.Equal( 101, backups.HeadRevision );
+		Assert.Equal( 101, backups.Documents[ 0 ].Revision );
+		Assert.Equal( 202, files.Files.Count );
+	}
+
+	[Fact]
+	public async Task OversizedPayloadAndPreCancelledQueuedWriteDoNotMutateStore()
+	{
+		var files = new MemoryStoreFiles();
+		var store = Store( files );
+		Assert.Equal( StorageStatus.InvalidData, (await Write( store, 0, new string( 'x', StoreFormat.MaximumBytes ) )).Status );
+		Assert.Empty( files.Files );
+		var started = new TaskCompletionSource();
+		var resume = new TaskCompletionSource();
+		files.WriteHook = async (path, content, token) =>
+		{
+			started.TrySetResult();
+			await resume.Task;
+			files.Files.Add( path, content );
+		};
+		var first = Write( store, 0 );
+		await started.Task;
+		using var cancel = new CancellationTokenSource();
+		var queued = store.WriteAsync( Directory, 1, 0, Payload(), cancel.Token );
+		cancel.Cancel();
+		Assert.Equal( StorageStatus.Cancelled, (await queued).Status );
+		resume.SetResult();
+		Assert.Equal( StorageStatus.Committed, (await first).Status );
+		Assert.Equal( 2, files.Files.Count );
+	}
+
+	[Fact]
+	public void TransactionSnapshotsAuditInputsAndRejectsNonUtcTimes()
+	{
+		var fields = new Dictionary<string, string> { [ "reason" ] = "original" };
+		var targets = new[] { "76561198000000001" };
+		var intent = new AuditIntent( Guid.NewGuid(), Guid.NewGuid(), ActorKind.DedicatedConsole,
+			"dedicated-console", CommandOrigin.Console, "test.change", DateTimeOffset.UtcNow, fields, targets );
+		fields[ "reason" ] = "modified";
+		targets[ 0 ] = "76561198000000002";
+		var payload = new PolicyTransaction( "{}", new[] { intent } ).CreateWriteRequest( new StoreKey( "test", "policy" ), 0 ).Document.PayloadJson;
+		Assert.Contains( "original", payload );
+		Assert.DoesNotContain( "modified", payload );
+		Assert.Contains( "76561198000000001", payload );
+		Assert.DoesNotContain( "76561198000000002", payload );
+		Assert.Throws<ArgumentException>( () => new AuditIntent( Guid.NewGuid(), Guid.NewGuid(), ActorKind.DedicatedConsole,
+			"dedicated-console", CommandOrigin.Console, "test.change", DateTimeOffset.Now.ToOffset( TimeSpan.FromHours( 1 ) ) ) );
+	}
+
+	[Fact]
 	public async Task MalformedSchemaAndDuplicatePropertiesNeverReachStorage()
 	{
 		var files = new MemoryStoreFiles();
