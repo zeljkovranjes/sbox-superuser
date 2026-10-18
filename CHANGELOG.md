@@ -1,7 +1,7 @@
 # Changelog
 
 ## 2026-10-18
-Title: Persistent Moderation and Verified Lifetimes
+Title: Administration and an Example-First Guide
 ### Added
 # Validation
 Measured limits - actual dedicated pressure and persistence workloads now have a recorded environment, timings and bounded-capacity evidence
@@ -44,6 +44,10 @@ Failure handling - failed ban writes leave players connected; explicit backup re
 # Documentation
 Getting started - short Markdown chapters cover setup, a working ping command, custom chat and core APIs
 Navigation - replaces implementation history and task labels with a linked guide and concise example-first README
+Examples - verifies the guide snippets in a fresh game, including native dedicated ping and private client chat
+### Fixed
+# Documentation
+Logger examples - uses the engine's global Log in sample snippets so they compile in the adopting game
 # Audit
 Completion checks - verifies attributable Unknown outcomes across an actual dedicated-server interruption and restart
 Validation - all 212 tests pass and the engine whitelist accepts audit cleanup; Tasks 5–10 are complete
