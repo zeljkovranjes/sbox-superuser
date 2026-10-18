@@ -16,10 +16,14 @@ Plain .NET builds do not apply the engine whitelist. Check the adopting game in 
 
 ## Verified behavior
 
-On engine **26.10.13a**, Steam build **25964806**, all **239 contract and 75 Core tests** passed. Existing tests were preserved. The generated library build and actual engine assembly references compile with zero warnings/errors.
+On engine **26.10.13a**, Steam build **25964806**, all **259 contract and 75 Core tests** passed. Existing tests were preserved. The generated library build and actual engine assembly references compile with zero warnings/errors.
 
 | Check | Evidence |
 |---|---|
+| Optional menu | Actual game-camera capture verified ImGui rendering in the editor. Live checks cover cursor acquisition, disable/replacement, console and slash chat continuity. |
+| Admin transport | Two actual clients deny non-staff reads/actions. Authorized client received two history records; a peer deliberately prepared with the same request ID received no private reply. |
+| Custom storage | Actual editor ran the tutorial decorator through two eligible runtimes, offline warning/ban persistence and history/audit reads. Guard tests cover exceptions, wrong revisions, cancellation and invalid payloads. No external database endpoint was tested. |
+| Documentation | Eleven Markdown C# blocks are extracted or matched to source; the adapter, setup and replacement-view fixtures compile in the actual engine. |
 | Caller identity | Actual forwarded requests use the engine connection; null and SteamId0 player routes deny. Dedicated-local commands have distinct authority. |
 | Permission conflicts | Actual engine resolver and Core tests cover direct precedence, inherited deny, cycles and cache invalidation. |
 | Protection | Group ranks stop below reserved owner rank; owners, equal ranks and self-targets cannot punish each other. Queued permission revocation prevents execution. |
