@@ -29,6 +29,8 @@ Restart the scene after changing the file. Nobody becomes an owner automatically
 
 ## Run a command
 
+Enable **Project Settings > Platform > Chat Enabled** if you use platform chat. A new game can default to off.
+
 Enter Play in the editor, or start your actual dedicated server. Run `admin help` in the console, then `admin diagnostics` as an owner. In the chatbox, use `/admin help`.
 
 Successful help confirms routing. Successful diagnostics confirms owner authority. The editor option does not enable player-hosted release games.

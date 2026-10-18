@@ -6,7 +6,7 @@ There are two integration paths. Choose one for each submitted message.
 
 ## Your UI uses platform chat
 
-Submit the input through the normal platform API:
+Enable **Project Settings > Platform > Chat Enabled**, then submit the input through the normal platform API:
 
 ```csharp
 Sandbox.Platform.Chat.Say( text );
