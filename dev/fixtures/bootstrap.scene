@@ -134,6 +134,19 @@
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
           "OnComponentUpdate": null
+        },
+        {
+          "__type": "SboxSuperuser.Components.SuperuserBootstrap",
+          "__guid": "a1696486-214a-4dc8-89cd-11715d8a1a0b",
+          "__enabled": true,
+          "Flags": 0,
+          "AllowEditorTesting": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null
         }
       ],
       "Children": []
