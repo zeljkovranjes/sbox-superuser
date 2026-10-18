@@ -39,6 +39,18 @@ public sealed class CommandRegistrationScope : IModuleRegistration, IDisposable
 		_commands.Add( new RegisteredCommand( descriptor, handler, _token ) );
 	}
 
+	internal void RegisterAuditQuery( CommandDescriptor descriptor, CommandHandler handler )
+	{
+		if ( descriptor.ExecutionPolicy != CommandExecutionPolicy.ReadOnly || ModuleId != "superuser.administration"
+			|| descriptor.Name is not ("audit.query" or "results") )
+		{
+			throw new ArgumentException( "Only built-in read-only audit queries may avoid self-invalidating journal writes." );
+		}
+
+		RegisterCommand( descriptor, handler );
+		_commands[ _commands.Count - 1 ] = _commands[ _commands.Count - 1 ] with { RecordsAudit = false };
+	}
+
 	/// <summary>Stages an exact permission key without granting it to any actor.</summary>
 	public void RegisterPermission( PermissionDescriptor descriptor )
 	{

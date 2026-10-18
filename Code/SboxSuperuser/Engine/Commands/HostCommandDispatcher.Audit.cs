@@ -14,7 +14,7 @@ internal sealed partial class HostCommandDispatcher
 		string entryName, RegisteredCommand command, CommandArguments arguments, AuditSubmission audit )
 	{
 		var rejected = ValidateExecution( context, services, entryName, command, arguments );
-		if ( rejected is not null || _audit is null )
+		if ( rejected is not null || _audit is null || !command.RecordsAudit )
 		{
 			return rejected ?? await ExecuteAsync( context, services, entryName, command, arguments );
 		}

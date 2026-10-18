@@ -108,6 +108,7 @@ internal sealed partial class HostCommandDispatcher : ICommandDispatcher, IDispo
 			}
 
 			audit.Action = CreateAuditAction( context, command.Descriptor, null );
+			audit.Handled = !command.RecordsAudit;
 			if ( context.Origin == CommandOrigin.Chat && command.Descriptor.Arguments.Any( argument =>
 				argument.Audit == CommandArgumentAudit.Sensitive || AuditRedaction.SensitiveName( argument.Name ) ) )
 			{
