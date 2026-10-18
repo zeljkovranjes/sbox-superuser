@@ -19,11 +19,15 @@ Import `SboxSuperuser`. Call host APIs on the engine main thread after bootstrap
 | `TryHandleChat(sender, text, requestId)` | Consume a custom-chat command |
 | `CheckOrdinaryChat(sender)` | Authorize ordinary chat before broadcast |
 | `GetStore()` | Host-local versioned storage |
+| `ConfigureStorage(factory)` | Select a host backend before enabling bootstrap; [tutorial](storage-tutorial.md) |
 | `QueryAuditAsync(connection, query)` | Permission-filtered audit pages |
+| `RequestAdminQuery(query)` | Client request for a private player/activity view |
+| `RequestAdminAction(request)` | Client request for an exact-target moderation action |
+| `IAdminResultEvent` | Receive correlated private query/action results; [example](admin-menu.md) |
 
 The source of truth for signatures is the [facade and public types](../Code/SboxSuperuser). `Core/` contains engine-independent rules; integrations use the public facade instead of internal classes.
 
-Do not expose `GetStore`, `CreateCommandService` or module registration directly to player input. These are trusted host-code facilities. Use the live engine connection for player requests, never an actor assembled from message fields.
+Do not expose `GetStore`, `ConfigureStorage`, `CreateCommandService` or module registration directly to player input. These are trusted host-code facilities. Use the live engine connection for player requests, never an actor assembled from message fields.
 
 ## Module lifetime
 

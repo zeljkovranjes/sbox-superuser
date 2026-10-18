@@ -35,6 +35,8 @@ Enter Play in the editor, or start your actual dedicated server. Run `admin help
 
 Successful help confirms routing. Successful diagnostics confirms owner authority. The editor option does not enable player-hosted release games.
 
+For the optional **F6** moderation view, add **Superuser Admin Menu** on clients. See [the menu guide](admin-menu.md). To replace local storage, configure it before enabling bootstrap; see [custom storage](storage-tutorial.md).
+
 ## Try a sample from a clean checkout
 
 1. Copy `dev/samples/arena` to a new game folder. In this workspace, scaffold a new game first with root namespace `SuperuserArena`; copy the sample's `Code/` and `Assets/` into it.

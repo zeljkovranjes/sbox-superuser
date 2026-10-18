@@ -9,6 +9,8 @@ Start with setup, then add a ping command. Each chapter includes only the code n
 1. [Setup](setup.md) — add the library, configure an owner, run a command.
 2. [Your first command](commands-tutorial.md) — register `ping` and grant its permission.
 3. [Custom chat](chat.md) — use platform chat or your own backend.
+4. [Admin menu](admin-menu.md) — enable the default view or connect your own.
+5. [Custom storage](storage-tutorial.md) — register an adapter and implement a database backend.
 
 ## Reference
 
