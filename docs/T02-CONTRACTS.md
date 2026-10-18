@@ -1,6 +1,6 @@
 # T02: Library foundation and public contracts
 
-Status: **Complete**. Scope is data contracts, interfaces and structural invariants only. T03 onward remain not started.
+Status: **Complete**. This is the historical T02 foundation record. Subsequent bootstrap work is recorded in [T03](T03-BOOTSTRAP.md); T04 onward remain not started.
 
 Public integration types live in `Code/SboxSuperuser/Api/`, using the root `SboxSuperuser` namespace per repository conventions. They are engine-independent boundary types, not a callable administration service. Internal structural rules live in Core by feature; Engine holds transport/invocation boundaries. Future Core systems must not depend on Api or Engine: adapters translate public contracts to internal domain inputs.
 

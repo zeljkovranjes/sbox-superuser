@@ -1,6 +1,6 @@
 # T01: Engine compatibility
 
-Status: **Probe and compatibility report complete, with unavailable evidence marked Blocked below.** This is the historical T01 record, not production certification. Subsequent foundation work is recorded in [T02](T02-CONTRACTS.md); T03–T20 remain not started.
+Status: **Probe and compatibility report complete, with unavailable evidence marked Blocked below.** This is the historical T01 record, not production certification. Subsequent work is recorded in [T02](T02-CONTRACTS.md) and [T03](T03-BOOTSTRAP.md); T04–T20 remain not started.
 
 Source: [specification 0.2](sbox-admin-specification.docx). User amendments: actual dedicated servers only in production, explicit editor testing switch, `/` chat prefix (future `/admin`), and [sbox-imgui](https://github.com/zeljkovranjes/sbox-imgui) for future UI. Its staging folder is `dev/ui-source/sbox-imgui/`; no UI is implemented.
 

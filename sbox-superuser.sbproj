@@ -14,8 +14,8 @@
     "EnableMcpCommunication": true
   },
   "Metadata": {
-    "Summary": "Defines administration contracts and compatibility probes for dedicated servers, with opt-in editor testing.",
-    "Description": "Provides public administration contracts and compatibility probes inside one C# library. Use exported metadata to describe integrations and add the probe to an isolated dedicated-server scene, or explicitly enable editor testing. Runtime administration systems and UI are not implemented yet.",
+    "Summary": "Bootstraps dedicated-server administration with authenticated identities, explicit owners and editor testing.",
+    "Description": "Provides trusted bootstrap, authenticated identities and explicit owner configuration inside one C# library. Add one Superuser Bootstrap to your game's network scene and explicitly enable its editor switch for testing. Public contracts and diagnostics are included; administration commands, permission resolution, durable storage and UI are not implemented yet.",
     "WebsiteUrl": "https://github.com/zeljkovranjes/sbox-superuser",
     "Tags": [ "tools", "administration", "dedicated-server", "diagnostics" ],
     "Compiler": {
