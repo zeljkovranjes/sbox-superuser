@@ -4,7 +4,7 @@ using SboxSuperuser.Core.Storage;
 
 namespace SboxSuperuser.Engine.Storage;
 
-internal sealed class EngineStoreFiles : IStoreFiles
+internal sealed class EngineStoreFiles : IStoreRetentionFiles
 {
 	private readonly Func<bool> _available;
 
@@ -27,6 +27,15 @@ internal sealed class EngineStoreFiles : IStoreFiles
 	}
 
 	public bool FileExists( string path ) => Access( () => FileSystem.Data.FileExists( path ) );
+
+	public void DeleteFile( string path )
+	{
+		Access( () =>
+		{
+			FileSystem.Data.DeleteFile( path );
+			return true;
+		} );
+	}
 
 	public void CreateDirectory( string directory )
 	{

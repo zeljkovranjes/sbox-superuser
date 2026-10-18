@@ -3,7 +3,7 @@ using SboxSuperuser.Core.Storage;
 
 namespace SboxSuperuser.Engine.Storage;
 
-internal sealed class HostAdminStore : IRecoverableAdminStore
+internal sealed class HostAdminStore : IRecoverableAdminStore, Audit.IAuditRetention
 {
 	private readonly StoreCoordinator _coordinator;
 	private readonly string _root;
@@ -22,6 +22,12 @@ internal sealed class HostAdminStore : IRecoverableAdminStore
 		Report( key, result.Status );
 		return new StoreReadResult( ReadStatus( result.Status ), result.Document is null ? null
 			: new VersionedStoreDocument( result.Document.SchemaVersion, result.Document.Revision, result.Document.PayloadJson ) );
+	}
+
+	public Task<StoragePruneResult> PruneAuditAsync( long expectedRevision, CancellationToken cancellation )
+	{
+		// No caller-controlled key: general policy and owner backups never enter automatic retention.
+		return _coordinator.PruneAuditHistoryAsync( DirectoryFor( new StoreKey( "audit", "journal" ) ), expectedRevision, cancellation );
 	}
 
 	public async Task<StoreWriteResult> WriteAsync( StoreWriteRequest request, CancellationToken cancellation )
