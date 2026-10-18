@@ -14,6 +14,7 @@ internal sealed class BootstrapRuntime : IDisposable
 	internal Storage.HostAdminStore Store { get; }
 	internal Authority.HostPolicyService Policy { get; }
 	internal Commands.CommandRegistry Commands { get; }
+	internal Commands.HostCommandDispatcher Dispatcher { get; }
 
 	internal BootstrapState Health
 	{
@@ -58,6 +59,34 @@ internal sealed class BootstrapRuntime : IDisposable
 		Store.StorageChanged += Policy.OnStorageChanged;
 		Commands = new Commands.CommandRegistry( Policy.RegisteredPermissions, Policy.ReplaceRegisteredPermissions,
 			() => ThreadSafe.IsMainThread && IsUsable );
+		Dispatcher = new Commands.HostCommandDispatcher( Policy, Commands, () => ThreadSafe.IsMainThread && IsUsable,
+			OnlinePlayers, error => Log.Warning( $"[Superuser] Command execution failed; type={error.GetType().Name}; outcome may be Unknown." ) );
+	}
+
+	private IReadOnlyList<CommandPlayer> OnlinePlayers()
+	{
+		var players = new List<CommandPlayer>();
+		foreach ( var connection in Connection.All )
+		{
+			if ( !TryResolvePlayer( connection, out var actor ) )
+			{
+				continue;
+			}
+
+			var name = connection.DisplayName;
+			if ( string.IsNullOrWhiteSpace( name ) || name.Length > 256 || name.Any( char.IsControl ) )
+			{
+				name = actor.SubjectId;
+			}
+
+			players.Add( new CommandPlayer( actor.SubjectId, name ) );
+			if ( players.Count > 1024 )
+			{
+				return null;
+			}
+		}
+
+		return players.AsReadOnly();
 	}
 
 	internal bool TryResolvePlayer( Connection connection, out ActorIdentity identity )
@@ -104,6 +133,7 @@ internal sealed class BootstrapRuntime : IDisposable
 	public void Dispose()
 	{
 		_disposed = true;
+		Dispatcher.Dispose();
 		Store.StorageChanged -= Policy.OnStorageChanged;
 	}
 }
