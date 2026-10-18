@@ -4,7 +4,7 @@ internal sealed class RequestWork<T>
 {
 	internal RequestKey Key { get; }
 	internal string Fingerprint { get; }
-	internal Func<Task<T>> Execute { get; }
+	internal Func<Task<T>> Execute { get; set; }
 	internal TaskCompletionSource<T> Completion { get; } = new( TaskCreationOptions.RunContinuationsAsynchronously );
 	internal CancellationTokenRegistration Cancellation { get; set; }
 	internal bool Started { get; set; }

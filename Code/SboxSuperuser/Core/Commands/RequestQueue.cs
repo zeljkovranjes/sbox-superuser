@@ -101,6 +101,8 @@ internal sealed class RequestQueue<T>
 			finally
 			{
 				work.Cancellation.Dispose();
+				work.Cancellation = default;
+				work.Execute = null;
 				lock ( _gate )
 				{
 					work.CompletedUtc = _clock();

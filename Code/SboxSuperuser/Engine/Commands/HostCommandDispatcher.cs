@@ -12,6 +12,7 @@ internal sealed partial class HostCommandDispatcher : ICommandDispatcher, IDispo
 	private readonly Action<Exception> _report;
 	private readonly CancellationTokenSource _lifetime = new();
 	private readonly RequestQueue<CommandResult> _queue;
+	private bool _disposed;
 
 	internal HostCommandDispatcher( HostPolicyService policy, CommandRegistry registry, Func<bool> available,
 		Func<IReadOnlyList<CommandPlayer>> players, Action<Exception> report, Func<DateTimeOffset> clock = null )
@@ -27,7 +28,7 @@ internal sealed partial class HostCommandDispatcher : ICommandDispatcher, IDispo
 	internal async Task<CommandResult> SubmitAsync( Func<ActorIdentity> authenticate, CommandOrigin origin, CommandRequest request,
 		CancellationToken cancellation, CommandService service = null )
 	{
-		if ( !_available() || _lifetime.IsCancellationRequested )
+		if ( !_available() || _disposed )
 		{
 			return Result( CommandStatus.Unsupported, "An eligible authoritative runtime on the main thread is required." );
 		}
@@ -112,7 +113,17 @@ internal sealed partial class HostCommandDispatcher : ICommandDispatcher, IDispo
 		}
 	}
 
-	public void Dispose() => _lifetime.Cancel();
+	public void Dispose()
+	{
+		if ( _disposed )
+		{
+			return;
+		}
+
+		_disposed = true;
+		_lifetime.Cancel();
+		_lifetime.Dispose();
+	}
 
 	private static CommandResult Result( CommandStatus status, string message ) => new( status, message );
 }

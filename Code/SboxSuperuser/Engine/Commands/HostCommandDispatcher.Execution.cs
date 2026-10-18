@@ -55,7 +55,7 @@ internal sealed partial class HostCommandDispatcher
 
 	private CommandResult ValidateCaller( CommandContext context, CommandExecutionServices services )
 	{
-		if ( !_available() || _lifetime.IsCancellationRequested )
+		if ( !_available() || _disposed )
 		{
 			return Result( CommandStatus.Unsupported, "The authoritative runtime is no longer available." );
 		}

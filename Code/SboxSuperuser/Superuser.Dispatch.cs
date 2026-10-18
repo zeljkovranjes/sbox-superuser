@@ -24,7 +24,8 @@ public static partial class Superuser
 	{
 		ContractGuard.Key( serviceId, nameof( serviceId ) );
 		var runtime = FindAuthorityRuntime() ?? throw new InvalidOperationException( "An eligible authoritative runtime is required." );
-		if ( permissions is null || permissions.Any( key => !runtime.Policy.RegisteredPermissions.Contains( key, StringComparer.Ordinal ) ) )
+		var registered = runtime.Policy.RegisteredPermissions;
+		if ( permissions is null || permissions.Count > 64 || permissions.Any( key => !registered.Contains( key, StringComparer.Ordinal ) ) )
 		{
 			throw new ArgumentException( "Service capabilities must name registered exact permissions.", nameof( permissions ) );
 		}
