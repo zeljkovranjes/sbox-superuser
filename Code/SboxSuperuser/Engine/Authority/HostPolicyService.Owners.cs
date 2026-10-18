@@ -7,15 +7,18 @@ internal sealed partial class HostPolicyService
 	internal Task<CommandResult> ChangeOwnerAsync( Func<ActorIdentity> authenticate, string steamId, bool add,
 		Guid requestId, CancellationToken cancellation )
 	{
-		return WriteOwnersAsync( authenticate, current => current.Change( steamId, add ), false,
-			add ? "security.owner.add" : "security.owner.remove", requestId, cancellation );
+		var command = add ? "security.owner.add" : "security.owner.remove";
+		return AuditedMutationAsync( authenticate, CommandOrigin.Console, requestId, command, new[] { steamId },
+			() => WriteOwnersAsync( authenticate, current => current.Change( steamId, add ), false, command, requestId, cancellation ) );
 	}
 
 	internal Task<CommandResult> RecoverOwnersAsync( Func<ActorIdentity> authenticate, IEnumerable<string> explicitOwners,
 		Guid requestId, CancellationToken cancellation )
 	{
 		var replacement = new OwnerSet( explicitOwners );
-		return WriteOwnersAsync( authenticate, _ => replacement, true, "security.owner.recover", requestId, cancellation );
+		return AuditedMutationAsync( authenticate, CommandOrigin.Console, requestId, "security.owner.recover",
+			_owners.Ids.Union( replacement.Ids ),
+			() => WriteOwnersAsync( authenticate, _ => replacement, true, "security.owner.recover", requestId, cancellation ) );
 	}
 
 	private async Task<CommandResult> WriteOwnersAsync( Func<ActorIdentity> authenticate, Func<OwnerSet, OwnerSet> change,
@@ -62,6 +65,10 @@ internal sealed partial class HostPolicyService
 			}
 
 			var expected = stored.Document?.Revision ?? 0;
+			if ( !_available() || authenticate()?.Kind != ActorKind.DedicatedConsole )
+			{
+				return new CommandResult( CommandStatus.Denied, "Dedicated local authority was revoked before the owner write." );
+			}
 			var affected = _owners.Ids.Except( candidate.Ids ).Concat( candidate.Ids.Except( _owners.Ids ) ).ToArray();
 			var intents = new List<AuditIntent>();
 			for ( var offset = 0; offset < Math.Max( affected.Length, 1 ); offset += 64 )

@@ -13,7 +13,10 @@ internal sealed partial class HostPolicyService
 		CommandOrigin origin, Guid requestId, CancellationToken cancellation )
 	{
 		ArgumentNullException.ThrowIfNull( change );
-		return await SerializedAsync( async () =>
+		var targets = change.Edit.Kind is PolicyEditKind.AddUserGroup or PolicyEditKind.RemoveUserGroup or PolicyEditKind.SetUserPermission
+			? new[] { change.Edit.Subject } : Array.Empty<string>();
+		return await AuditedMutationAsync( authenticate, origin, requestId, "security.policy.change", targets,
+			() => SerializedAsync( async () =>
 		{
 			var actor = authenticate();
 			if ( !CanManage( actor ) )
@@ -54,7 +57,7 @@ internal sealed partial class HostPolicyService
 			}
 
 			return MutationResult( result );
-		}, cancellation );
+		}, cancellation ) );
 	}
 
 	private static CommandResult MutationResult( StoreWriteResult result )

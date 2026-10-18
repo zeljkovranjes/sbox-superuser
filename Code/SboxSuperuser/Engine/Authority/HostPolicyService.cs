@@ -1,5 +1,6 @@
 using SboxSuperuser.Core.Permissions;
 using SboxSuperuser.Core.Storage;
+using SboxSuperuser.Engine.Audit;
 
 namespace SboxSuperuser.Engine.Authority;
 
@@ -15,6 +16,7 @@ internal sealed partial class HostPolicyService
 	private OwnerSet _owners;
 	private long _ownerRevision;
 	private bool _managedOwners;
+	private readonly IAuditWriter _audit;
 
 	internal Task Initialization { get; }
 	internal StoreReadStatus PolicyStatus { get; private set; } = StoreReadStatus.Unknown;
@@ -31,11 +33,12 @@ internal sealed partial class HostPolicyService
 	internal static StoreKey OwnersKey { get; } = new( "security", "owners" );
 
 	internal HostPolicyService( IAdminStore store, IEnumerable<string> bootstrapOwners,
-		StoreReadStatus bootstrapOwnerStatus, Func<bool> available, Action<Exception> report )
+		StoreReadStatus bootstrapOwnerStatus, Func<bool> available, Action<Exception> report, IAuditWriter audit = null )
 	{
 		_store = store;
 		_available = available;
 		_report = report;
+		_audit = audit;
 		_bootstrapOwners = new OwnerSet( bootstrapOwners );
 		_bootstrapOwnerStatus = bootstrapOwnerStatus;
 		_owners = _bootstrapOwners;
