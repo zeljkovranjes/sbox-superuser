@@ -43,8 +43,11 @@ internal sealed class ModerationLedger
 
 	internal ModerationEntry Active( string target, ModerationKind kind, DateTimeOffset now )
 	{
-		return _active.TryGetValue( (target, kind), out var entry )
-			&& (!entry.ExpiresUtc.HasValue || entry.ExpiresUtc > now) ? entry : null;
+		if ( !_active.TryGetValue( (target, kind), out var entry ) ) return null;
+		if ( !entry.ExpiresUtc.HasValue || entry.ExpiresUtc > now ) return entry;
+		// At most one expired index entry is cleaned per lookup; immutable history remains intact.
+		_active.Remove( (target, kind) );
+		return null;
 	}
 
 	internal ModerationLedger Append( ModerationEntry entry )
