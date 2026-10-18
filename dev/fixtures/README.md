@@ -34,3 +34,16 @@ With the isolated bootstrap scene playing, run `dev/verify-dispatch-editor.cs` f
 ## Task 12 module fixtures
 
 Copy `SampleCounterModule.cs`, `SamplePulseSource.cs`, `SamplePulseSubscription.cs`, `FailingStartupModule.cs` and `HeldCommandModule.cs` into the game's `Engine/Modules/`. Run `dev/verify-module-lifecycle.cs` on the isolated editor host or dedicated server. It installs a removable module, invokes native management commands, checks five reloads, retained versioned data, listener cleanup, startup rollback and bounded shutdown of a deliberately held command. It restores owner configuration and bootstrap settings afterward. The deliberately failing and held modules are development-only fixtures; never install them in a production game.
+
+## Task 14 custom chat fixtures
+
+Copy these original sources into the adopting game, preserving the example namespace:
+
+| Files | Destination beneath Code/SuperuserCompatibilityLab |
+|---|---|
+| IExampleChatMessageEvent.cs | Api/ |
+| ExampleChatGate.cs, ChatExampleModule.cs | Engine/Chat/ |
+| IndependentChatExample.cs, FailingChatResultObserver.cs | Components/ |
+| CustomChatExample.razor, CustomChatExample.razor.scss | UI/ |
+
+Follow [T14](../../docs/T14-CUSTOM-CHAT.md) for the two-client sequence and cleanup. Setup creates runtime objects only, hides the platform overlay locally and installs a deliberately permissive test counter. Neither saved scene settings nor production permissions should be changed. The failing observer is only for the fallback check. The independent transport passes the actual RPC caller to the library; neither client supplies identity or permission claims. These fixtures are examples inside the adopting game, not another required library or service.

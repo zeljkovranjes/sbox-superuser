@@ -1,6 +1,6 @@
 # Superuser
 
-Superuser provides console and platform-chat administration, host-local records and explicit owner configuration for dedicated servers. Add one Superuser Bootstrap to your game's network scene; enable its editor switch for local testing. Permissions, managed modules, typed dispatch and durable audit records run in the same s&box C# library. Custom chat, moderation and visual admin UI remain pending.
+Superuser provides console and chat administration, host-local records and explicit owner configuration for dedicated servers. Add one Superuser Bootstrap to your game's network scene; enable its editor switch for local testing. Permissions, managed modules, typed dispatch and durable audit records run in the same s&box C# library. Custom chat hooks are available; moderation and visual admin UI remain pending.
 
 ## Requirements
 
@@ -22,6 +22,7 @@ This package is not published on sbox.game. Add this local library to a test gam
 6. For Task 1 checks, additionally add **Superuser Compatibility Probe** and opt into its editor mode. Its commands remain `superuser_probe`, `superuser_probe_local` and `/superuser-probe` in the chatbox.
 7. Host code can obtain `Superuser.GetStore()` for versioned transactions. Follow the [storage and recovery guide](docs/T04-STORAGE.md); editor and dedicated records are isolated.
 8. With platform chat enabled, enter `/admin help` in the in-game chatbox. Replies are private. See [chat setup](docs/T13-PLATFORM-CHAT.md).
+9. For your own chatbox, use the [custom chat hooks and examples](docs/T14-CUSTOM-CHAT.md). Choose platform submission or an authenticated independent backend for each message.
 
 ### In code
 
@@ -63,15 +64,15 @@ Dedicated servers are the only production target. Opt-in editor testing is devel
 
 ## Limitations
 
-- Tasks 1–13 are implemented. Custom-backend chat APIs, moderation enforcement and visual admin UI remain pending.
+- Tasks 1–14 are implemented. Native settings, moderation enforcement and visual admin UI remain pending.
 - Task 1's unavailable dedicated multiplayer evidence remains marked Blocked; Task 2 does not certify that deployment.
-- Chat commands use `/`; the future administration root will be `/admin`. The current probe does not implement administration commands.
+- Chat commands use `/admin` by default; `!` is ordinary text. The compatibility probe remains separate from administration commands.
 - Native dynamic registration and full engine-name enumeration are unavailable. Visible managed-name collisions are reported; see the [console guide](docs/T11-CONSOLE.md) for the fixed transport and configured-root fallback.
 - The probe is for isolated testing and should be removed from a production scene.
 - Do not enter credentials or sensitive arguments into diagnostic commands: bounded test arguments are logged.
 - Storage requires one host process per data root. Process interruption/restart recovery is verified; filesystem flush-to-device and power-loss durability are not guaranteed.
 - Policy and owner backups retain all committed generations. Only audit history has automatic retention; damaged historical audit files are preserved and reported as degraded.
-- Future ImGui source can be staged in [dev/ui-source/sbox-imgui](dev/ui-source/sbox-imgui/README.md); no UI is integrated.
+- Future ImGui source can be staged in [dev/ui-source/sbox-imgui](dev/ui-source/sbox-imgui/README.md); the demo chatbox does not implement admin UI.
 
 ## Development
 
@@ -102,6 +103,7 @@ Task 12 adds [managed module lifetimes](docs/T12-MODULES.md). Trusted host setup
 Task 13 adds [platform chat commands](docs/T13-PLATFORM-CHAT.md) through the same dispatcher. Two actual editor clients verify synchronous command consumption, private successes/errors and one request per submission. The current suites contain 207 contract and 61 Core cases. Platform rate limits remain active; `/` is the only admin chat prefix.
 
 ## License
+
 
 
 No license selected yet. No third-party UI code is included.
