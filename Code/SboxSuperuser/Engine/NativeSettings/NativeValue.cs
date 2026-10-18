@@ -21,13 +21,16 @@ internal static class NativeValue
 		return value;
 	}
 
-	internal static string Normalize( NativeSettingDescriptor binding, string value )
+	internal static string Normalize( NativeSettingDescriptor binding, string value, bool validateConstraints = true )
 	{
 		if ( value is null ) return null;
+		// Direct native changes may be outside framework bounds; operators must still inspect and reset them.
+		var argument = validateConstraints ? binding.Value : new CommandArgumentDescriptor( "value", binding.Description,
+			binding.Value.Kind == CommandArgumentKind.Enum ? CommandArgumentKind.String : binding.Value.Kind );
 		var descriptor = new CommandDescriptor( "settings.value", binding.Description, binding.Permission,
-			"superuser.settings", new[] { binding.Value } );
+			"superuser.settings", new[] { argument } );
 		var parsed = CommandArgumentParser.Parse( descriptor, new[] { value }, Array.Empty<CommandPlayer>() );
-		return parsed.IsSuccess ? Format( binding.Value, parsed.Arguments ) : null;
+		return parsed.IsSuccess ? Format( argument, parsed.Arguments ) : null;
 	}
 
 	internal static string Format( CommandArgumentDescriptor argument, CommandArguments values ) => argument.Kind switch

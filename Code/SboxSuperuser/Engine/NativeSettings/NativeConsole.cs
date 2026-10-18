@@ -29,7 +29,7 @@ internal static class NativeConsole
 		if ( !Accessible( binding ) ) return false;
 		try
 		{
-			value = NativeValue.Normalize( binding, ConsoleSystem.GetValue( binding.NativeName, null ) );
+			value = NativeValue.Normalize( binding, ConsoleSystem.GetValue( binding.NativeName, null ), validateConstraints: false );
 			return value is not null;
 		}
 		catch ( Exception error )
@@ -73,7 +73,7 @@ internal static class NativeConsole
 	{
 		if ( Find( binding.NativeName, true ) is null )
 			return new CommandResult( CommandStatus.Unsupported, "Native command is inaccessible or its flags cannot be verified." );
-		if ( binding.Command.Arguments.Any( argument => argument.Audit == CommandArgumentAudit.Sensitive ) )
+		if ( binding.Command.Arguments.Any( argument => argument.Audit == CommandArgumentAudit.Sensitive || Audit.AuditRedaction.SensitiveName( argument.Name ) ) )
 			return new CommandResult( CommandStatus.Unsupported, "Sensitive native command arguments require an independently verified game adapter." );
 		var values = binding.Command.Arguments.Select( argument => (object)NativeValue.Format( argument, arguments ) ).ToArray();
 		try
