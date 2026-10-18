@@ -47,7 +47,7 @@ The dedicated console's local connection is not a player; use `superuser_local_i
 | Probe Storage On Start | `false` | Exercises isolated files under `FileSystem.Data/superuser-t01/<mode>/` and preserves an existing baseline. |
 | Rejected Test Steam Id | Empty | Deliberately rejects only this test account at the admission callback. Empty accepts all connections. |
 
-Bootstrap and compatibility probe each have their own Allow Editor Testing switch. Storage/admission options belong only to the probe. Bootstrap reads fixed host-local owner files; no owner list is stored in scene properties.
+Bootstrap and compatibility probe each have their own Allow Editor Testing switch. Storage/admission options belong only to the probe. Bootstrap reads fixed host-local owner files by default; explicit dedicated-local owner changes create managed overrides. No owner list is stored in scene properties. See the [owner recovery procedure](docs/T06-AUTHORITY.md).
 
 ## How it works
 
@@ -59,7 +59,7 @@ Dedicated servers are the only production target. Opt-in editor testing is devel
 
 ## Limitations
 
-- Tasks 1–5 are implemented. No dispatcher, parser, live policy administration, module loader, moderation enforcement or UI is installed.
+- Tasks 1–6 are implemented. No dispatcher, parser, module loader, moderation enforcement or UI is installed.
 - Task 1's unavailable dedicated multiplayer evidence remains marked Blocked; Task 2 does not certify that deployment.
 - Chat commands use `/`; the future administration root will be `/admin`. The current probe does not implement administration commands.
 - The probe is for isolated testing and should be removed from a production scene.
@@ -70,6 +70,8 @@ Dedicated servers are the only production target. Opt-in editor testing is devel
 
 ## Development
 
+See the [implementation ledger](docs/IMPLEMENTATION.md) for completed tasks, current scope and remaining work.
+
 Run `sbox-check` and `dotnet build Code/chomnr_sbox_superuser.csproj` after the editor generates it. Run both test projects: `dotnet test tests/SboxSuperuser.Contracts.Tests/SboxSuperuser.Contracts.Tests.csproj` and `dotnet test tests/SboxSuperuser.Tests/SboxSuperuser.Tests.csproj`. The original project has no test cases; the new contract suite verifies structural invariants through an engine-free harness. Run `dev/verify-contracts.cs` through the engine's `run_csharp` tool, and `dev/verify-editor.cs` with the isolated test scene playing. Plain .NET compilation does not replace the engine whitelist check.
 
 Task 3 adds `dev/verify-bootstrap.cs` for isolated editor-host identity/owner checks, plus `dev/verify-dedicated-owners.cs` and `dev/verify-bootstrap-scenes.cs` for actual dedicated validation. The scripts restore owner-file contents; the scene test replaces the disposable test scene.
@@ -77,6 +79,8 @@ Task 3 adds `dev/verify-bootstrap.cs` for isolated editor-host identity/owner ch
 Task 4 adds `dev/verify-durable-store.cs` and the dedicated restart/interruption scripts documented in [T04](docs/T04-STORAGE.md). These use disposable test keys and preserve test evidence. The contract/Core suite contains 55 tests, including 22 storage cases; the original empty test project remains unchanged.
 
 Task 5 adds [immutable policy and permission resolution](docs/T05-PERMISSIONS.md), 24 tests (79 total), and `dev/verify-permissions.cs` for the actual engine assembly. Creating a policy evaluator does not install or authorize a live server policy.
+
+Task 6 adds [owner-only policy administration, offline target protection and local owner recovery](docs/T06-AUTHORITY.md), with 97 tests in total. Use `Superuser.ApplyPolicyChangeAsync`, `ExplainPermissionAsync`, `CheckPunitiveTargetAsync` and `GetAuthorityDiagnostics` from authenticated host integrations. An explicit dedicated-local owner change creates managed ownership; thereafter the managed store takes precedence over the bootstrap owner file.
 
 ## License
 

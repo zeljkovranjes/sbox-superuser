@@ -1,6 +1,6 @@
 # T04: Versioned durable storage
 
-Status: **Complete.** T05 onward remain not started. Source: [specification 0.2](sbox-admin-specification.docx), T04 and its storage/recovery requirements.
+Status: **Complete.** This is the historical T04 completion record; see the [implementation ledger](IMPLEMENTATION.md) for subsequent work. Source: [specification 0.2](sbox-admin-specification.docx), T04 and its storage/recovery requirements.
 
 ## Runtime and API
 
@@ -104,6 +104,6 @@ Tested 2026-10-17 local time (UTC events extend into October 18), Steam app 5908
 
 The scripts operate on disposable test keys. `dev/seed-durable-store.cs` refuses to overwrite an existing fixture. `dev/interrupt-durable-store.cs` uses a private instance checkpoint set only by the trusted development bridge; no shipped command, ConVar or player input activates fault injection. Set `superuser/t04-interrupt-phase.txt` to `candidate` or `commit`, start that script, wait for its INTERRUPTION CHECKPOINT log, terminate only the test PID, then run `dev/verify-durable-restart.cs` on a fresh server. `dev/recover-durable-test.cs` deliberately invokes local recovery for that known corrupt fixture. Repeat in a separate disposable game/data root; do not reset production data for testing.
 
-Raw local evidence: ignored `dev/out/evidence/t04-*`. This committed report is the portable record. T01's unrelated dedicated-client package prerequisite remains unresolved; it does not block host-local T04 restart/recovery tests. There is no T04 implementation blocker. Tasks T05 onward have not begun.
+Raw local evidence: ignored `dev/out/evidence/t04-*`. This committed report is the portable record. T01's unrelated dedicated-client package prerequisite remains unresolved; it does not block host-local T04 restart/recovery tests. There is no T04 implementation blocker. At T04 completion, tasks T05 onward had not begun.
 
 Final repository checks: library and lab `sbox-check` passed; both generated runtime projects built with zero warnings/errors; engine whitelist compilation had zero diagnostics. All 55 contract/Core tests passed with no skips. Original empty test projects were run without claiming additional passed cases. Existing T02/T03 tests and the original Core harness are unchanged. Final editor/server logs contained no new error-level entries. Publication lint reported zero failures and one warning in ignored generated engine XML; no engine binaries or generated outputs are tracked. `git diff --check` passed. Owned test processes were stopped, the lab tracked tree remained unchanged, and the user's pre-existing editor PID17136 was left running. GitHub remains private.

@@ -1,7 +1,7 @@
 # Changelog
 
 ## 2026-10-17
-Title: Permission Resolution And Recoverable Storage
+Title: Owner Policy And Target Protection
 ### Added
 # Diagnostics
 Compatibility probe - checks type discovery, caller identity and argument forwarding inside the library
@@ -29,6 +29,11 @@ Host isolation - separates editor and dedicated data and refuses retired runtime
 Policy evaluation - resolves exact permissions with direct user precedence, inherited deny and explicit default denial
 Inheritance - validates immutable group graphs, rejects cycles and includes implicit player membership
 Explain - records contributing groups and policy revisions; policy and permission registration changes invalidate cached decisions
+# Authority
+Policy administration - only current owners and dedicated console authority may persist user, group and protection edits
+Target protection - uses stored offline roles, refuses equal ranks and punitive self-targeting, and keeps permissions separate
+Owner recovery - dedicated-local owner changes retain versions, protect the final owner and require explicit recovery to clear all owners
+Degraded authority - corrupt managed ownership never falls back to bootstrap or cached owners; storage recovery invalidates permission caches
 ### Improved
 # Diagnostics
 Chat probe - uses /superuser-probe in the chatbox; nonmatching messages pass through normally
@@ -41,5 +46,5 @@ Scene lifecycle - repeated initialization stays idempotent; duplicates suspend a
 Dedicated multiplayer - the unpublished test game cannot load on joining clients; a published adopting game is needed for dedicated network validation
 Storage guarantees - actual process interruption and restart recovery are verified; power-loss durability and cross-process writers are unsupported
 Administration - Task 1 provides diagnostics only; administration commands and UI are not implemented
-Administration runtime - live policy administration, dispatch, parsing and module management remain later tasks
+Administration runtime - dispatch, parsing and module management remain later tasks
 Storage retention - retains all committed generations; automatic pruning and audit outcomes remain later tasks

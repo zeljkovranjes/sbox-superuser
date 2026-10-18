@@ -1,6 +1,6 @@
 # T03: Trusted bootstrap and identity
 
-Status: **Complete**. This historical T03 record covers bootstrap, identity, explicit owner configuration and diagnostics. Subsequent storage work is recorded in [T04](T04-STORAGE.md); T05 onward remain not started.
+Status: **Complete**. This historical T03 record covers bootstrap, identity, explicit owner configuration and diagnostics. See the [implementation ledger](IMPLEMENTATION.md) for subsequent work.
 
 Design: one scene-owned system coordinates bootstrap registrations. Only the active, authoritative network scene can own a usable runtime; scene transitions retire older runtimes. Duplicate components fail closed. Production requires an actual dedicated server; editor testing remains explicit opt-in.
 
