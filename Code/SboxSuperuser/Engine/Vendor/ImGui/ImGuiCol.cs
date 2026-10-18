@@ -1,0 +1,76 @@
+// Vendored from zeljkovranjes/sbox-imgui; see LICENSE and PROVENANCE.md in this folder.
+using Sandbox;
+#pragma warning disable CS0649 // Upstream reserves fields for optional widgets and features.
+namespace SboxSuperuser.Engine.Vendor.ImGui;
+
+internal enum ImGuiCol
+{
+	Text,
+	TextDisabled,
+	/// <summary>Background of normal windows</summary>
+	WindowBg,
+	/// <summary>Background of child windows</summary>
+	ChildBg,
+	/// <summary>Background of popups, menus, tooltips windows</summary>
+	PopupBg,
+	Border,
+	BorderShadow,
+	/// <summary>Background of checkbox, radio button, plot, slider, text input</summary>
+	FrameBg,
+	FrameBgHovered,
+	FrameBgActive,
+	TitleBg,
+	TitleBgActive,
+	TitleBgCollapsed,
+	MenuBarBg,
+	ScrollbarBg,
+	ScrollbarGrab,
+	ScrollbarGrabHovered,
+	ScrollbarGrabActive,
+	/// <summary>Checkbox tick and RadioButton circle</summary>
+	CheckMark,
+	SliderGrab,
+	SliderGrabActive,
+	Button,
+	ButtonHovered,
+	ButtonActive,
+	/// <summary>Header* colors are used for CollapsingHeader, TreeNode, Selectable, MenuItem</summary>
+	Header,
+	HeaderHovered,
+	HeaderActive,
+	Separator,
+	SeparatorHovered,
+	SeparatorActive,
+	ResizeGrip,
+	ResizeGripHovered,
+	ResizeGripActive,
+	InputTextCursor,
+	TabHovered,
+	Tab,
+	TabSelected,
+	TabSelectedOverline,
+	TabDimmed,
+	TabDimmedSelected,
+	TabDimmedSelectedOverline,
+	PlotLines,
+	PlotLinesHovered,
+	PlotHistogram,
+	PlotHistogramHovered,
+	TableHeaderBg,
+	TableBorderStrong,
+	TableBorderLight,
+	TableRowBg,
+	TableRowBgAlt,
+	TextLink,
+	TextSelectedBg,
+	DragDropTarget,
+	NavCursor,
+	NavWindowingHighlight,
+	NavWindowingDimBg,
+	ModalWindowDimBg,
+	COUNT,
+
+	[Obsolete( "Use ButtonHovered" )] ImGuiColButtonHovered = ButtonHovered,
+	[Obsolete( "Use TabSelected" )] TabActive = TabSelected,
+	[Obsolete( "Use NavCursor" )] NavHighlight = NavCursor,
+}
