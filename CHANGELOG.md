@@ -5,6 +5,7 @@ Title: Optional Admin Menu and Custom Storage
 ### Added
 # Interface
 Moderation menu - bundled ImGui view includes searchable players, offline Steam ID lookup, roles, restrictions, history, confirmations and private activity
+Menu redesign - Players and Activity tabs, a navy theme, colored outcome banners and badges, player rows with exact IDs, duration presets, table history and a highlighted confirmation panel
 Replacement views - typed queries and exact-target actions return correlated private results without exposing ImGui or unrestricted console execution
 Input ownership - configurable F6 binding and Escape close; removing the menu releases its panel and cursor while console and slash chat stay available
 # Storage

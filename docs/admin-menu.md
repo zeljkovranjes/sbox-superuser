@@ -6,11 +6,15 @@ Add one **Superuser Admin Menu** to a GameObject that exists on each client. It 
 
 The host still needs **Superuser Bootstrap**. Production runs on an actual dedicated server; local testing requires **Allow Editor Testing** on the editor host. Opening the menu grants no permissions.
 
+## Layout
+
+The header shows connection state, **Refresh** and **Close**. Below it, a colored strip reports the last action result: green for success, amber for Unknown or a conflict, red for errors. Use the **Players** and **Activity** tabs to move between views. Views refresh every 5 seconds.
+
 ## Moderate a player
 
-Search by name or Steam ID, then select the exact ID. Duplicate names remain separate rows. To manage an offline ban, enter its Steam ID under **Offline lookup**.
+In the **Players** tab, search the left column by name or Steam ID; press Enter or **Search**. Each row shows the name and its exact Steam ID. Duplicate names remain separate rows. To manage an offline ban, enter its Steam ID under **Offline lookup**.
 
-The selected view shows roles, visible active restrictions and permitted actions. Enter a reason. Ban and text mute also need a duration such as `30m`, `2h`, `7d` or `permanent`. Review the action, ID, reason and duration before confirming. Kick requires an online player.
+The right column shows the selected player's online state, roles, visible active restrictions, permitted actions and history. Enter a reason. Ban and text mute also need a duration: type one such as `30m`, `2h` or `7d`, or pick a preset including **Permanent**. Action buttons are red for kick and ban, amber for warn and text mute, and green for revocations. A confirmation panel then repeats the action, target, reason and duration; inputs stay locked until you confirm or cancel. Kick requires an online player.
 
 The host rechecks permission and target protection when executing. A disconnect, revoked permission or storage failure returns an explicit result. **Unknown** means inspect recent activity before retrying; it is not success.
 

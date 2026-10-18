@@ -21,14 +21,7 @@ internal sealed partial class AdminMenuRenderer : IDisposable
 		_scene = scene;
 		_previousMouse = Mouse.Visibility;
 		_input = new AdminInputPanel( _context.IO ) { Close = () => Open = false };
-		_context.Style.WindowRounding = 8;
-		_context.Style.FrameRounding = 4;
-		_context.Style.WindowPadding = new Vector2( 18, 18 );
-		_context.Style.ItemSpacing = new Vector2( 10, 9 );
-		_context.Style.Colors[ (int)ImGuiCol.WindowBg ] = new Vector4( 0.035f, 0.06f, 0.1f, 0.98f );
-		_context.Style.Colors[ (int)ImGuiCol.TitleBgActive ] = new Vector4( 0.06f, 0.12f, 0.22f, 1 );
-		_context.Style.Colors[ (int)ImGuiCol.Button ] = new Vector4( 0.10f, 0.22f, 0.38f, 1 );
-		_context.Style.Colors[ (int)ImGuiCol.ButtonHovered ] = new Vector4( 0.16f, 0.35f, 0.58f, 1 );
+		AdminMenuTheme.Apply( _context.Style );
 	}
 
 	internal void CaptureInput()

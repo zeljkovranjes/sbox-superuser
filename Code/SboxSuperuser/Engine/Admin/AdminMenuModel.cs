@@ -14,6 +14,8 @@ internal sealed class AdminMenuModel
 	internal AdminReply Activity { get; private set; }
 	internal AdminActionRequest Confirmation { get; private set; }
 	internal string Feedback { get; private set; } = "";
+	/// <summary>Outcome behind Feedback; null while an action waits for the host.</summary>
+	internal CommandStatus? FeedbackStatus { get; private set; }
 	internal string Selected { get; private set; } = "";
 	internal bool Busy => _actionRequest != Guid.Empty;
 	internal int PlayerPage;
@@ -76,6 +78,7 @@ internal sealed class AdminMenuModel
 			_actionRequest = _action( Confirmation );
 			Confirmation = null;
 			Feedback = "Waiting for the host...";
+			FeedbackStatus = null;
 		} );
 	}
 
@@ -107,6 +110,7 @@ internal sealed class AdminMenuModel
 		{
 			_actionRequest = Guid.Empty;
 			Feedback = $"{reply.Status}: {reply.Message}  Request: {reply.RequestId:N}";
+			FeedbackStatus = reply.Status;
 			Details = null;
 			_refreshAfter = DateTimeOffset.MinValue;
 		}
@@ -115,7 +119,13 @@ internal sealed class AdminMenuModel
 	private void Try( Action action )
 	{
 		try { action(); }
-		catch ( ArgumentException error ) { Feedback = error.Message; }
-		catch ( InvalidOperationException error ) { Feedback = error.Message; }
+		catch ( ArgumentException error ) { Fail( error.Message ); }
+		catch ( InvalidOperationException error ) { Fail( error.Message ); }
+	}
+
+	private void Fail( string message )
+	{
+		Feedback = message;
+		FeedbackStatus = CommandStatus.InvalidArguments;
 	}
 }

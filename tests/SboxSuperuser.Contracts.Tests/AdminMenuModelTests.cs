@@ -37,9 +37,11 @@ public sealed class AdminMenuModelTests
 		Assert.Equal( "Original", Assert.Single( actions ).Reason );
 		Assert.Equal( "1h", actions[ 0 ].Duration );
 		Assert.True( model.Busy );
+		Assert.Null( model.FeedbackStatus );
 		model.Receive( new AdminReply { RequestId = actionId, Status = CommandStatus.Unknown, Message = "Inspect before retrying." } );
 		Assert.False( model.Busy );
 		Assert.Contains( "Unknown", model.Feedback );
+		Assert.Equal( CommandStatus.Unknown, model.FeedbackStatus );
 		Assert.Null( model.Confirmation );
 		Assert.Null( model.Details );
 	}
