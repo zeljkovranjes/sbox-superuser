@@ -16,16 +16,16 @@ Plain .NET builds do not apply the engine whitelist. Check the adopting game in 
 
 ## Verified behavior
 
-On engine **26.10.13a**, Steam build **25964806**, all **232 contract and 75 Core tests** passed. Existing tests were preserved. Generated library/game builds and actual editor whitelist compilation had zero warnings/errors.
+On engine **26.10.13a**, Steam build **25964806**, all **236 contract and 75 Core tests** passed. Existing tests were preserved. The generated library build and actual engine assembly references compile with zero warnings/errors.
 
 | Check | Evidence |
 |---|---|
 | Caller identity | Actual forwarded requests use the engine connection; null and SteamId0 player routes deny. Dedicated-local commands have distinct authority. |
 | Permission conflicts | Actual engine resolver and Core tests cover direct precedence, inherited deny, cycles and cache invalidation. |
-| Protection | Equal-rank and self-target punishment denied; queued permission revocation prevents execution. |
+| Protection | Group ranks stop below reserved owner rank; owners, equal ranks and self-targets cannot punish each other. Queued permission revocation prevents execution. |
 | Duplicate requests | Real client retry executes once; dedicated pressure test coalesces pending and completed retries. |
 | Failed ban write | Real injected generation failure returns StorageUnavailable, preserves the previous revision and leaves the connected target online. |
-| Private chat | Two actual editor clients: requester received five private replies, peer received none. Denied/unavailable command text was not broadcast; ordinary chat resumed. Both chat views were inspected. |
+| Private chat | Two actual editor clients: requester received five private replies, peer received none. Denied/unavailable command text was not broadcast; ordinary chat resumed. Result contracts reject control-character line injection. |
 | Restart | Actual dedicated process restarts preserve policy, moderation and original UTC expiry. |
 | Recovery | Processes terminated during candidate/marker writes recover through validated backups. Interrupted audit outcomes stay Unknown. |
 | Native restrictions | Protected/Admin/Cheat bindings refused; native command acknowledgment remains Unknown. |
