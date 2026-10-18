@@ -29,7 +29,7 @@ Only owners and the dedicated local console can edit policy.
 | `admin group list [page]` | Groups and protection levels |
 | `admin group <group> parents set <comma-separated-parents>` | Replace inheritance; `""` clears it |
 | `admin group <group> parents list [page]` | Inspect inheritance |
-| `admin group <group> protection set <level>` | Set a nonnegative rank |
+| `admin group <group> protection set <level>` | Set a rank from 0 through 99 |
 | `admin group <group> permission allow/deny/unset <key>` | Group permission entry |
 | `admin user <user> group add/remove <group>` | Membership |
 | `admin user <user> group list [page]` | Membership summary |

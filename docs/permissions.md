@@ -23,7 +23,7 @@ Only owners and the dedicated local console can change policy. Granting `admin.s
 
 ## Target protection
 
-Punitive actions require a strictly higher protection level than the target. Equal rank and self-punishment are denied. Effective rank is the highest inherited group level; offline players use their stored groups.
+Punitive actions require a strictly higher protection level than the target. Equal rank and self-punishment are denied. Group levels range from 0 through 99; owners have the reserved level 100, so one owner cannot punish another. Offline players use their stored groups.
 
 The actual dedicated local console has separate authority. Null callers and client-supplied roles never become console authority.
 
