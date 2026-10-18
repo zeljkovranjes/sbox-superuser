@@ -30,9 +30,30 @@ internal static class ChatReplies
 		// Local system notifications have no sender and never enter the command transport.
 		var fields = keys.Select( (key, index) => new KeyValuePair<string, string>( key, values[ index ] ) ).ToDictionary( pair => pair.Key, pair => pair.Value );
 		var result = new CommandResult( status, message, fields );
-		foreach ( var line in ChatResultText.Lines( result ) )
+		var notification = new AdminChatResultEvent( requestId, result );
+		var scene = Game.ActiveScene;
+		if ( scene.IsValid() )
 		{
-			Chat.AddText( line );
+			scene.RunEvent<IAdminChatResultEvent>( listener =>
+			{
+				var suppressed = notification.SuppressDefaultDisplay;
+				try
+				{
+					listener.OnAdminChatResult( notification );
+				}
+				catch ( Exception error )
+				{
+					notification.SuppressDefaultDisplay = suppressed;
+					Log.Warning( $"[Superuser] Chat result view failed; type={error.GetType().Name}." );
+				}
+			} );
+		}
+		if ( !notification.SuppressDefaultDisplay )
+		{
+			foreach ( var line in ChatResultText.Lines( result ) )
+			{
+				Chat.AddText( line );
+			}
 		}
 		Log.Info( $"[Superuser chat {requestId:N}] Private result: {status}." );
 	}
