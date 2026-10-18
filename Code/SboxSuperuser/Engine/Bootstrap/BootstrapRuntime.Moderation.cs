@@ -9,6 +9,15 @@ internal sealed partial class BootstrapRuntime
 	private bool CanModerateTarget( ActorIdentity actor, string target ) => Policy.CheckTarget( actor, target ).IsAllowed;
 	private static void ReportModerationFailure( Exception error ) => Log.Warning( $"[Superuser] Moderation storage degraded; type={error.GetType().Name}; admission fails closed." );
 
+	private CommandResult NotifyModerationWarning( CommandContext context, string target, string reason )
+	{
+		if ( !Dispatcher.CanUse( context, "admin.players.warn" ) || !CanModerateTarget( context.Actor, target ) )
+			return new CommandResult( CommandStatus.Unknown, "Warning persisted; authority changed before notification." );
+		foreach ( var connection in Connection.All.Where( connection => connection.IsActive && connection.SteamId.ToString() == target ) )
+			connection.SendLog( LogLevel.Warn, "Server warning: " + reason );
+		return new CommandResult( CommandStatus.Success, "Warning persisted; private console notification sent to any active target connection." );
+	}
+
 	internal bool AcceptConnection( Connection connection, ref string reason )
 	{
 		if ( connection is null || connection.SteamId == 0 )

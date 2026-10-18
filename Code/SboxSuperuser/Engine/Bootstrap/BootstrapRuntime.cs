@@ -89,7 +89,8 @@ internal sealed partial class BootstrapRuntime : IDisposable
 			CommandDiscovery.AttributeCommandDiscovery.Discover );
 		Moderation = new Moderation.HostModerationService( Store, ModerationAvailable, Dispatcher.CanUse, CanModerateTarget, ReportModerationFailure );
 		Store.StorageChanged += Moderation.OnStorageChanged;
-		Administration = new Commands.AdministrationCommands( Policy, Audit, Commands, Dispatcher, ConsoleDiagnostics, Modules, Moderation, DisconnectModeratedAsync );
+		Administration = new Commands.AdministrationCommands( Policy, Audit, Commands, Dispatcher, ConsoleDiagnostics, Modules,
+			Moderation, DisconnectModeratedAsync, NotifyModerationWarning );
 		Chat = new ChatIntegration.Platform.PlatformChatAdapter( this );
 		if ( !ConsoleRoot.IsAvailable )
 		{

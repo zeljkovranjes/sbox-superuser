@@ -32,6 +32,11 @@ internal sealed partial class AdministrationCommands
 				var reason = values.Contains( "reason" ) ? values.Get<string>( "reason" ) : "Revoked by operator.";
 				var duration = timed ? values.Get<CommandDuration>( "duration" ) : null;
 				var result = await _moderation.ApplyAsync( context, command, permission, kind, target, reason, duration );
+				if ( result.Status == CommandStatus.Success && kind == ModerationKind.Warn && _notifyWarning is not null )
+				{
+					var notified = _notifyWarning( context, target, reason );
+					return new CommandResult( notified.Status, notified.Message, result.Data );
+				}
 				if ( result.Status != CommandStatus.Success || kind is not (ModerationKind.Kick or ModerationKind.Ban) ) return result;
 				if ( _disconnect is null ) return new CommandResult( CommandStatus.Unsupported, "Record persisted; this integration has no disconnect adapter.", result.Data );
 				var disconnected = await _disconnect( context, target, permission, kind == ModerationKind.Ban );
