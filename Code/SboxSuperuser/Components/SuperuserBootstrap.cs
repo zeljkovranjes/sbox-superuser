@@ -20,7 +20,7 @@ public sealed class SuperuserBootstrap : Component
 	private void Attach()
 	{
 		_session = Scene.GetSystem<SuperuserSession>();
-		_session.Attach( Id, AllowEditorTesting );
+		_session?.Attach( Id, AllowEditorTesting );
 	}
 
 	protected override void OnDisabled()

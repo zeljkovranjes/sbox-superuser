@@ -10,9 +10,8 @@ public static partial class Superuser
 	public static BootstrapDiagnostics GetDiagnostics()
 	{
 		var scene = Game.ActiveScene;
-		return scene.IsValid()
-			? scene.GetSystem<SuperuserSession>().GetDiagnostics()
-			: new BootstrapDiagnostics( BootstrapState.Disabled, null, 0, 0, null, "No active scene." );
+		var diagnostics = scene.IsValid() ? scene.GetSystem<SuperuserSession>()?.GetDiagnostics() : null;
+		return diagnostics ?? new BootstrapDiagnostics( BootstrapState.Disabled, null, 0, 0, null, "No active runtime scene." );
 	}
 
 	/// <summary>Resolves only a live host-authenticated engine connection; null or stale connections fail.</summary>
@@ -20,7 +19,7 @@ public static partial class Superuser
 	{
 		identity = null;
 		var scene = Game.ActiveScene;
-		var runtime = scene.IsValid() ? scene.GetSystem<SuperuserSession>().GetRuntime() : null;
+		var runtime = scene.IsValid() ? scene.GetSystem<SuperuserSession>()?.GetRuntime() : null;
 		return runtime is not null && runtime.TryResolvePlayer( connection, out identity );
 	}
 
@@ -28,7 +27,7 @@ public static partial class Superuser
 	public static bool IsOwner( Connection connection )
 	{
 		var scene = Game.ActiveScene;
-		var runtime = scene.IsValid() ? scene.GetSystem<SuperuserSession>().GetRuntime() : null;
+		var runtime = scene.IsValid() ? scene.GetSystem<SuperuserSession>()?.GetRuntime() : null;
 		return runtime is not null && runtime.IsOwner( connection );
 	}
 }

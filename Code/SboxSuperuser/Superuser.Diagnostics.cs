@@ -28,7 +28,7 @@ public static partial class Superuser
 	private static void PrintDedicatedConsoleIdentity()
 	{
 		var scene = Game.ActiveScene;
-		var runtime = scene.IsValid() ? scene.GetSystem<SuperuserSession>().GetRuntime() : null;
+		var runtime = scene.IsValid() ? scene.GetSystem<SuperuserSession>()?.GetRuntime() : null;
 		if ( runtime is null || !runtime.TryResolveDedicatedConsole( out var identity ) )
 		{
 			Log.Warning( "[Superuser] Local console authority refused: requires the non-forwarded entry on an actual dedicated runtime." );
