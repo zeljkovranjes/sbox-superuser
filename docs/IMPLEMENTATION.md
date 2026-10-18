@@ -15,7 +15,7 @@ The specification is [version 0.2](sbox-admin-specification.docx). Current autho
 | T09 Authoritative dispatcher | Complete | [T09](T09-DISPATCH.md) |
 | T10 Audit and durable outcomes | Complete | [T10](T10-AUDIT.md) |
 | T11 Native console and help | Complete | [T11](T11-CONSOLE.md) |
-| T12 Module lifecycle | Not started | Depends on T11 |
+| T12 Module lifecycle | In progress | [T12](T12-MODULES.md) |
 | T13 Platform chat | Not started | Depends on T11, T12 |
 | T14 Custom chat hooks | Not started | Depends on T13 |
 | T15 Native bindings | Not started | Depends on T11, T12 |
