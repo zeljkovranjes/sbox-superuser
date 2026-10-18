@@ -62,6 +62,8 @@ internal sealed class PolicyGraph
 		return Array.AsReadOnly( result.OrderBy( id => id, StringComparer.Ordinal ).ToArray() );
 	}
 
+	internal IReadOnlyList<string> AncestorsOf( string groupId ) => _ancestors[ groupId ];
+
 	private void ValidateReferences( IEnumerable<string> references )
 	{
 		foreach ( var id in references )
