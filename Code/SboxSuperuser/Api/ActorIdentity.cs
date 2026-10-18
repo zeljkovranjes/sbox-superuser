@@ -14,13 +14,13 @@ public sealed class ActorIdentity
 
 	internal ActorIdentity( ActorKind kind, string subjectId )
 	{
-		Kind = ContractGuard.EnumValue( kind, nameof(kind) );
+		Kind = ContractGuard.EnumValue( kind, nameof( kind ) );
 		SubjectId = kind switch
 		{
-			ActorKind.Player => SteamIdentity.Validate( subjectId, nameof(subjectId) ),
+			ActorKind.Player => SteamIdentity.Validate( subjectId, nameof( subjectId ) ),
 			ActorKind.DedicatedConsole when subjectId == "dedicated-console" => subjectId,
-			ActorKind.InternalService => ContractGuard.Key( subjectId, nameof(subjectId) ),
-			_ => throw new ArgumentException( "An explicit authenticated principal is required.", nameof(kind) )
+			ActorKind.InternalService => ContractGuard.Key( subjectId, nameof( subjectId ) ),
+			_ => throw new ArgumentException( "An explicit authenticated principal is required.", nameof( kind ) )
 		};
 	}
 }

@@ -59,7 +59,7 @@ internal static class ContractGuard
 
 	internal static T EnumValue<T>( T value, string parameter ) where T : struct, Enum
 	{
-		if ( !Enum.IsDefined( typeof(T), value ) )
+		if ( !Enum.IsDefined( typeof( T ), value ) )
 		{
 			throw new ArgumentOutOfRangeException( parameter );
 		}

@@ -11,6 +11,6 @@ public sealed class PlayerReference
 	/// <summary>Creates a stable reference; authentication and target rechecks remain separate.</summary>
 	public PlayerReference( string steamId )
 	{
-		SteamId = SteamIdentity.Validate( steamId, nameof(steamId) );
+		SteamId = SteamIdentity.Validate( steamId, nameof( steamId ) );
 	}
 }
