@@ -1,0 +1,118 @@
+@using Sandbox
+@using Sandbox.UI
+@using SboxSuperuser
+@using SuperuserCompatibilityLab.Components
+@namespace SuperuserCompatibilityLab.UI
+@inherits PanelComponent
+@implements IAdminChatResultEvent
+@implements IExampleChatMessageEvent
+@implements IChatEvent
+
+<root>
+	<div class="title">Chat example — @(IndependentBackend ? "Independent RPC" : "Platform chat")</div>
+	<div class="messages">
+		@foreach ( var line in _lines )
+		{
+			<div class="message">@line</div>
+		}
+	</div>
+	<TextEntry @ref="_input" MaxLength="512" Placeholder="Message or /admin help" onsubmit="@SubmitInput" />
+</root>
+
+@code
+{
+	private readonly List<string> _lines = new();
+	private TextEntry _input;
+	private IndependentChatExample _backend;
+	private int _revision;
+
+	/// <summary>Selects the independent example backend instead of platform Chat.Say.</summary>
+	[Property] public bool IndependentBackend { get; set; }
+
+	/// <summary>Gets private result events rendered by this local view.</summary>
+	public int PrivateResults { get; private set; }
+
+	/// <summary>Gets ordinary messages rendered by this local view.</summary>
+	public int OrdinaryMessages { get; private set; }
+
+	/// <summary>Gets the last private result request ID for correlation.</summary>
+	public Guid LastRequestId { get; private set; }
+
+	/// <summary>Gets the local rendered message snapshot; never synchronized to other clients.</summary>
+	public IReadOnlyList<string> Lines => _lines.AsReadOnly();
+
+	protected override void OnStart() => _backend = Scene.GetAllComponents<IndependentChatExample>().SingleOrDefault();
+
+	private void SubmitInput()
+	{
+		var text = _input.Text;
+		_input.Text = "";
+		SubmitText( text );
+	}
+
+	/// <summary>Uses exactly one transport; a custom input control can call the same method.</summary>
+	public void SubmitText( string text )
+	{
+		if ( string.IsNullOrWhiteSpace( text ) || text.Length > 512 )
+		{
+			return;
+		}
+		if ( IndependentBackend )
+		{
+			if ( _backend.IsValid() )
+			{
+				_backend.Submit( Guid.NewGuid(), text );
+			}
+			else
+			{
+				AddLine( "Independent chat backend is not available." );
+			}
+			return;
+		}
+		Sandbox.Platform.Chat.Say( text );
+	}
+
+	/// <summary>Renders authenticated host results and suppresses duplicate default display.</summary>
+	public void OnAdminChatResult( AdminChatResultEvent message )
+	{
+		PrivateResults++;
+		LastRequestId = message.RequestId;
+		AddLine( $"Private • {message.Result.Status}: {message.Result.Message}" );
+		foreach ( var field in message.Result.Data.Take( 4 ) )
+		{
+			AddLine( $"{field.Key}: {field.Value}" );
+		}
+		message.SuppressDefaultDisplay = true;
+	}
+
+	void IChatEvent.OnChatMessage( ChatMessageEvent message )
+	{
+		if ( !IndependentBackend && !Networking.IsHost && !message.Suppress && message.Sender is not null )
+		{
+			OrdinaryMessages++;
+			AddLine( $"{message.Sender.DisplayName}: {message.Message}" );
+		}
+	}
+
+	/// <summary>Renders the independent backend's already-routed ordinary messages.</summary>
+	public void OnExampleChatMessage( string name, string message )
+	{
+		if ( IndependentBackend )
+		{
+			OrdinaryMessages++;
+			AddLine( $"{name}: {message}" );
+		}
+	}
+
+	private void AddLine( string text )
+	{
+		_lines.Add( text );
+		if ( _lines.Count > 12 )
+		{
+			_lines.RemoveAt( 0 );
+		}
+		_revision++;
+	}
+
+	protected override int BuildHash() => HashCode.Combine( _revision, IndependentBackend );
+}
