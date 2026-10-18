@@ -18,7 +18,10 @@ internal sealed class SuperuserSession : GameObjectSystem<SuperuserSession>
 
 	internal void Attach( Guid componentId, bool allowEditorTesting )
 	{
-		if ( _disposed ) return;
+		if ( _disposed )
+		{
+			return;
+		}
 		_registrations.Attach( componentId, allowEditorTesting );
 		Reconcile();
 	}
@@ -45,7 +48,10 @@ internal sealed class SuperuserSession : GameObjectSystem<SuperuserSession>
 
 	private void Reconcile()
 	{
-		if ( _disposed ) return;
+		if ( _disposed )
+		{
+			return;
+		}
 		if ( _registrations.Count == 0 )
 		{
 			Stop( BootstrapState.Disabled );
@@ -53,7 +59,7 @@ internal sealed class SuperuserSession : GameObjectSystem<SuperuserSession>
 		}
 
 		if ( !Scene.IsValid() || Scene != Game.ActiveScene || !Networking.IsHost
-			|| !Networking.IsActive || Networking.IsDisconnecting
+			|| !Networking.IsActive || Connection.Host is null || !Connection.Host.IsActive
 			|| (!Application.IsDedicatedServer && (!Game.IsEditor || !_registrations.AllowsEditorTesting)) )
 		{
 			Stop( _registrations.Count > 1 ? BootstrapState.DuplicateBootstrap : BootstrapState.Unsupported );
@@ -71,17 +77,21 @@ internal sealed class SuperuserSession : GameObjectSystem<SuperuserSession>
 			Stop( BootstrapState.Unsupported );
 		}
 
-		if ( _runtime is not null ) return;
+		if ( _runtime is not null )
+		{
+			return;
+		}
 
 		// Only on initialization: retire inactive scene runtimes before starting this one.
 		// No static registry, per-frame scene scan or retained cross-scene subscription.
 		foreach ( var otherScene in Sandbox.Scene.All )
 		{
-			if ( otherScene == Scene ) continue;
-			foreach ( var other in otherScene.GetSystems().OfType<SuperuserSession>() )
+			if ( otherScene == Scene || !otherScene.IsValid() )
 			{
-				other.Stop( BootstrapState.Unsupported );
+				continue;
 			}
+
+			otherScene.GetSystem<SuperuserSession>().Stop( BootstrapState.Unsupported );
 		}
 
 		_runtime = new BootstrapRuntime( Scene, _registrations.AllowsEditorTesting );
@@ -103,7 +113,10 @@ internal sealed class SuperuserSession : GameObjectSystem<SuperuserSession>
 
 	private void SetState( BootstrapState state )
 	{
-		if ( _state == state ) return;
+		if ( _state == state )
+		{
+			return;
+		}
 		_state = state;
 		if ( state == BootstrapState.DuplicateBootstrap )
 		{

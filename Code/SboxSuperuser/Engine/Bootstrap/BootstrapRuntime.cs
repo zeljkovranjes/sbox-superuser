@@ -13,7 +13,7 @@ internal sealed class BootstrapRuntime : IDisposable
 	internal OwnerConfigurationFile Owners { get; }
 
 	internal bool IsUsable => !_disposed && _scene.IsValid() && _scene == Game.ActiveScene
-		&& Networking.IsActive && Networking.IsHost && !Networking.IsDisconnecting
+		&& Networking.IsActive && Networking.IsHost && _host is not null && _host.IsActive
 		&& ReferenceEquals( _host, Connection.Host )
 		&& (Application.IsDedicatedServer || (Game.IsEditor && _allowEditorTesting));
 
