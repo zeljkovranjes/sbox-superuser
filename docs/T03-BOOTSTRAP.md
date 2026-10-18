@@ -1,6 +1,6 @@
 # T03: Trusted bootstrap and identity
 
-Status: **Implemented; final audit pending**. Only bootstrap, identity, explicit owner configuration and diagnostics are in scope. T04 onward remain not started.
+Status: **Complete**. Only bootstrap, identity, explicit owner configuration and diagnostics are in scope. T04 onward remain not started.
 
 Design: one scene-owned system coordinates bootstrap registrations. Only the active, authoritative network scene can own a usable runtime; scene transitions retire older runtimes. Duplicate components fail closed. Production requires an actual dedicated server; editor testing remains explicit opt-in.
 
@@ -35,6 +35,8 @@ if ( Superuser.TryGetPlayerIdentity( authenticatedConnection, out var actor ) )
 ```
 
 The façade does not accept Steam IDs, roles or ActorIdentity objects as proof of identity. It requires the exact active connection object in the engine's current connection list, rechecks host/runtime eligibility, and reads the engine-provided Steam ID. Null, disconnected, unrelated and non-player/SteamId 0 connections fail. Returning a Player identity does not grant owner membership. IsOwner performs a fresh connection check and an exact match against validated host configuration.
+
+Call the façade from the engine main thread, as with other scene APIs.
 
 The dedicated host's native forwarded-console connection has SteamId 0 on this build; it is deliberately rejected on the player route. A separate local ConCmd entry, guarded by actual dedicated runtime checks, issues DedicatedConsole internally. There is no public console-identity factory, remote console-role argument or null-caller shortcut. InternalService issuance is not exposed until explicit service capabilities exist; no service gets implicit root access.
 
@@ -73,8 +75,22 @@ Engine **26.10.13a**, Steam build **25964806**, Windows, 2026-10-17. The existin
 
 Reproduce using `dev/verify-bootstrap.cs` in the isolated editor-host scene, `dev/verify-dedicated-owners.cs` on dedicated, and `dev/verify-bootstrap-scenes.cs` on dedicated. These trusted development scripts temporarily change only the isolated owner's file, restore it in finally, and/or replace the test scene. They are not shipped runtime code. Raw local evidence is under ignored `dev/out/evidence/t03-*`.
 
-The contract test project now includes 13 additional owner/registration cases, alongside the 20 unchanged T02 tests. Engine compile results, final builds and the completion audit are recorded below when finished.
+The contract test project includes 13 additional owner/registration cases alongside the 20 unchanged T02 tests: **33 passed, zero failed/skipped**. The original library and lab test projects still contain no cases; their test commands completed without a fabricated pass count.
 
 ## Limits
 
 Dedicated remote-client loading is still blocked by the unpublished adopting game's package record, as established in T01. Remote transport evidence here comes from a real editor-host client; dedicated startup/local-console/configuration/lifecycle evidence comes from the actual dedicated process. This is not a full production multiplayer security certification. No Task 3 implementation blocker is known. Task 4 has not started.
+
+## Completion audit
+
+| Requirement | Final evidence |
+|---|---|
+| One runtime and duplicate detection | Core registration tests, editor duplicate/repeated-init assertions, and actual dedicated scene-replacement assertions all passed. Captured old runtime disposed; one new runtime across scenes. |
+| Stable authenticated player identity | Real editor-session client resolved to engine Steam ID and connection; payload role arguments rejected; retained disconnected connection rejected. Client-local façade could not issue identity or owner access. |
+| Trusted dedicated console and null denial | Actual dedicated command distinguished local entry from SteamId 0 player connection; null refused in both tested host modes. Editor local-console authority refused. |
+| Explicit owners only | Valid editor owner membership observed; dedicated owner count loaded from separate fixed file. Empty/missing/invalid files granted nobody and were preserved. Temporary owner files restored to absent after checks. |
+| Single-library scope | Runtime remains under Code/SboxSuperuser; no external runtime dependencies, store writer, dispatcher or later-task implementation added. Core rules compile as plain .NET. |
+| Compilation and regression | Engine library/adopting-game compilation: zero diagnostics. Both generated runtime builds and both workspace/Core checks passed. T01 probe/editor script and existing T02 tests unchanged; T01/T02 in-engine exercises replayed successfully. |
+| Delivery | README, metadata, GitHub description/topics, changelog, fixture and task record updated. Publication lint: zero failures, one ignored generated engine XML warning. No binaries tracked. |
+
+Final editor validation reported no new error-level logs after the earlier development fix. With play stopped, diagnostics returned Disabled and no runtime. Owned editor/server processes were closed; the original user editor remained untouched. Task 3 is complete; stop before Task 4.
