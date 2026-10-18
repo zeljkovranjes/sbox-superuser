@@ -104,6 +104,9 @@ internal sealed partial class HostCommandDispatcher
 			: explanation.IsAllowed;
 	}
 
+	internal bool CanUse( CommandContext context, string permission ) => context.Services is CommandExecutionServices services
+		&& ReferenceEquals( services.Issuer, this ) && ValidateCaller( context, services ) is null && HasPermission( context, services, permission );
+
 	private CommandResult ValidateTargets( ActorIdentity actor, CommandDescriptor descriptor, CommandArguments arguments )
 	{
 		var players = _players();

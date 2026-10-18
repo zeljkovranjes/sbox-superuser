@@ -4,6 +4,8 @@ namespace SboxSuperuser.Engine.Authority;
 
 internal sealed partial class HostPolicyService : Permissions.IPermissionEvaluator
 {
+	internal SboxSuperuser.Core.Permissions.PolicyGraph ReadPolicy( ActorIdentity actor ) => IsUsable && CanManage( actor ) ? _resolver.Policy : null;
+
 	public PermissionExplanation Explain( ActorIdentity actor, string permission )
 	{
 		var registered = _resolver.IsRegistered( permission );
