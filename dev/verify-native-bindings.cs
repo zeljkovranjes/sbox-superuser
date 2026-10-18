@@ -63,7 +63,7 @@ try
 	Require( (await Run( "settings.get.example.pending" )).Data[ "pending" ] == "False", "Applied desired value still shown pending." );
 	var listing = await Run( "settings.list" );
 	Require( listing.Status == SboxSuperuser.CommandStatus.Success && listing.Data.Count <= 10, "Settings listing failed or exceeded page bounds." );
-	return new { Pass = true, Dedicated = Application.IsDedicatedServer, ContractTests = 221, CoreTests = 65,
+	return new { Pass = true, Dedicated = Application.IsDedicatedServer,
 		NativeExecutions = SuperuserCompatibilityLab.Engine.Settings.NativeBindingExample.Executions - beforeCount,
 		Capacity = ConsoleSystem.GetValue( "superuser_example_capacity" ), Pending = ConsoleSystem.GetValue( "superuser_example_pending" ),
 		ClampOutcome = clamp.Status, SavedFrameworkState = (await Stored( "saved" )).Status };

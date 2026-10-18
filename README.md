@@ -64,7 +64,7 @@ Dedicated servers are the only production target. Opt-in editor testing is devel
 
 ## Limitations
 
-- Tasks 1–14 are implemented. Native settings, moderation enforcement and visual admin UI remain pending.
+- Tasks 1–15 are implemented. Moderation enforcement and visual admin UI remain pending.
 - Task 1's unavailable dedicated multiplayer evidence remains marked Blocked; Task 2 does not certify that deployment.
 - Chat commands use `/admin` by default; `!` is ordinary text. The compatibility probe remains separate from administration commands.
 - Native dynamic registration and full engine-name enumeration are unavailable. Visible managed-name collisions are reported; see the [console guide](docs/T11-CONSOLE.md) for the fixed transport and configured-root fallback.
@@ -102,8 +102,10 @@ Task 12 adds [managed module lifetimes](docs/T12-MODULES.md). Trusted host setup
 
 Task 13 adds [platform chat commands](docs/T13-PLATFORM-CHAT.md) through the same dispatcher. Two actual editor clients verify synchronous command consumption, private successes/errors and one request per submission. The current suites contain 207 contract and 61 Core cases. Platform rate limits remain active; `/` is the only admin chat prefix.
 
+Task 14 adds [custom chat hooks](docs/T14-CUSTOM-CHAT.md) and two compiled chatbox examples. Scene-owned private results support a game's renderer; independent backends authenticate the RPC sender before command consumption or ordinary-message routing.
+
+Task 15 adds [explicit native bindings](docs/T15-NATIVE-BINDINGS.md). Host setup creates the optional settings module; operators use `admin settings list/get/set/reset`. Writes require readback, and engine/framework persistence have one owner. Actual editor and dedicated checks cover failure rollback, reload and process restart. Native command submission reports Unknown because the engine provides no acknowledgment.
+
 ## License
-
-
 
 No license selected yet. No third-party UI code is included.

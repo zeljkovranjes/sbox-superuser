@@ -47,3 +47,9 @@ Copy these original sources into the adopting game, preserving the example names
 | CustomChatExample.razor, CustomChatExample.razor.scss | UI/ |
 
 Follow [T14](../../docs/T14-CUSTOM-CHAT.md) for the two-client sequence and cleanup. Setup creates runtime objects only, hides the platform overlay locally and installs a deliberately permissive test counter. Neither saved scene settings nor production permissions should be changed. The failing observer is only for the fallback check. The independent transport passes the actual RPC caller to the library; neither client supplies identity or permission claims. These fixtures are examples inside the adopting game, not another required library or service.
+
+## Task 15 native binding fixtures
+
+Copy `NativeBindingExample.cs` into the adopting game's `Engine/Settings/`. It declares test ConVars (ordinary, Saved, Protected, Admin, Cheat, clamped and sensitive) and a counter ConCmd. Trusted host setup calls its `CreateModule()` and passes the result to `Superuser.RegisterModulesAsync`. Do not ship these diagnostics.
+
+Run `verify-native-bindings.cs`, `verify-native-binding-failure.cs` and `verify-native-setting-lifetime.cs` on the isolated editor or actual dedicated host. The failure script interrupts a real settings generation write through the existing development checkpoint. The lifetime script temporarily configures the editor host as an owner, then restores the file. Restart the dedicated fixture and run `verify-native-setting-restart.cs` for persisted pending-state evidence. See [T15](../../docs/T15-NATIVE-BINDINGS.md) for setup, restoration and limitations.
