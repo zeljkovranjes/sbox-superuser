@@ -16,6 +16,7 @@
   <ItemGroup>
     <Compile Include="..\Code\SboxSuperuser\Assembly.cs" />
     <Compile Include="..\Code\SboxSuperuser\Core\**\*.cs" />
+    <InternalsVisibleTo Include="SboxSuperuser.Tests" />
   </ItemGroup>
 
 </Project>
