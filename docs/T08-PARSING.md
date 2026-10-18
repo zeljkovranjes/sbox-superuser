@@ -1,6 +1,6 @@
 # T08: Argument parsing and targeting
 
-Status: **Verification complete; final package checks pending.** Continue with T09/T10; no Task 11 transport.
+Status: **Complete.** Continue with T09/T10; no Task 11 transport.
 
 ## Public parsing surface
 
@@ -30,3 +30,5 @@ Names match the entire online display name ignoring case. A unique match becomes
 Engine 26.10.13a editor PID 21804 executed `dev/verify-command-parsing.cs` successfully through the public facade. `dev/verify-parsed-handler.cs` discovered the compiled dog fixture, tokenized and converted all scalar types, invoked its typed async handler, and rejected an integer beyond the CLR `int` range before invocation. Result: `parsed text|3|4000000000|1.5|2.5|True|Playful|True`. Development reflection only constructs the test registry; shipped parsing and discovery use supported code.
 
 No dedicated-client transport, public chat input or player moderation execution is claimed. These checks require no storage mutations. T01's unpublished adopting-game deployment limitation remains; it does not block pure parsing.
+
+Generated runtime builds for library and adopting game, both package checks and actual engine whitelist compilation passed without warnings or errors. Both library test projects passed; the adopting game test project has no cases.

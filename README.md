@@ -59,7 +59,7 @@ Dedicated servers are the only production target. Opt-in editor testing is devel
 
 ## Limitations
 
-- Tasks 1–7 are implemented. No dispatcher, parser, module loader, moderation enforcement or UI is installed.
+- Tasks 1–8 are implemented. No dispatcher, module loader, moderation enforcement or UI is installed.
 - Task 1's unavailable dedicated multiplayer evidence remains marked Blocked; Task 2 does not certify that deployment.
 - Chat commands use `/`; the future administration root will be `/admin`. The current probe does not implement administration commands.
 - The probe is for isolated testing and should be removed from a production scene.
@@ -72,7 +72,7 @@ Dedicated servers are the only production target. Opt-in editor testing is devel
 
 See the [implementation ledger](docs/IMPLEMENTATION.md) for completed tasks, current scope and remaining work.
 
-Run `sbox-check` and `dotnet build Code/chomnr_sbox_superuser.csproj` after the editor generates it. Run both test projects: `dotnet test tests/SboxSuperuser.Contracts.Tests/SboxSuperuser.Contracts.Tests.csproj` and `dotnet test tests/SboxSuperuser.Tests/SboxSuperuser.Tests.csproj`. The original project has no test cases; the new contract suite verifies structural invariants through an engine-free harness. Run `dev/verify-contracts.cs` through the engine's `run_csharp` tool, and `dev/verify-editor.cs` with the isolated test scene playing. Plain .NET compilation does not replace the engine whitelist check.
+Run `sbox-check` and `dotnet build Code/chomnr_sbox_superuser.csproj` after the editor generates it. Run both test projects: `dotnet test tests/SboxSuperuser.Contracts.Tests/SboxSuperuser.Contracts.Tests.csproj` and `dotnet test tests/SboxSuperuser.Tests/SboxSuperuser.Tests.csproj`. The Core project now tests command grammar; the contract suite verifies structural invariants through an engine-free harness. Run `dev/verify-contracts.cs` through the engine's `run_csharp` tool, and `dev/verify-editor.cs` with the isolated test scene playing. Plain .NET compilation does not replace the engine whitelist check.
 
 Task 3 adds `dev/verify-bootstrap.cs` for isolated editor-host identity/owner checks, plus `dev/verify-dedicated-owners.cs` and `dev/verify-bootstrap-scenes.cs` for actual dedicated validation. The scripts restore owner-file contents; the scene test replaces the disposable test scene.
 
@@ -83,6 +83,8 @@ Task 5 adds [immutable policy and permission resolution](docs/T05-PERMISSIONS.md
 Task 6 adds [owner-only policy administration, offline target protection and local owner recovery](docs/T06-AUTHORITY.md), with 97 tests in total. Use `Superuser.ApplyPolicyChangeAsync`, `ExplainPermissionAsync`, `CheckPunitiveTargetAsync` and `GetAuthorityDiagnostics` from authenticated host integrations. An explicit dedicated-local owner change creates managed ownership; thereafter the managed store takes precedence over the bootstrap owner file.
 
 Task 7 adds [atomic command registration and typed discovery](docs/T07-COMMANDS.md), with 110 tests in total. Begin a module registration scope, declare permissions and commands, commit, and retain it until shutdown. The compiled dog sample demonstrates an optional game capability.
+
+Task 8 adds [strict argument parsing, player targeting and generated syntax](docs/T08-PARSING.md). The suites contain 138 contract and 20 Core cases. Use `TokenizeCommandText`, `ParseCommandArguments` and `GetCommandSyntax`; parsing grants no execution authority.
 
 ## License
 

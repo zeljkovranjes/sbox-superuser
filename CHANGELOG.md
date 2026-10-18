@@ -1,7 +1,7 @@
 # Changelog
 
 ## 2026-10-17
-Title: Typed Command Registration
+Title: Command Parsing And Targeting
 ### Added
 # Diagnostics
 Compatibility probe - checks type discovery, caller identity and argument forwarding inside the library
@@ -38,6 +38,10 @@ Degraded authority - corrupt managed ownership never falls back to bootstrap or 
 Registration - validates module-owned commands and aliases atomically; replacement and disposal revoke old entry points
 Discovery - supports public static typed handlers through TypeLibrary with explicit registration fallback and a game capability example
 Metadata - validates argument order, numeric bounds, enum choices and explicit player target policies before registration
+# Parsing
+Arguments - accepts bounded quoted text and invariant typed values while rejecting malformed, extra and oversized input
+Player selection - exact IDs remain authoritative; duplicate display names return choices without selecting a target
+Syntax help - derives required, optional and remainder arguments plus constraints from command descriptors
 ### Improved
 # Diagnostics
 Chat probe - uses /superuser-probe in the chatbox; nonmatching messages pass through normally
@@ -50,5 +54,5 @@ Scene lifecycle - repeated initialization stays idempotent; duplicates suspend a
 Dedicated multiplayer - the unpublished test game cannot load on joining clients; a published adopting game is needed for dedicated network validation
 Storage guarantees - actual process interruption and restart recovery are verified; power-loss durability and cross-process writers are unsupported
 Administration - Task 1 provides diagnostics only; administration commands and UI are not implemented
-Administration runtime - dispatch, parsing and module management remain later tasks
+Administration runtime - dispatch and module management remain later tasks
 Storage retention - retains all committed generations; automatic pruning and audit outcomes remain later tasks
