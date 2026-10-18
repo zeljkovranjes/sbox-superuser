@@ -1,6 +1,6 @@
 namespace SboxSuperuser;
 
-/// <summary>A future host-owned registration scope, tied to one module and revoked on failure or stop.</summary>
+/// <summary>A host-owned registration scope tied to one module; declarations do not execute commands.</summary>
 public interface IModuleRegistration
 {
 	/// <summary>Gets the owning module; registrations cannot impersonate another module.</summary>

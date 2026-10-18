@@ -1,6 +1,6 @@
 namespace SboxSuperuser;
 
-/// <summary>Proposed handler metadata; T02 supplies no discovery or registration implementation.</summary>
+/// <summary>Metadata for a public static handler discovered through a module registration scope.</summary>
 [AttributeUsage( AttributeTargets.Method, AllowMultiple = false, Inherited = false )]
 public sealed class AdminCommandAttribute : Attribute
 {
