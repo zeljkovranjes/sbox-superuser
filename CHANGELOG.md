@@ -32,5 +32,5 @@ Scene lifecycle - repeated initialization stays idempotent; duplicates suspend a
 Dedicated multiplayer - the unpublished test game cannot load on joining clients; a published adopting game is needed for dedicated network validation
 Storage guarantees - interruption preserves the previous probe file; full recovery and power-loss guarantees are not implemented
 Administration - Task 1 provides diagnostics only; administration commands and UI are not implemented
-Foundation - Task 2 provides contracts only; bootstrap, dispatch, policy resolution, parsing, module management and storage remain assigned to later tasks
+Foundation - dispatch, policy resolution, parsing, module management and storage interfaces remain contracts only
 Administration runtime - Task 3 implements bootstrap and identity; dispatch, policy resolution, parsing, module management and durable storage remain later tasks

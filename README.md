@@ -42,7 +42,7 @@ The dedicated console's local connection is not a player; use `superuser_local_i
 
 | Option | Default | What it does |
 |---|---|---|
-| Allow Editor Testing | `false` | Allows probe execution on an editor host; does not enable player-hosted release games. |
+| Allow Editor Testing | `false` | Allows bootstrap or probe execution on an editor host; does not enable player-hosted release games. |
 | Probe Storage On Start | `false` | Exercises isolated files under `FileSystem.Data/superuser-t01/<mode>/` and preserves an existing baseline. |
 | Rejected Test Steam Id | Empty | Deliberately rejects only this test account at the admission callback. Empty accepts all connections. |
 
