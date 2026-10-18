@@ -68,7 +68,7 @@ Dedicated baseline before and after actual interruption: `T01:df8a7eb11d974261a1
 
 ## Validation and scope
 
-- Engine whitelist compilation: library and adopting game, zero errors/warnings. Runtime .NET builds and workspace/Core checks are also required; the development journal records their results.
+- Engine whitelist compilation and runtime .NET builds: library and adopting game passed with zero errors/warnings. Both workspace/Core checks passed. `git diff --check` passed; publication lint found zero failures and one path warning in ignored generated engine XML, which is not tracked.
 - Existing test projects contain **no test cases**. Their commands are run, but no unit-test pass count is claimed. Existing tests were not changed.
 - No editor code is shipped. Runtime is under `Code/SboxSuperuser`; fixtures and trusted development scripts remain under `dev/`.
 - [GitHub repository](https://github.com/zeljkovranjes/sbox-superuser) is private. No engine binaries, generated build output or extracted game assets are tracked. No sbox.game publication.
