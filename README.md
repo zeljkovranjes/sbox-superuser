@@ -1,6 +1,6 @@
 # Superuser
 
-Superuser provides host-local administration storage, authenticated identities and explicit owner configuration for dedicated servers. Add one Superuser Bootstrap to your game's network scene; enable its editor switch for local testing. Versioned transactions, retained backups and dedicated-local recovery run in the same s&box C# library. Administration commands, permission resolution and UI are not implemented yet.
+Superuser provides host-local administration storage, authenticated identities and explicit owner configuration for dedicated servers. Add one Superuser Bootstrap to your game's network scene; enable its editor switch for local testing. Versioned transactions, retained backups, permission evaluation and dedicated-local recovery run in the same s&box C# library. Command dispatch and UI are not implemented yet.
 
 ## Requirements
 
@@ -59,7 +59,7 @@ Dedicated servers are the only production target. Opt-in editor testing is devel
 
 ## Limitations
 
-- Tasks 1–4 are implemented. No dispatcher, parser, permission resolver, module loader, moderation enforcement or UI is installed.
+- Tasks 1–5 are implemented. No dispatcher, parser, live policy administration, module loader, moderation enforcement or UI is installed.
 - Task 1's unavailable dedicated multiplayer evidence remains marked Blocked; Task 2 does not certify that deployment.
 - Chat commands use `/`; the future administration root will be `/admin`. The current probe does not implement administration commands.
 - The probe is for isolated testing and should be removed from a production scene.
@@ -75,6 +75,8 @@ Run `sbox-check` and `dotnet build Code/chomnr_sbox_superuser.csproj` after the 
 Task 3 adds `dev/verify-bootstrap.cs` for isolated editor-host identity/owner checks, plus `dev/verify-dedicated-owners.cs` and `dev/verify-bootstrap-scenes.cs` for actual dedicated validation. The scripts restore owner-file contents; the scene test replaces the disposable test scene.
 
 Task 4 adds `dev/verify-durable-store.cs` and the dedicated restart/interruption scripts documented in [T04](docs/T04-STORAGE.md). These use disposable test keys and preserve test evidence. The contract/Core suite contains 55 tests, including 22 storage cases; the original empty test project remains unchanged.
+
+Task 5 adds [immutable policy and permission resolution](docs/T05-PERMISSIONS.md), 24 tests (79 total), and `dev/verify-permissions.cs` for the actual engine assembly. Creating a policy evaluator does not install or authorize a live server policy.
 
 ## License
 

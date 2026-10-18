@@ -1,7 +1,7 @@
 # Changelog
 
 ## 2026-10-17
-Title: Recoverable Host Storage
+Title: Permission Resolution And Recoverable Storage
 ### Added
 # Diagnostics
 Compatibility probe - checks type discovery, caller identity and argument forwarding inside the library
@@ -25,6 +25,10 @@ Versioned transactions - persists policy state and Unknown audit intents togethe
 Backups - retains immutable generations with integrity checks and explicit schema validation
 Recovery - dedicated local console can inspect compatible backups and restore a selected version without deleting corrupt evidence
 Host isolation - separates editor and dedicated data and refuses retired runtime handles
+# Permissions
+Policy evaluation - resolves exact permissions with direct user precedence, inherited deny and explicit default denial
+Inheritance - validates immutable group graphs, rejects cycles and includes implicit player membership
+Explain - records contributing groups and policy revisions; policy and permission registration changes invalidate cached decisions
 ### Improved
 # Diagnostics
 Chat probe - uses /superuser-probe in the chatbox; nonmatching messages pass through normally
@@ -37,5 +41,5 @@ Scene lifecycle - repeated initialization stays idempotent; duplicates suspend a
 Dedicated multiplayer - the unpublished test game cannot load on joining clients; a published adopting game is needed for dedicated network validation
 Storage guarantees - actual process interruption and restart recovery are verified; power-loss durability and cross-process writers are unsupported
 Administration - Task 1 provides diagnostics only; administration commands and UI are not implemented
-Administration runtime - dispatch, policy resolution, parsing and module management remain later tasks
+Administration runtime - live policy administration, dispatch, parsing and module management remain later tasks
 Storage retention - retains all committed generations; automatic pruning and audit outcomes remain later tasks
