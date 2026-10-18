@@ -32,4 +32,7 @@ public enum BootstrapState
 
 	/// <summary>The configured console root is invalid or collides with visible managed native metadata.</summary>
 	ConsoleUnavailable = 9,
+
+	/// <summary>Moderation history is unavailable or awaiting validation; admission and ordinary chat fail closed.</summary>
+	ModerationDegraded = 10,
 }

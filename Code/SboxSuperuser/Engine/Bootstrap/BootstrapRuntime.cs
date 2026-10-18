@@ -2,7 +2,7 @@ using Sandbox;
 
 namespace SboxSuperuser.Engine.Bootstrap;
 
-internal sealed class BootstrapRuntime : IDisposable
+internal sealed partial class BootstrapRuntime : IDisposable
 {
 	private readonly Scene _scene;
 	private readonly Connection _host;
@@ -22,6 +22,7 @@ internal sealed class BootstrapRuntime : IDisposable
 	internal Commands.AdministrationCommands Administration { get; }
 	internal Modules.ModuleManager Modules { get; }
 	internal ChatIntegration.Platform.PlatformChatAdapter Chat { get; }
+	internal Moderation.HostModerationService Moderation { get; }
 
 	internal BootstrapState Health
 	{
@@ -37,6 +38,7 @@ internal sealed class BootstrapRuntime : IDisposable
 			{
 				return BootstrapState.AuditDegraded;
 			}
+			if ( !Moderation.IsUsable ) return BootstrapState.ModerationDegraded;
 
 			if ( !ConsoleRoot.IsAvailable )
 			{
@@ -85,8 +87,10 @@ internal sealed class BootstrapRuntime : IDisposable
 		Modules = new Modules.ModuleManager( Commands, Policy, () => ThreadSafe.IsMainThread && IsUsable,
 			error => Log.Warning( $"[Superuser] Module lifecycle failed; type={error.GetType().Name}; inspect module status." ),
 			CommandDiscovery.AttributeCommandDiscovery.Discover );
-		Administration = new Commands.AdministrationCommands( Policy, Audit, Commands, Dispatcher, ConsoleDiagnostics, Modules );
-		Chat = ConsoleRoot.IsAvailable ? new ChatIntegration.Platform.PlatformChatAdapter( this ) : null;
+		Moderation = new Moderation.HostModerationService( Store, ModerationAvailable, Dispatcher.CanUse, CanModerateTarget, ReportModerationFailure );
+		Store.StorageChanged += Moderation.OnStorageChanged;
+		Administration = new Commands.AdministrationCommands( Policy, Audit, Commands, Dispatcher, ConsoleDiagnostics, Modules, Moderation, DisconnectModeratedAsync );
+		Chat = new ChatIntegration.Platform.PlatformChatAdapter( this );
 		if ( !ConsoleRoot.IsAvailable )
 		{
 			Log.Warning( $"[Superuser] {ConsoleRoot.Message}" );
@@ -105,6 +109,7 @@ internal sealed class BootstrapRuntime : IDisposable
 		[ "auditDegraded" ] = Audit.IsDegraded.ToString(),
 		[ "auditWrite" ] = Audit.Diagnostics().LastWriteStatus.ToString(),
 		[ "retentionPending" ] = Audit.Diagnostics().RetentionPending.ToString(),
+		[ "moderation" ] = Moderation.Status.ToString(),
 		[ "migration" ] = "Player-hosted release games and host migration are unsupported."
 	} );
 
@@ -174,7 +179,7 @@ internal sealed class BootstrapRuntime : IDisposable
 
 	internal CommandResult CheckOrdinaryChat( Connection sender )
 	{
-		if ( !TryResolvePlayer( sender, out _ ) )
+		if ( !TryResolvePlayer( sender, out var actor ) )
 		{
 			return new CommandResult( CommandStatus.Denied, "An authenticated player connection is required." );
 		}
@@ -182,7 +187,7 @@ internal sealed class BootstrapRuntime : IDisposable
 		{
 			return new CommandResult( CommandStatus.StorageUnavailable, "Authority state is unavailable." );
 		}
-		return new CommandResult( CommandStatus.Success, "No framework text restriction is active." );
+		return Moderation.CheckRestriction( actor.SubjectId, Core.Moderation.ModerationKind.TextMute );
 	}
 
 	// Called only by the separate non-forwarded dedicated-console entry, never the player route.
@@ -208,5 +213,6 @@ internal sealed class BootstrapRuntime : IDisposable
 		Dispatcher.Dispose();
 		Store.StorageChanged -= Policy.OnStorageChanged;
 		Store.StorageChanged -= Audit.OnStorageChanged;
+		Store.StorageChanged -= Moderation.OnStorageChanged;
 	}
 }

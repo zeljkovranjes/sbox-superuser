@@ -30,7 +30,7 @@ internal sealed record CommandRoute( string Command, IReadOnlyList<string> Argum
 			command += "." + tokens[ 1 ] + "." + tokens[ 2 ];
 			arguments = tokens.Skip( 3 ).ToArray();
 		}
-		else if ( tokens.Count >= 2 && command is "group" or "permissions" or "audit" or "modules" or "settings" )
+		else if ( tokens.Count >= 2 && command is "group" or "permissions" or "audit" or "modules" or "settings" or "moderation" )
 		{
 			command += "." + tokens[ 1 ];
 			arguments = tokens.Skip( 2 ).ToArray();

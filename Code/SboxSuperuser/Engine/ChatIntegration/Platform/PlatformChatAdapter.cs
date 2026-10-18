@@ -12,14 +12,14 @@ internal sealed class PlatformChatAdapter : IDisposable
 	internal PlatformChatAdapter( BootstrapRuntime runtime )
 	{
 		_runtime = runtime;
-		_ingress = new ChatCommandIngress( runtime.ConsoleRoot.Name, runtime.Dispatcher, runtime.Audit, Available );
+		_ingress = runtime.ConsoleRoot.IsAvailable ? new ChatCommandIngress( runtime.ConsoleRoot.Name, runtime.Dispatcher, runtime.Audit, Available ) : null;
 	}
 
-	private bool Available() => !_disposed && ThreadSafe.IsMainThread && _runtime.IsUsable && _runtime.ConsoleRoot.IsAvailable;
+	private bool Available() => !_disposed && ThreadSafe.IsMainThread && _runtime.IsUsable;
 
 	internal bool TryHandle( Connection sender, string message, Guid requestId )
 	{
-		if ( !Available() || !_ingress.Owns( message ) )
+		if ( !Available() || _ingress?.Owns( message ) != true )
 		{
 			return false;
 		}
@@ -29,8 +29,18 @@ internal sealed class PlatformChatAdapter : IDisposable
 
 	internal void Observe( ChatMessageEvent message )
 	{
-		if ( message is null || message.Suppress || message.Sender is null || !Available() || !_ingress.Owns( message.Message ) )
+		if ( message is null || message.Suppress || message.Sender is null || !Available() )
 		{
+			return;
+		}
+		if ( _ingress?.Owns( message.Message ) != true )
+		{
+			var result = _runtime.CheckOrdinaryChat( message.Sender );
+			if ( result.Status != CommandStatus.Success )
+			{
+				message.Suppress = true;
+				ChatReplies.Send( message.Sender, Guid.NewGuid(), result );
+			}
 			return;
 		}
 		// Consumption must be visible to later listeners before any asynchronous handler starts.
