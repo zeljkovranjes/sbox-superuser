@@ -1,6 +1,6 @@
 # T15: Explicit native bindings
 
-Status: **Implemented; final checks in progress.** One optional internal module supplies explicit host bindings. No arbitrary console execution endpoint or external runtime is introduced.
+Status: **Complete.** One optional internal module supplies explicit host bindings. No arbitrary console execution endpoint or external runtime is introduced.
 
 ## Game setup
 
@@ -57,3 +57,5 @@ The dedicated console's `admin settings set` produced a Success audit record att
 After stopping only the owned dedicated process and restarting it as PID 11412, `verify-native-setting-restart.cs` observed native default 2 before module registration and persisted value 6 afterward. This is actual process-restart evidence. Reproduction order: run the three main scripts, restart the isolated dedicated fixture, then run the restart script. Preserve/backup test data first and restore native values and bootstrap settings afterward. No saved scene changes are required.
 
 Dedicated-client transport remains uncertified because the adopting game is unpublished. Source hot reload and broader lifecycle checks remain T17. Player-hosted release games and host migration remain unsupported. No publication occurred.
+
+Final checks: all 222 contract and 65 Core tests pass, including 19 new cases; existing tests were not changed. Generated library and lab builds pass with zero warnings/errors. Actual editor compilation passes; actual dedicated scripts execute the compiled library. Both package standard checks pass. The lab test project has no cases. Pre-release lint reports zero failures and two ignored-path warnings for the local journal and generated engine XML. Owned dedicated processes were stopped by exact PID; new editor/dedicated settings and audit files were archived to the lab's dev/out/t15-settings-evidence, preserving 43 original data files. Owner configuration is absent again and the saved scene is unchanged.

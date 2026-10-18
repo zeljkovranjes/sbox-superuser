@@ -1,7 +1,7 @@
 # Changelog
 
 ## 2026-10-18
-Title: Console, Modules and Private Chat
+Title: Console, Chat and Native Settings
 ### Added
 # Console
 Operator commands - native admin help, access management, diagnostics and private audit queries use the authoritative dispatcher
@@ -20,6 +20,11 @@ Chat validation - two real clients verify ordinary-chat pass-through, private er
 Custom chat hooks - independent backends consume commands before broadcast and receive authenticated private results through a scene event
 Chat examples - compiled platform and independent chatboxes demonstrate private feedback, request retries and ordinary-message checks
 Result fallback - disabled views unsubscribe automatically and failing observers preserve the platform notification fallback
+# Settings
+Explicit bindings - allowlisted native settings and commands use typed permissions and retain native restrictions
+Setting commands - list, get, set and reset report actual native values with verified write readback
+Persistence ownership - engine Saved variables stay engine-owned; framework values survive dedicated restart with distinct pending state
+Failure recovery - native clamping and interrupted storage writes preserve the previous committed setting and report unconfirmed outcomes honestly
 ### Improved
 # Audit
 Completion checks - verifies attributable Unknown outcomes across an actual dedicated-server interruption and restart
