@@ -29,5 +29,6 @@ internal static class ProbeChat
 		}
 
 		Chat.AddText( "[Superuser T01] Private probe reply. Verify a second client sees neither this nor the request." );
+		Log.Info( $"[Superuser T01] private reply received; recipient={Connection.Local.Id}" );
 	}
 }

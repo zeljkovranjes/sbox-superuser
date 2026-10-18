@@ -15,7 +15,7 @@ internal static class ProbeConsole
 
 		var identity = caller is null
 			? "null (unclassified; no authority granted)"
-			: $"connection={caller.Id}; steamId={caller.SteamId}";
+			: $"connection={caller.Id}; steamId={caller.SteamId}; isHost={caller.IsHost}";
 		Log.Info( $"[Superuser T01] caller={identity}; arguments={JsonSerializer.Serialize( arguments )}" );
 		if ( caller is not null )
 		{

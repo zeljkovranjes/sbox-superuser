@@ -23,6 +23,7 @@ public sealed partial class CompatibilityProbe : Component
 		if ( CanRun && FindActiveProbe() == this )
 		{
 			ProbeDiscovery.Run();
+			ProbeNativeSettings.Run();
 			if ( ProbeStorageOnStart )
 			{
 				ProbeStorage.Run();
