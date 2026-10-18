@@ -24,3 +24,9 @@ Run `superuser_status`, `superuser_identity` and, only on an actual dedicated co
 Copy `IDogSpawner.cs` and `DogMood.cs` into the adopting game's `Api/`, and `DogCommands.cs`, `InvalidCommandSamples.cs`, `EmptyCommandServices.cs` into `Engine/Commands/`. Keep the `SuperuserCompatibilityLab` namespace or adjust it consistently for your game. These files are development fixtures, not additional runtime libraries.
 
 Run `dev/verify-command-discovery.cs` through `run_csharp` after the game compiles. It invokes handlers in the actual library/game assemblies, including expected failures. The dog command returns Unsupported without a game-provided `IDogSpawner`; no dog assets are supplied. In a playing editor host, `dev/verify-command-registration-host.cs` checks the public host API and restores the editor switch.
+
+## Task 9 dispatcher fixtures
+
+Copy `IDispatchProbe.cs` into the game's `Api/`, and `DispatchProbe.cs` plus `DispatchCommands.cs` into `Engine/Commands/`. They provide a compiled main-thread counter and asynchronous hold barrier, not moderation or dog spawning. Test commands deliberately use the default help permission to avoid editing stored lab policy; never ship them in a production game.
+
+With the isolated bootstrap scene playing, run `dev/verify-dispatch-editor.cs` for the authenticated player route. On an actual dedicated instance, run `dev/verify-dispatch-dedicated.cs` for the separate dedicated-local boundary and service queue. Both remove their registrations; the editor script restores its bootstrap switch.
