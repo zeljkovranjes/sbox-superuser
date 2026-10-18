@@ -29,4 +29,7 @@ public enum BootstrapState
 
 	/// <summary>Audit persistence or retention is degraded; new actions require a confirmed durable intent.</summary>
 	AuditDegraded = 8,
+
+	/// <summary>The configured console root is invalid or collides with visible managed native metadata.</summary>
+	ConsoleUnavailable = 9,
 }

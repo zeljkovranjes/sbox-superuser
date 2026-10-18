@@ -18,6 +18,8 @@ internal sealed class BootstrapRuntime : IDisposable
 	internal Commands.CommandRegistry Commands { get; }
 	internal Commands.HostCommandDispatcher Dispatcher { get; }
 	internal Audit.HostAuditService Audit { get; }
+	internal Core.Commands.ConsoleRootState ConsoleRoot { get; }
+	internal Commands.AdministrationCommands Administration { get; }
 
 	internal BootstrapState Health
 	{
@@ -34,6 +36,11 @@ internal sealed class BootstrapRuntime : IDisposable
 				return BootstrapState.AuditDegraded;
 			}
 
+			if ( !ConsoleRoot.IsAvailable )
+			{
+				return BootstrapState.ConsoleUnavailable;
+			}
+
 			if ( Policy.OwnerSource == "bootstrap" )
 			{
 				return Owners.State;
@@ -48,7 +55,7 @@ internal sealed class BootstrapRuntime : IDisposable
 		&& ReferenceEquals( _host, Connection.Host )
 		&& (Application.IsDedicatedServer || (Game.IsEditor && _allowEditorTesting));
 
-	internal BootstrapRuntime( Scene scene, bool allowEditorTesting )
+	internal BootstrapRuntime( Scene scene, bool allowEditorTesting, string commandRoot = "admin" )
 	{
 		_scene = scene;
 		_host = Connection.Host;
@@ -72,7 +79,26 @@ internal sealed class BootstrapRuntime : IDisposable
 			() => ThreadSafe.IsMainThread && IsUsable );
 		Dispatcher = new Commands.HostCommandDispatcher( Policy, Commands, () => ThreadSafe.IsMainThread && IsUsable,
 			OnlinePlayers, error => Log.Warning( $"[Superuser] Command execution failed; type={error.GetType().Name}; outcome may be Unknown." ), audit: Audit );
+		ConsoleRoot = new Core.Commands.ConsoleRootState( commandRoot, TypeLibrary.GetMemberAttributes<ConVarAttribute>().Select( attribute => attribute.Name ) );
+		Administration = new Commands.AdministrationCommands( Policy, Audit, Commands, Dispatcher, ConsoleDiagnostics );
+		if ( !ConsoleRoot.IsAvailable )
+		{
+			Log.Warning( $"[Superuser] {ConsoleRoot.Message}" );
+		}
 	}
+
+	private CommandResult ConsoleDiagnostics() => new( CommandStatus.Success, "Host administration health.", new Dictionary<string, string>
+	{
+		[ "mode" ] = Application.IsDedicatedServer ? "DedicatedServer" : "EditorTesting",
+		[ "root" ] = ConsoleRoot.Name,
+		[ "console" ] = ConsoleRoot.Message,
+		[ "policy" ] = Policy.PolicyStatus.ToString(),
+		[ "owners" ] = Policy.OwnerStatus.ToString(),
+		[ "ownerSource" ] = Policy.OwnerSource,
+		[ "audit" ] = Audit.Diagnostics().ReadStatus.ToString(),
+		[ "auditDegraded" ] = Audit.IsDegraded.ToString(),
+		[ "migration" ] = "Player-hosted release games and host migration are unsupported."
+	} );
 
 	internal void MaintainAudit()
 	{
@@ -154,6 +180,7 @@ internal sealed class BootstrapRuntime : IDisposable
 	/// <summary>Revokes this runtime so retained references cannot resolve identities.</summary>
 	public void Dispose()
 	{
+		Administration.Dispose();
 		_disposed = true;
 		Dispatcher.Dispose();
 		Store.StorageChanged -= Policy.OnStorageChanged;

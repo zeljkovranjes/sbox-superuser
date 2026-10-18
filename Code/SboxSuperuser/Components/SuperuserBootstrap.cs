@@ -13,6 +13,10 @@ public sealed class SuperuserBootstrap : Component
 	[Property, Group( "Testing" )]
 	public bool AllowEditorTesting { get; set; }
 
+	/// <summary>Sets the logical command root; alternate names use superuser root in console. Re-enable to apply.</summary>
+	[Property, Group( "Commands" )]
+	public string CommandRoot { get; set; } = "admin";
+
 	protected override void OnEnabled() => Attach();
 
 	protected override void OnStart() => Attach();
@@ -20,7 +24,7 @@ public sealed class SuperuserBootstrap : Component
 	private void Attach()
 	{
 		_session = Scene.GetSystem<SuperuserSession>();
-		_session?.Attach( Id, AllowEditorTesting );
+		_session?.Attach( Id, AllowEditorTesting, CommandRoot );
 	}
 
 	protected override void OnDisabled()

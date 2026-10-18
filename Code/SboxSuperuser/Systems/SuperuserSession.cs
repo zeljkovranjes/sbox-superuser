@@ -17,13 +17,13 @@ internal sealed class SuperuserSession : GameObjectSystem<SuperuserSession>
 		Listen( Stage.StartUpdate, -100, Reconcile, nameof( SuperuserSession ) );
 	}
 
-	internal void Attach( Guid componentId, bool allowEditorTesting )
+	internal void Attach( Guid componentId, bool allowEditorTesting, string commandRoot = "admin" )
 	{
 		if ( _disposed )
 		{
 			return;
 		}
-		_registrations.Attach( componentId, allowEditorTesting );
+		_registrations.Attach( componentId, allowEditorTesting, commandRoot );
 		Reconcile();
 	}
 
@@ -44,7 +44,7 @@ internal sealed class SuperuserSession : GameObjectSystem<SuperuserSession>
 		Reconcile();
 		return new BootstrapDiagnostics( _state, _runtime?.Id, _registrations.Count,
 			_runtime?.Policy.OwnerCount ?? 0, _runtime?.Owners.Path,
-			_runtime is null ? _state.ToString() : $"{_runtime.Owners.Message} Policy={_runtime.Policy.PolicyStatus}; ownerSource={_runtime.Policy.OwnerSource}; ownerStatus={_runtime.Policy.OwnerStatus}" );
+			_runtime is null ? _state.ToString() : $"{_runtime.Owners.Message} Policy={_runtime.Policy.PolicyStatus}; ownerSource={_runtime.Policy.OwnerSource}; ownerStatus={_runtime.Policy.OwnerStatus}; {_runtime.ConsoleRoot.Message}" );
 	}
 
 	private void Reconcile()
@@ -97,7 +97,7 @@ internal sealed class SuperuserSession : GameObjectSystem<SuperuserSession>
 			otherScene.GetSystem<SuperuserSession>()?.Stop( BootstrapState.Unsupported );
 		}
 
-		_runtime = new BootstrapRuntime( Scene, _registrations.AllowsEditorTesting );
+		_runtime = new BootstrapRuntime( Scene, _registrations.AllowsEditorTesting, _registrations.CommandRoot );
 		SetState( _runtime.Health );
 		Log.Info( $"[Superuser] Runtime {_runtime.Id} initialized; owners={_runtime.Owners.Configuration?.Count ?? 0}; file={_runtime.Owners.Path}" );
 	}
