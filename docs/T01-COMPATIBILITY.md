@@ -1,6 +1,6 @@
 # T01: Engine compatibility
 
-Status: **Blocked on runtime evidence**. The probe and report are implemented. Scope: T01 only; T02–T20 remain **Not started**.
+Status: **In progress — dedicated validation resumed**. The previous blocked assessment was premature: missing test sessions had not yet been demonstrated to be an environment limitation. The probe and report are implemented. Scope: T01 only; T02–T20 remain **Not started**.
 
 The source specification is [version 0.2](sbox-admin-specification.docx). The user narrowed production support to actual dedicated servers and requested an explicit editor testing switch. Player-hosted releases and host migration are unsupported. Editor results never establish dedicated-server compatibility.
 
