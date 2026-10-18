@@ -58,7 +58,7 @@ internal sealed partial class HostPolicyService
 
 	private async Task LoadAsync( CancellationToken cancellation )
 	{
-		var policy = await _store.ReadAsync( PolicyKey, 1, cancellation );
+		var policy = await ReadStoredAsync( PolicyKey, cancellation );
 		PolicyStatus = policy.Status;
 		try
 		{
@@ -86,7 +86,7 @@ internal sealed partial class HostPolicyService
 			_report( error );
 		}
 
-		var owners = await _store.ReadAsync( OwnersKey, 1, cancellation );
+		var owners = await ReadStoredAsync( OwnersKey, cancellation );
 		OwnerStatus = owners.Status;
 		try
 		{
@@ -120,6 +120,23 @@ internal sealed partial class HostPolicyService
 			_managedOwners = true;
 			OwnerStatus = error is UnsupportedStoreSchemaException ? StoreReadStatus.UnsupportedSchema : StoreReadStatus.Corrupt;
 			_report( error );
+		}
+	}
+
+	private async Task<StoreReadResult> ReadStoredAsync( StoreKey key, CancellationToken cancellation )
+	{
+		try
+		{
+			return await _store.ReadAsync( key, 1, cancellation );
+		}
+		catch ( OperationCanceledException )
+		{
+			return new StoreReadResult( StoreReadStatus.Cancelled );
+		}
+		catch ( Exception error )
+		{
+			_report( error );
+			return new StoreReadResult( StoreReadStatus.Unavailable );
 		}
 	}
 
