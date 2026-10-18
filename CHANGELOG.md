@@ -30,6 +30,7 @@ Storage tutorial - includes a runnable adapter and setup component, exact placem
 Integration guide - documents the optional menu, replacement view and dedicated/editor storage selection; README includes the centered project SVG
 README screenshot - the top of the README shows the admin menu in game
 Documentation structure - the README and docs follow one contents page with concepts, a tutorial, running guides and reference chapters for the host API, console commands and each admin menu window
+README - ends with the admin menu overview and license; known limits now live in the release status and dedicated-server pages
 # Identity
 Project icon - adds a navy caped figure and shield as a scalable SVG, matching the Humanoid Retargeter logo style
 # Validation
