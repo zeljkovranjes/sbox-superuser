@@ -1,6 +1,6 @@
 # T13: Platform chat commands
 
-Status: **Implementation and real-client checks passed; final package verification in progress.** The user-selected prefix is `/`, replacing the specification's illustrative `!` prefix. The bootstrap command root determines the complete chat prefix: `/admin` by default, or `/operators` when Command Root is `operators`.
+Status: **Complete.** The user-selected prefix is `/`, replacing the specification's illustrative `!` prefix. The bootstrap command root determines the complete chat prefix: `/admin` by default, or `/operators` when Command Root is `operators`.
 
 Only an exact prefix followed by whitespace or the end of the message is owned. Matching is case-sensitive and does not trim leading text. Malformed, unknown and denied admin commands are consumed and answered privately. Ordinary chat, `!admin`, `/administrator`, system messages and already-suppressed events remain outside command dispatch.
 
@@ -36,3 +36,5 @@ Changing the root to `operators` produced a private success for `/operators vers
 The first test attempt had an unapplied editor switch and therefore no runtime; it correctly passed messages through as ordinary chat. The fixture was corrected by re-enabling bootstrap and confirming a runtime ID before the successful run. This observation is why setup explicitly requires that check. Idle test clients could not use the inaccessible native `connect` command; only the two owned clients were stopped by exact PID and relaunched with the verified `-joinlocal` arguments. The user's original editor was untouched.
 
 Backup: `E:/06-um-data/backups/superuser-t13-chat-data/20261018-004924.zip` (43 files). Dedicated-client deployment remains unverified under T01's unpublished game-package prerequisite; the actual privacy checks above use editor networking. No package was published. T14 custom-backend APIs and result events are not part of this task.
+
+Final verification: both runtime builds passed with zero warnings/errors, both package/Core checks passed, all 268 tests passed, and the engine whitelist was clean. Publication lint found zero failures and two ignored local-path warnings. Bootstrap was disabled and its runtime confirmed absent before archiving only new audit evidence to the lab's `dev/out/t13-chat-evidence`. Owner files remain absent, saved scenes are unchanged, and the two owned clients remain available for T14.
