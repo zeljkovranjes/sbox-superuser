@@ -16,6 +16,10 @@ public sealed partial class CompatibilityProbe : Component
 	protected override void OnStart()
 	{
 		Log.Info( $"[Superuser T01] {ProbeRuntime.Describe( AllowEditorTesting )}" );
+		if ( CanRun && FindActiveProbe() == this )
+		{
+			ProbeDiscovery.Run();
+		}
 	}
 
 	private static CompatibilityProbe FindActiveProbe()
