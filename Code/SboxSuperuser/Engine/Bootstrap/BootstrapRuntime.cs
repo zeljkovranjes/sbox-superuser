@@ -207,11 +207,12 @@ internal sealed partial class BootstrapRuntime : IDisposable
 	/// <summary>Revokes this runtime so retained references cannot resolve identities.</summary>
 	public void Dispose()
 	{
-		Chat?.Dispose();
-		Modules.Dispose();
-		Administration.Dispose();
+		if ( _disposed ) return;
 		_disposed = true;
-		Dispatcher.Dispose();
+		Chat?.Dispose();
+		Modules?.Dispose();
+		Administration?.Dispose();
+		Dispatcher?.Dispose();
 		Store.StorageChanged -= Policy.OnStorageChanged;
 		Store.StorageChanged -= Audit.OnStorageChanged;
 		Store.StorageChanged -= Moderation.OnStorageChanged;

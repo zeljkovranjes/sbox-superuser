@@ -35,4 +35,7 @@ public enum BootstrapState
 
 	/// <summary>Moderation history is unavailable or awaiting validation; admission and ordinary chat fail closed.</summary>
 	ModerationDegraded = 10,
+
+	/// <summary>Active source code reloaded; start a fresh play session or dedicated process before enabling administration again.</summary>
+	RestartRequired = 11,
 }

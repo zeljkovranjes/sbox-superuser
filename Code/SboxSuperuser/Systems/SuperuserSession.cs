@@ -4,12 +4,14 @@ using SboxSuperuser.Engine.Bootstrap;
 
 namespace SboxSuperuser.Systems;
 
-internal sealed class SuperuserSession : GameObjectSystem<SuperuserSession>
+internal sealed partial class SuperuserSession : GameObjectSystem<SuperuserSession>
 {
 	private readonly BootstrapRegistrations _registrations = new();
 	private BootstrapRuntime _runtime;
 	private BootstrapState _state;
 	private bool _disposed;
+	private bool _stopping;
+	private bool _restartRequired;
 
 	/// <summary>Creates the scene-owned coordinator and one lifecycle callback.</summary>
 	public SuperuserSession( Scene scene ) : base( scene )
@@ -19,7 +21,7 @@ internal sealed class SuperuserSession : GameObjectSystem<SuperuserSession>
 
 	internal void Attach( Guid componentId, bool allowEditorTesting, string commandRoot = "admin" )
 	{
-		if ( _disposed )
+		if ( _disposed || _stopping )
 		{
 			return;
 		}
@@ -49,8 +51,13 @@ internal sealed class SuperuserSession : GameObjectSystem<SuperuserSession>
 
 	private void Reconcile()
 	{
-		if ( _disposed )
+		if ( _disposed || _stopping )
 		{
+			return;
+		}
+		if ( _restartRequired )
+		{
+			Stop( BootstrapState.RestartRequired );
 			return;
 		}
 		if ( _registrations.Count == 0 )
@@ -106,9 +113,18 @@ internal sealed class SuperuserSession : GameObjectSystem<SuperuserSession>
 	{
 		if ( _runtime is not null )
 		{
-			Log.Info( $"[Superuser] Runtime {_runtime.Id} stopped." );
-			_runtime.Dispose();
+			var retiring = _runtime;
 			_runtime = null;
+			_stopping = true;
+			try
+			{
+				Log.Info( $"[Superuser] Runtime {retiring.Id} stopped." );
+				retiring.Dispose();
+			}
+			finally
+			{
+				_stopping = false;
+			}
 		}
 
 		SetState( state );
