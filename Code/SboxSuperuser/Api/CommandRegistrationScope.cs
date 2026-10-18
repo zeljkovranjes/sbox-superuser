@@ -10,6 +10,7 @@ public sealed class CommandRegistrationScope : IModuleRegistration, IDisposable
 	private readonly Action<CommandRegistrationScope> _discover;
 	private readonly List<RegisteredCommand> _commands = new();
 	private readonly List<PermissionDescriptor> _permissions = new();
+	private readonly Dictionary<Type, object> _services = new();
 	private readonly Guid _token = Guid.NewGuid();
 	private bool _committed;
 	private bool _disposed;
@@ -76,8 +77,20 @@ public sealed class CommandRegistrationScope : IModuleRegistration, IDisposable
 	public void Commit()
 	{
 		EnsureStaging();
-		_registry.Replace( ModuleId, _token, _commands, _permissions );
+		var capabilities = new CommandCapabilities( _services );
+		_registry.Replace( ModuleId, _token, _commands.Select( command => command with { Capabilities = capabilities } ).ToArray(), _permissions );
 		_committed = true;
+	}
+
+	/// <summary>Approves one exact game capability type for this module's handlers; no fallback service is constructed.</summary>
+	public void RegisterService<T>( T service ) where T : class
+	{
+		EnsureStaging();
+		ArgumentNullException.ThrowIfNull( service );
+		if ( _services.Count >= 32 || !_services.TryAdd( typeof( T ), service ) )
+		{
+			throw new ArgumentException( "Capability types must be unique, with at most 32 per module." );
+		}
 	}
 
 	/// <summary>Removes this scope's active entries; disposing an older replaced scope has no effect.</summary>
