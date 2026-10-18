@@ -14,6 +14,9 @@ internal sealed partial class HostModerationService
 			context.Cancellation.ThrowIfCancellationRequested();
 			if ( !_canUse( context, permission ) ) return Denied();
 			if ( !IsUsable ) return Unavailable();
+			if ( kind is ModerationKind.Kick or ModerationKind.Ban or ModerationKind.Warn or ModerationKind.TextMute
+				&& !_canTarget( context.Actor, target ) )
+				return new CommandResult( CommandStatus.Denied, "Target protection denied this action." );
 			var now = _clock();
 			var restrictedKind = kind is ModerationKind.Unban ? ModerationKind.Ban : kind is ModerationKind.Unmute ? ModerationKind.TextMute : kind;
 			var active = _ledger.Active( target, restrictedKind, now );

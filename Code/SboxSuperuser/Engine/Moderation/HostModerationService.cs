@@ -8,6 +8,7 @@ internal sealed partial class HostModerationService
 	private readonly IAdminStore _store;
 	private readonly Func<bool> _available;
 	private readonly Func<CommandContext, string, bool> _canUse;
+	private readonly Func<ActorIdentity, string, bool> _canTarget;
 	private readonly Func<DateTimeOffset> _clock;
 	private readonly Action<Exception> _report;
 	private readonly SemaphoreSlim _gate = new( 1, 1 );
@@ -18,11 +19,12 @@ internal sealed partial class HostModerationService
 	internal bool IsUsable => _available() && Status is StoreReadStatus.Found or StoreReadStatus.Missing;
 
 	internal HostModerationService( IAdminStore store, Func<bool> available, Func<CommandContext, string, bool> canUse,
-		Action<Exception> report, Func<DateTimeOffset> clock = null )
+		Func<ActorIdentity, string, bool> canTarget, Action<Exception> report, Func<DateTimeOffset> clock = null )
 	{
 		_store = store;
 		_available = available;
 		_canUse = canUse;
+		_canTarget = canTarget;
 		_report = report;
 		_clock = clock ?? (() => DateTimeOffset.UtcNow);
 		Initialization = ReloadAsync();

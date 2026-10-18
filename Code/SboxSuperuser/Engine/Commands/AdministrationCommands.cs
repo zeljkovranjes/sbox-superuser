@@ -13,9 +13,12 @@ internal sealed partial class AdministrationCommands : IDisposable
 	private readonly Func<CommandResult> _diagnostics;
 	private readonly CommandRegistrationScope _scope;
 	private readonly Modules.ModuleManager _modules;
+	private readonly Moderation.HostModerationService _moderation;
+	private readonly Func<CommandContext, string, string, bool, Task<CommandResult>> _disconnect;
 
 	internal AdministrationCommands( HostPolicyService policy, HostAuditService audit, CommandRegistry registry,
-		HostCommandDispatcher dispatcher, Func<CommandResult> diagnostics, Modules.ModuleManager modules = null )
+		HostCommandDispatcher dispatcher, Func<CommandResult> diagnostics, Modules.ModuleManager modules = null,
+		Moderation.HostModerationService moderation = null, Func<CommandContext, string, string, bool, Task<CommandResult>> disconnect = null )
 	{
 		_policy = policy;
 		_audit = audit;
@@ -23,10 +26,13 @@ internal sealed partial class AdministrationCommands : IDisposable
 		_dispatcher = dispatcher;
 		_diagnostics = diagnostics;
 		_modules = modules;
+		_moderation = moderation;
+		_disconnect = disconnect;
 		_scope = new CommandRegistrationScope( registry, Module, managed: true );
 		RegisterDiscovery();
 		RegisterAccess();
 		RegisterModules();
+		if ( _moderation is not null ) RegisterModeration();
 		_scope.Commit();
 	}
 
