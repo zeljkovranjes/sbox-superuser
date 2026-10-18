@@ -11,6 +11,10 @@ public sealed partial class CompatibilityProbe : Component
 	[Property, Group( "Testing" )]
 	public bool AllowEditorTesting { get; set; }
 
+	/// <summary>Writes only an isolated T01 marker in host data storage when the scene starts.</summary>
+	[Property, Group( "Testing" )]
+	public bool ProbeStorageOnStart { get; set; }
+
 	private bool CanRun => Enabled && ProbeRuntime.IsSupported( AllowEditorTesting );
 
 	protected override void OnStart()
@@ -19,6 +23,10 @@ public sealed partial class CompatibilityProbe : Component
 		if ( CanRun && FindActiveProbe() == this )
 		{
 			ProbeDiscovery.Run();
+			if ( ProbeStorageOnStart )
+			{
+				ProbeStorage.Run();
+			}
 		}
 	}
 
