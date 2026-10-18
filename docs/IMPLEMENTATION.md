@@ -17,7 +17,7 @@ The specification is [version 0.2](sbox-admin-specification.docx). Current autho
 | T11 Native console and help | Complete | [T11](T11-CONSOLE.md) |
 | T12 Module lifecycle | Complete | [T12](T12-MODULES.md) |
 | T13 Platform chat | Complete | [T13](T13-PLATFORM-CHAT.md) |
-| T14 Custom chat hooks | In progress | [T14](T14-CUSTOM-CHAT.md) |
+| T14 Custom chat hooks | Complete | [T14](T14-CUSTOM-CHAT.md) |
 | T15 Native bindings | Not started | Depends on T11, T12 |
 | T16 Moderation and admission | Not started | Depends on T06, T10, T11, T14 |
 | T17 Lifecycle validation | Not started | Depends on T12–T16 |
@@ -25,4 +25,4 @@ The specification is [version 0.2](sbox-admin-specification.docx). Current autho
 | T19 Security, recovery and load | Not started | Depends on T18 |
 | T20 Unpublished release candidate | Not started | Depends on T19 |
 
-Current baseline: 207 passing contract cases and 61 Core cases. Task records distinguish plain-.NET tests from actual engine execution, editor-host checks and actual dedicated-server recovery/restart. Historical task reports describe their completion point; this ledger tracks current progress. T01–T13 are implemented, retaining the recorded dedicated-client deployment limitation. T14 is the next executable task.
+Current baseline: 207 passing contract cases and 61 Core cases. Task records distinguish plain-.NET tests from actual engine execution, editor-host checks and actual dedicated-server recovery/restart. Historical task reports describe their completion point; this ledger tracks current progress. T01–T14 are implemented, retaining the recorded dedicated-client deployment limitation. T15 is the next executable task.

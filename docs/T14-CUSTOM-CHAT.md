@@ -1,6 +1,6 @@
 # T14: Custom chat integration
 
-Status: **Implemented; final verification in progress.** Custom UI over platform chat uses `Sandbox.Platform.Chat.Say`; an independent backend authenticates its RPC sender and calls the library before routing or broadcasting. Neither path introduces another executable, service or required UI library.
+Status: **Complete.** Custom UI over platform chat uses `Sandbox.Platform.Chat.Say`; an independent backend authenticates its RPC sender and calls the library before routing or broadcasting. Neither path introduces another executable, service or required UI library.
 
 ## Custom UI over platform chat
 
@@ -29,3 +29,6 @@ Use an editor host with Allow Editor Testing enabled and two real remote clients
 The isolated editor host (PID 25616) and two remote game clients (24908, 23656) compiled the library and adopting-game examples in the engine. Client A received four private results: platform counter execution 1, independent counter execution 2, the retried result still reporting execution 2, and a Denied policy command. Host audit contained exactly two counter executions, both Chat origin and A's authenticated player identity. B received only the two ordinary messages, with zero private results. Screenshots of both rendered chatboxes were inspected.
 
 Disabling A's view prevented delivery to it. An active observer received one version result, set suppression and threw; the default platform notification still appeared and only the exception type was logged. No owners were added and no policy grants were changed. Actual dedicated-client transport remains uncertified because the adopting game is unpublished; these checks are editor-host multiplayer evidence.
+
+
+Final checks: generated library and adopting-game builds passed with zero warnings/errors, and actual engine compilation reported zero diagnostics for both packages. All 207 contract and 61 Core tests passed unchanged. Both package standards checks passed. The lab test project contains no cases. Pre-release lint reported zero failures and two ignored-path warnings (local journal and generated engine XML). Bootstrap is disabled with editor opt-in reset false, local overlay settings restored true, and owned runtime chat objects removed; saved scene unchanged. No publication occurred.
