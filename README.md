@@ -6,7 +6,7 @@
 
 Administration for s&box dedicated servers, with console commands, slash chat and an optional moderation menu. Commands, permissions, moderation and storage run inside one C# library.
 
-Add the local library `notpointless.chomnr_sbox_superuser` to your game, then add **Superuser Bootstrap** to its network scene. Enable **Allow Editor Testing** when testing in the editor. The package is not published yet.
+Add the local library `notpointless.chomnr_sbox_superuser` to your game, then add **Superuser Bootstrap** to its network scene. Enable **Allow Editor Testing** when testing in the editor.
 
 ## Guide
 
