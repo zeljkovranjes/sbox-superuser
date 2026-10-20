@@ -32,6 +32,7 @@ README screenshot - the top of the README shows the admin menu in game
 Documentation structure - the README and docs follow one contents page with concepts, a tutorial, running guides and reference chapters for the host API, console commands and each admin menu window
 README - opens with the admin menu screenshot instead of the logo and ends with the menu overview and license; known limits now live in the release status and dedicated-server pages
 # Identity
+License - Superuser and its samples are released under the MIT license
 Project icon - adds a navy caped figure and shield as a scalable SVG, matching the Humanoid Retargeter logo style
 # Validation
 Measured limits - actual dedicated pressure and persistence workloads now have a recorded environment, timings and bounded-capacity evidence

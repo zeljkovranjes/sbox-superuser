@@ -49,8 +49,8 @@ checks passed; this is not a certified multiplayer production release. No
 package, GitHub release or public tag has been published.
 
 Voice moderation, player-hosted production and host migration remain deferred.
-ImGui source has a [staging folder](../dev/ui-source/sbox-imgui/README.md). No
-redistribution license has been selected.
+ImGui source has a [staging folder](../dev/ui-source/sbox-imgui/README.md).
+Superuser is released under the [MIT license](../LICENSE).
 
 See the [changelog](../CHANGELOG.md) for changes and [validation](validation.md)
 for evidence.

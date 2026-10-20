@@ -112,7 +112,7 @@ restart. [Reference](docs/menu.md).
 
 #### License
 
-No license selected.
+Licensed under the [MIT license](LICENSE).
 
-Bundled ImGui code retains its MIT license. See
+Bundled ImGui code keeps its own MIT license. See
 [third-party notices](THIRD_PARTY_NOTICES.md).

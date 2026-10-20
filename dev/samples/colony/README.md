@@ -58,4 +58,4 @@ Build the generated runtime project and run the library's colony verification sc
 
 ## License
 
-No license selected. Original sample source; no engine assets included.
+MIT, the same as the library; see the repository [LICENSE](../../../LICENSE). Original sample source; no engine assets included.
