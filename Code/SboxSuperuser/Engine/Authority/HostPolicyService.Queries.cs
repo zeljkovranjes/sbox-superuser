@@ -6,6 +6,9 @@ internal sealed partial class HostPolicyService : Permissions.IPermissionEvaluat
 {
 	internal SboxSuperuser.Core.Permissions.PolicyGraph ReadPolicy( ActorIdentity actor ) => IsUsable && CanManage( actor ) ? _resolver.Policy : null;
 
+	/// <summary>The current policy for host-internal features such as prefixes; null while authority is unusable.</summary>
+	internal SboxSuperuser.Core.Permissions.PolicyGraph CurrentPolicy => IsUsable ? _resolver.Policy : null;
+
 	public PermissionExplanation Explain( ActorIdentity actor, string permission )
 	{
 		var registered = _resolver.IsRegistered( permission );

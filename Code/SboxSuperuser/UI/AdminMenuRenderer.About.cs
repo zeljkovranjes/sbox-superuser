@@ -5,11 +5,9 @@ namespace SboxSuperuser.UI;
 
 internal sealed partial class AdminMenuRenderer
 {
-	private const string ProductVersion = "0.1.0-rc.1";
 	private const int ModuleApiVersion = 1;
-	private const string Author = "chomnr";
 	private const string Package = "notpointless.chomnr_sbox_superuser";
-	private const string SourceUrl = "https://github.com/zeljkovranjes/sbox-superuser";
+	private const string SourceUrl = Core.Contracts.ProductInfo.Website;
 
 	private void DrawAboutWindow()
 	{
@@ -21,13 +19,13 @@ internal sealed partial class AdminMenuRenderer
 	private void DrawAbout()
 	{
 		Model.RequestAbout();
-		ImGui.Text( "Superuser {0}", ProductVersion );
+		ImGui.Text( "Superuser {0}", Superuser.Version );
 		Caption( "In-process administration for s&box dedicated servers: commands, permissions, moderation and audit." );
 		ImGui.Separator();
 
 		if ( ImGui.BeginTable( "about-facts", 2, ImGuiTableFlags.SizingFixedFit ) )
 		{
-			AboutRow( "Created by", Author );
+			AboutRow( "Created by", Superuser.Author );
 			AboutRow( "Package", Package );
 			AboutRow( "Module API", ModuleApiVersion.ToString() );
 			AboutRow( "Source", SourceUrl );

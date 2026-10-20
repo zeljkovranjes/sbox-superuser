@@ -6,6 +6,12 @@ namespace SboxSuperuser;
 /// <summary>Entry points for host administration, authenticated dispatch, storage and chat integration.</summary>
 public static partial class Superuser
 {
+	/// <summary>Gets the Superuser library version, such as "0.1.0-rc.1".</summary>
+	public static string Version => Core.Contracts.ProductInfo.Version;
+
+	/// <summary>Gets who made the Superuser library.</summary>
+	public static string Author => Core.Contracts.ProductInfo.Author;
+
 	/// <summary>Returns local bootstrap health without exposing owner IDs or granting authority.</summary>
 	public static BootstrapDiagnostics GetDiagnostics()
 	{

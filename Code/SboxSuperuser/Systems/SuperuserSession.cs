@@ -27,13 +27,13 @@ internal sealed partial class SuperuserSession : GameObjectSystem<SuperuserSessi
 		Listen( Stage.StartUpdate, -100, Reconcile, nameof( SuperuserSession ) );
 	}
 
-	internal void Attach( Guid componentId, bool allowEditorTesting, string commandRoot = "admin" )
+	internal void Attach( Guid componentId, bool allowEditorTesting, string commandRoot = "admin", bool prefixes = true, bool prefixedChat = true )
 	{
 		if ( _disposed || _stopping )
 		{
 			return;
 		}
-		_registrations.Attach( componentId, allowEditorTesting, commandRoot );
+		_registrations.Attach( componentId, allowEditorTesting, commandRoot, prefixes, prefixedChat );
 		Reconcile();
 	}
 
@@ -112,7 +112,9 @@ internal sealed partial class SuperuserSession : GameObjectSystem<SuperuserSessi
 			otherScene.GetSystem<SuperuserSession>()?.Stop( BootstrapState.Unsupported );
 		}
 
-		_runtime = new BootstrapRuntime( Scene, _registrations.AllowsEditorTesting, _registrations.CommandRoot, _storageFactory );
+		_runtime = new BootstrapRuntime( Scene, _registrations.AllowsEditorTesting, _registrations.CommandRoot, _storageFactory,
+			new BootstrapModules( _registrations.Prefixes, _registrations.PrefixedChat, Superuser.PrefixApiGuide ) );
+		_runtime.StartBuiltInModules();
 		SetState( _runtime.Health );
 		Log.Info( $"[Superuser] Runtime {_runtime.Id} initialized; owners={_runtime.Owners.Configuration?.Count ?? 0}; file={_runtime.Owners.Path}" );
 	}

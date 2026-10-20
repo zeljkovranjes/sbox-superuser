@@ -14,13 +14,14 @@ internal sealed partial class HostAdminQueries
 	private readonly Func<IReadOnlyList<CommandDescriptor>> _commands;
 	private readonly Func<IReadOnlyDictionary<string, string>> _diagnostics;
 	private readonly Core.Chat.RecentChat _chat;
+	private readonly Commands.CommandRegistry _registry;
 	private static readonly AdminAction[] AllActions = Enum.GetValues<AdminAction>();
 
 	// The server-view providers are optional so hosts and tests that only need player views stay unchanged.
 	internal HostAdminQueries( HostPolicyService policy, HostModerationService moderation, HostAuditService audit,
 		Func<IReadOnlyList<CommandPlayer>> players, Func<IReadOnlyList<ModuleStatus>> modules = null,
 		Func<IReadOnlyList<CommandDescriptor>> commands = null, Func<IReadOnlyDictionary<string, string>> diagnostics = null,
-		Core.Chat.RecentChat chat = null )
+		Core.Chat.RecentChat chat = null, Commands.CommandRegistry registry = null )
 	{
 		_policy = policy;
 		_moderation = moderation;
@@ -30,6 +31,7 @@ internal sealed partial class HostAdminQueries
 		_commands = commands ?? (() => Array.Empty<CommandDescriptor>());
 		_diagnostics = diagnostics ?? (() => new Dictionary<string, string>());
 		_chat = chat ?? new Core.Chat.RecentChat();
+		_registry = registry;
 	}
 
 	internal async Task<AdminReply> QueryAsync( Func<ActorIdentity> authenticate, AdminQuery query, Guid id, CancellationToken cancellation )
@@ -53,6 +55,7 @@ internal sealed partial class HostAdminQueries
 			case AdminQueryKind.Commands: return ReadCommands( id, actor, Can );
 			case AdminQueryKind.Permissions: return ReadPermissions( id, actor );
 			case AdminQueryKind.Chat: return ReadChat( id, query, Can );
+			case AdminQueryKind.Documentation: return ReadDocumentation( id, query, actor, Can );
 			case AdminQueryKind.Activity:
 			case AdminQueryKind.ActivitySearch: return await ReadActivityAsync( id, query, Current, cancellation );
 		}

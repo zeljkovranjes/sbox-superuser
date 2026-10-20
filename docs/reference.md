@@ -12,7 +12,10 @@ the bootstrap is ready.
   types, game services, results and retries.
 
 - ***[Modules](reference/modules.md)*** &mdash; module lifetime, dependencies,
-  reload, and API compatibility.
+  reload, documentation pages, and API compatibility.
+
+- ***[Effect scripts](reference/effects.md)*** &mdash; the language prefix effects
+  are written in.
 
 - ***[Permissions](reference/permissions.md)*** &mdash; how a decision is
   resolved; owners; target protection; revocation.

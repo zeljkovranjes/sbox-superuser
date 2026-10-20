@@ -8,6 +8,28 @@ module.
 The [ping module](../../dev/fixtures/PingModule.cs) is a complete minimal
 example.
 
+## Loading automatically
+
+Mark a module with `[AdminModule]` and it loads itself: when the bootstrap
+starts, Superuser creates it with its public parameterless constructor, installs
+it and starts it. Adding the module's file to a game is then all it takes, which
+is how a module from someone else is meant to be used.
+
+```csharp
+[AdminModule]
+public sealed class GreeterModule : IAdminModule
+```
+
+Modules load in dependency order whatever order they are found in. One that
+can't load (a missing dependency, a duplicate ID, a constructor that throws) is
+skipped with a warning in the console and doesn't stop the others. Passing a
+marked module to `RegisterModulesAsync` as well is harmless: it is skipped there.
+Use `RegisterModulesAsync` for modules that need constructor arguments or must
+start after your own setup.
+
+The [greeter example](../../dev/examples/greeter/README.md) is a complete module
+that loads this way.
+
 ## Lifetime
 
 The manager orders modules by their dependencies, validates API versions and
@@ -21,6 +43,37 @@ through ordinary module commands.
 
 Owners can list, enable and disable modules with `admin modules list`,
 `admin modules enable <id>` and `admin modules disable <id>`.
+
+## Documentation
+
+For a walkthrough, see ***[Documenting your module](../documenting.md)***.
+
+Every module gets a page in **Superuser › Documentation**, with the same four
+parts so they all read alike: an **Overview** (description, version, author,
+website, state, dependencies), your **guides**, then **Commands** and
+**Permissions**, which Superuser generates from your registrations. A module
+with no guides still has useful documentation.
+
+Say who made it on the descriptor, and add guides while starting:
+
+```csharp
+public ModuleDescriptor Descriptor { get; } = new( "example.ping", "A ping command", 1 )
+{
+	Version = "1.0.0",
+	Author = "Your name",
+	Website = "https://example.com"
+};
+
+registration.AddDocumentation( "Using ping", "# Using ping\n\nRun `admin ping` to check commands reach the server." );
+registration.AddDocumentationFile( "Setup", "docs/ping-setup.md" );
+```
+
+`AddDocumentationFile` reads Markdown from the game's mounted files. Pages keep
+the order you add them; a module can have 32 pages of up to 32 KB, with titles of
+up to 64 characters. The Markdown subset is headings, paragraphs, bullet and
+numbered lists, code blocks, tables, inline code, bold and italic. A code block
+tagged `effect` is colored as an effect script. Direct registration scopes have
+the same two methods.
 
 ## Direct registration
 

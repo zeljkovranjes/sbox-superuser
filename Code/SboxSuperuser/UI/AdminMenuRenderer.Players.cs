@@ -11,6 +11,13 @@ internal sealed partial class AdminMenuRenderer
 	private bool _scrollToSelected;
 
 	/// <summary>Search, a full-width player table and the selected player below it, laid out like Activity.</summary>
+	/// <summary>Opens the Players window with this player selected, for links from outside the menu.</summary>
+	internal void ShowPlayer( string steamId )
+	{
+		_layout.SetOpen( PlayersWindow, true );
+		Model.Select( steamId );
+	}
+
 	private void DrawPlayersWindow()
 	{
 		if ( !BeginWindow( PlayersWindow, "Players", new Vector2( 16, 16 ), new Vector2( 760, 560 ), new Vector2( 420, 300 ), out var expanded ) ) return;

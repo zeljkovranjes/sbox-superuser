@@ -60,6 +60,12 @@ public sealed class AdminReply
 	/// <summary>Gets recent public chat, newest first, for a Chat query.</summary>
 	public AdminChatRow[] Chat { get; init; } = Array.Empty<AdminChatRow>();
 
+	/// <summary>Gets the title of a documentation page, for a Documentation page query.</summary>
+	public string DocumentTitle { get; init; } = "";
+
+	/// <summary>Gets the Markdown of a documentation page, for a Documentation page query.</summary>
+	public string Document { get; init; } = "";
+
 	/// <summary>Gets a command's result fields, such as row1..row8, page and more for listings.</summary>
 	public Dictionary<string, string> Data { get; init; } = new();
 

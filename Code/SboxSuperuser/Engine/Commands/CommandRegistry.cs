@@ -7,11 +7,22 @@ internal sealed class CommandRegistry
 	private Dictionary<string, RegisteredCommand> _commands = new( StringComparer.Ordinal );
 	private Dictionary<string, string> _permissions = new( StringComparer.Ordinal );
 	private Dictionary<string, Guid> _modules = new( StringComparer.Ordinal );
+	private Dictionary<string, ModuleDocumentation> _documentation = new( StringComparer.Ordinal );
 	private readonly Action<IEnumerable<string>> _publishPermissions;
 	private readonly Func<bool> _available;
 	private readonly HashSet<string> _managed = new( StringComparer.Ordinal );
 	internal bool HasModule( string id ) => _modules.ContainsKey( id ) || _managed.Contains( id );
 	internal void ReserveModule( string id ) => _managed.Add( id );
+
+	/// <summary>Reads a module's Markdown file for AddDocumentationFile; null where no file system is available.</summary>
+	internal Func<string, string> ReadDocumentationFile { get; init; }
+
+	/// <summary>IDs of every module with a committed registration, sorted.</summary>
+	internal IReadOnlyList<string> RegisteredModules => _modules.Keys.Order( StringComparer.Ordinal ).ToArray();
+
+	internal ModuleDocumentation DocumentationOf( string moduleId ) =>
+		_documentation.TryGetValue( moduleId, out var documentation ) ? documentation
+			: new ModuleDocumentation( Array.Empty<Core.Documentation.DocumentationPage>(), Array.Empty<PermissionDescriptor>() );
 
 	internal CommandRegistry( IEnumerable<string> reservedPermissions, Action<IEnumerable<string>> publishPermissions, Func<bool> available )
 	{
@@ -28,7 +39,8 @@ internal sealed class CommandRegistry
 	internal IReadOnlyList<CommandDescriptor> Descriptors => Array.AsReadOnly( _commands.Values
 		.Distinct().Select( value => value.Descriptor ).OrderBy( value => value.Name, StringComparer.Ordinal ).ToArray() );
 
-	internal void Replace( string moduleId, Guid token, IReadOnlyList<RegisteredCommand> commands, IReadOnlyList<PermissionDescriptor> permissions, bool managed = false )
+	internal void Replace( string moduleId, Guid token, IReadOnlyList<RegisteredCommand> commands, IReadOnlyList<PermissionDescriptor> permissions,
+		bool managed = false, IReadOnlyList<Core.Documentation.DocumentationPage> pages = null )
 	{
 		EnsureAvailable( moduleId );
 		if ( _managed.Contains( moduleId ) && !managed )
@@ -82,6 +94,10 @@ internal sealed class CommandRegistry
 		_permissions = nextPermissions;
 		_commands = nextCommands;
 		_modules = modules;
+		_documentation = new Dictionary<string, ModuleDocumentation>( _documentation, StringComparer.Ordinal )
+		{
+			[ moduleId ] = new ModuleDocumentation( (pages ?? Array.Empty<Core.Documentation.DocumentationPage>()).ToArray(), permissions.ToArray() )
+		};
 	}
 
 	internal void Remove( string moduleId, Guid token )
@@ -105,6 +121,7 @@ internal sealed class CommandRegistry
 		_permissions = permissions;
 		_commands = commands;
 		_modules.Remove( moduleId );
+		_documentation.Remove( moduleId );
 	}
 
 	private void EnsureAvailable( string moduleId )

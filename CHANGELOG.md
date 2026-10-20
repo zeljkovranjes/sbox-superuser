@@ -1,5 +1,37 @@
 # Changelog
 
+## 2026-10-20
+Title: Prefixes and Module Documentation
+### Added
+# Prefixes
+Prefix module - styled, animated tags in front of player names, for groups (the highest protection wins, owner means every owner) or single players; shipped on by default as the superuser.prefixes module and can be turned off
+Effect scripts - a small language for prefix effects: one color per line or per letter, animation from a shared clock, variables, if/else, lists, palettes and 26 built-in functions, with plain-English errors that suggest fixes
+WaW presets - rain, cycl, cyln/krdr, move, the bouncing dot and plus, and the static RED/GRN/YELW/BLUE/CYAN colors, ported from waw-color-tags with the same timings
+Templates - new effects start from solid color, gradient, rainbow scroll, wipe, scanner, blink or typewriter
+Starter prefixes - a new server shows [OWNER], [ADMIN] and [MOD] straight away; change or delete them like any other prefix
+Prefix commands - prefix list, create, update, delete, export and group/user set and clear, audited and gated by the new admin.prefixes.manage permission (admins by default on new servers)
+Prefixed chat - Superuser draws the chat box with animated prefixes in place of the built-in one, which only shows plain text, in a dark #1A1A1A and #242424 theme; when closed, recent lines sit on the game with a thin text shadow and fade out; turn Prefixed Chat off on the bootstrap to keep the built-in box
+Game API - Superuser.GetPrefix, RenderPrefix (markup for rich labels, plain text for logs), RegisterTagEffect for C# effects, IPrefixChangedEvent and the PrefixLabel panel
+# Interface
+Prefixes window - Server > Prefixes lists every prefix with a live preview and edits its name, tag, template, palette and effects, plus a Groups tab listing every server group with its protection level and a Players tab; the Players window gains a Prefix section
+Chat history and names - Up and Down in the chat box bring back messages you sent, and clicking a name while the chat is open shows that player in the admin menu
+Effect editor - Superuser's own code editor with numbered lines, live coloring, color swatches, error underlines, undo, auto-indent and clipboard, a live preview of the whole line, click-to-insert built-ins, templates, presets and a color picker
+Documentation window - Superuser > Documentation shows every module's overview, guides, commands and permissions; effect code blocks are colored
+# Modules
+Automatic loading - mark a module [AdminModule] and the bootstrap creates, installs and starts it, so adding its file to a game is all it takes; a module that can't load is skipped with a warning and the rest still load
+Greeter example - dev/examples/greeter is a complete third-party module in one file that loads itself, with two commands, a permission and its own documentation page
+Module documentation - modules add pages with AddDocumentation or AddDocumentationFile and set Version, Author and Website on their descriptor; every module's documentation has the same overview, guides, commands and permissions structure
+# Documentation
+Prefixes guide - a new chapter on prefixes, the effect editor and chat, plus an effect script reference and the documentation API in the modules reference
+Documenting your module - a step-by-step guide to giving a module a version, author, guide pages and Markdown files, with the Markdown the menu draws and its limits
+Tutorial - now shows where a module appears in the admin menu: the Commands window form each argument type produces, Documentation, Permissions, and a button in your own UI through the same private request API
+### Improved
+# Modules
+Module registration - RegisterModulesAsync waits for the shipped modules to finish starting instead of refusing the game's modules
+### Fixed
+# Prefixes
+Moving colors - the name no longer shifts by a pixel while an effect like the scanner moves its colors or turns a letter bold
+
 ## 2026-10-18
 Title: Optional Admin Menu and Custom Storage
 ### Added

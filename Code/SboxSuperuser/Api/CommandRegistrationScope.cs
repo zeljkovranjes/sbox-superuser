@@ -16,6 +16,7 @@ public sealed class CommandRegistrationScope : IModuleRegistration, IDisposable
 	private bool _disposed;
 	private readonly bool _managed;
 	private readonly List<IDisposable> _subscriptions = new();
+	private readonly List<Core.Documentation.DocumentationPage> _pages = new();
 	internal Engine.Modules.ModuleExecution Execution { get; }
 
 	/// <summary>Gets the module that owns this registration batch.</summary>
@@ -106,8 +107,28 @@ public sealed class CommandRegistrationScope : IModuleRegistration, IDisposable
 	{
 		EnsureStaging();
 		var capabilities = new CommandCapabilities( _services );
-		_registry.Replace( ModuleId, _token, _commands.Select( command => command with { Capabilities = capabilities, Execution = Execution } ).ToArray(), _permissions, _managed );
+		_registry.Replace( ModuleId, _token, _commands.Select( command => command with { Capabilities = capabilities, Execution = Execution } ).ToArray(),
+			_permissions, _managed, _pages );
 		_committed = true;
+	}
+
+	/// <summary>Adds a Markdown documentation page; pages keep the order they were added.</summary>
+	public void AddDocumentation( string title, string markdown )
+	{
+		EnsureStaging();
+		if ( _pages.Count >= Core.Documentation.DocumentationPage.MaximumPages )
+			throw new ArgumentException( $"A module supports at most {Core.Documentation.DocumentationPage.MaximumPages} documentation pages." );
+		_pages.Add( Core.Documentation.DocumentationPage.Create( title, markdown ) );
+	}
+
+	/// <summary>Adds a documentation page from a Markdown file in the mounted file system.</summary>
+	public void AddDocumentationFile( string title, string path )
+	{
+		EnsureStaging();
+		if ( string.IsNullOrWhiteSpace( path ) || path.Contains( ".." ) || !path.EndsWith( ".md", StringComparison.OrdinalIgnoreCase ) )
+			throw new ArgumentException( "Use a relative path to a .md file, such as \"docs/guide.md\".", nameof( path ) );
+		var read = _registry.ReadDocumentationFile ?? throw new NotSupportedException( "Documentation files can only be read inside the engine." );
+		AddDocumentation( title, read( path ) );
 	}
 
 	/// <summary>Approves one exact game capability type for this module's handlers; no fallback service is constructed.</summary>

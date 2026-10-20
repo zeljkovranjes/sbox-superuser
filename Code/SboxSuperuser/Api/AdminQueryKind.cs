@@ -20,5 +20,7 @@ public enum AdminQueryKind
 	/// <summary>Read audit records filtered by command (search), actor and outcome, 20 per page.</summary>
 	ActivitySearch,
 	/// <summary>Read the last 100 public chat lines kept in memory; search filters by an exact Steam ID.</summary>
-	Chat
+	Chat,
+	/// <summary>List documented modules (empty search), or read one page: search is the module ID, page its index.</summary>
+	Documentation
 }

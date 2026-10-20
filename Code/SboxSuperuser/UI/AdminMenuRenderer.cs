@@ -66,6 +66,7 @@ internal sealed partial class AdminMenuRenderer : IDisposable
 
 		Model.Cancel();
 		_pendingRun = null;
+		_effectEdit?.Editor.SetFocused( false );
 		ReleaseInput();
 		Interactive = false;
 	}
@@ -87,6 +88,11 @@ internal sealed partial class AdminMenuRenderer : IDisposable
 	// Esc backs out of a pending confirmation before it closes the whole menu.
 	private void HandleEscape()
 	{
+		if ( _effectEdit?.Editor.Focused == true )
+		{
+			_effectEdit.Editor.SetFocused( false );
+			return;
+		}
 		if ( Model.Confirmation is not null ) Model.Cancel();
 		else if ( _pendingRun is not null ) _pendingRun = null;
 		else CloseRequested = true;
@@ -95,6 +101,7 @@ internal sealed partial class AdminMenuRenderer : IDisposable
 	/// <summary>Routes a host reply to the model that asked for it.</summary>
 	internal void Receive( AdminReply reply )
 	{
+		if ( PrefixEditor.Receive( reply ) ) return;
 		if ( !Server.Receive( reply ) )
 		{
 			Model.Receive( reply );
@@ -133,7 +140,10 @@ internal sealed partial class AdminMenuRenderer : IDisposable
 			DrawCommandsWindow();
 			DrawActivityWindow();
 			DrawPermissionsWindow();
+			DrawPrefixesWindow();
+			DrawDocumentationWindow();
 			DrawAboutWindow();
+			DrawEffectEditor();
 			DrawNotices();
 			if ( Interactive )
 			{

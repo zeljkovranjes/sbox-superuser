@@ -50,6 +50,7 @@ internal sealed partial class AdminMenuRenderer
 		if ( ImGui.CollapsingHeader( "Actions", ImGuiTreeNodeFlags.DefaultOpen ) ) DrawActions( details );
 
 		if ( Server.Can( NoteCommand ) && ImGui.CollapsingHeader( "Add a note" ) ) DrawNoteInput();
+		if ( Server.Can( "prefix.user.set" ) && ImGui.CollapsingHeader( "Prefix" ) ) DrawPlayerPrefix();
 		if ( ImGui.CollapsingHeader( "Recent chat" ) ) DrawPlayerChat();
 
 		var historyLabel = details.HistoryAllowed ? $"History ({details.History.Length})###history" : "History###history";

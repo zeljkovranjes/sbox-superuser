@@ -36,6 +36,7 @@ internal sealed partial class AdministrationCommands : IDisposable
 		RegisterAccess();
 		RegisterModules();
 		if ( _moderation is not null ) RegisterModeration();
+		RegisterDocumentation();
 		_scope.Commit();
 	}
 

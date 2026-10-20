@@ -15,6 +15,7 @@ internal sealed partial class ModuleManager : IModuleCatalog, IDisposable
 	private readonly TimeSpan _deadline;
 	private IReadOnlyList<string> _order = Array.Empty<string>();
 	private bool _busy;
+	private TaskCompletionSource _idle;
 	private bool _disposed;
 
 	internal ModuleManager( CommandRegistry registry, HostPolicyService policy, Func<bool> available, Action<Exception> report,
@@ -81,6 +82,12 @@ internal sealed partial class ModuleManager : IModuleCatalog, IDisposable
 
 	internal Task<CommandResult> StartAllAsync( CancellationToken cancellation ) => ChangeAsync( () => true, null, true, cancellation );
 
+	/// <summary>Whether a start, stop or enable is running; Install refuses to run until it ends.</summary>
+	internal bool IsBusy => _busy;
+
+	/// <summary>Completes when the running lifecycle operation ends.</summary>
+	internal Task Idle => _busy ? _idle.Task : Task.CompletedTask;
+
 	internal Task<CommandResult> SetEnabledAsync( Func<ActorIdentity> authenticate, string id, bool enabled, CancellationToken cancellation )
 		=> ChangeAsync( () => CanManage( authenticate() ), id, enabled, cancellation );
 
@@ -106,6 +113,7 @@ internal sealed partial class ModuleManager : IModuleCatalog, IDisposable
 			return Result( CommandStatus.NotFound, "Module is not installed." );
 		}
 		_busy = true;
+		_idle = new TaskCompletionSource();
 		try
 		{
 			if ( !enabled )
@@ -126,6 +134,7 @@ internal sealed partial class ModuleManager : IModuleCatalog, IDisposable
 		finally
 		{
 			_busy = false;
+			_idle.TrySetResult();
 		}
 	}
 

@@ -7,8 +7,12 @@ namespace SuperuserExamples.Engine;
 /// <summary>A minimal command module for the getting-started guide.</summary>
 public sealed class PingModule : IAdminModule
 {
-	/// <summary>Declares the module's name and supported API version.</summary>
-	public ModuleDescriptor Descriptor { get; } = new( "example.ping", "A ping command", 1 );
+	/// <summary>Declares the module's name, supported API version and who made it.</summary>
+	public ModuleDescriptor Descriptor { get; } = new( "example.ping", "A ping command", 1 )
+	{
+		Version = "1.0.0",
+		Author = "Your name"
+	};
 
 	/// <summary>Registers the permission and attributed command.</summary>
 	public Task StartAsync( IModuleRegistration registration, CancellationToken cancellation )
@@ -16,6 +20,16 @@ public sealed class PingModule : IAdminModule
 		cancellation.ThrowIfCancellationRequested();
 		registration.RegisterPermission( new PermissionDescriptor( "example.ping", "Use ping" ) );
 		registration.DiscoverCommands();
+		registration.AddDocumentation( "Using ping", """
+			# Using ping
+
+			`ping` replies **Pong!** to whoever runs it. It is the smallest useful command,
+			so use it to check that commands reach the server.
+
+			```text
+			admin ping
+			```
+			""" );
 		return Task.CompletedTask;
 	}
 

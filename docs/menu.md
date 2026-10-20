@@ -31,6 +31,9 @@ grants no permissions.
 - ***[Permissions](menu/permissions.md)*** &mdash; owners editing groups,
   members and permission entries.
 
+- ***[Prefixes and documentation](menu/prefixes.md)*** &mdash; editing prefixes
+  and their effects, and reading every module's documentation.
+
 - ***[Replacing the menu](menu/replace.md)*** &mdash; building your own interface
   on the same private API.
 
@@ -48,6 +51,8 @@ grants no permissions.
 | Own recent activity only | `admin.results.own` |
 | Commands | Each command's own permission |
 | Permissions, installed modules, server status | Owners |
+| Prefixes, the effect editor, a player's Prefix section | `admin.prefixes.manage` |
+| Documentation | Superuser's own pages for everyone; a module's pages for owners and anyone who can run one of its commands |
 
 Replies go privately to the requesting connection. History pages hold 20
 records. Kick history is an intent; use the correlated activity outcome to

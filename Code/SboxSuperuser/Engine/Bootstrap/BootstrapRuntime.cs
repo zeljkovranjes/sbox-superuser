@@ -26,6 +26,9 @@ internal sealed partial class BootstrapRuntime : IDisposable
 	internal Admin.HostAdminQueries AdminQueries { get; }
 	internal Admin.AdminRequestGate AdminRequests { get; } = new();
 
+	/// <summary>The shipped Prefix module, or null when the bootstrap's Prefixes option is off.</summary>
+	internal Prefixes.PrefixModule Prefixes { get; }
+
 	/// <summary>Recent public chat for moderators; memory only, cleared when this runtime stops.</summary>
 	internal Core.Chat.RecentChat RecentChat { get; } = new();
 
@@ -65,7 +68,7 @@ internal sealed partial class BootstrapRuntime : IDisposable
 		&& (Application.IsDedicatedServer || (Game.IsEditor && _allowEditorTesting));
 
 	internal BootstrapRuntime( Scene scene, bool allowEditorTesting, string commandRoot = "admin",
-		Func<AdminStorageContext, IAdminStorageBackend> storageFactory = null )
+		Func<AdminStorageContext, IAdminStorageBackend> storageFactory = null, BootstrapModules modules = null )
 	{
 		_scene = scene;
 		_host = Connection.Host;
@@ -99,7 +102,7 @@ internal sealed partial class BootstrapRuntime : IDisposable
 			error => Log.Warning( $"[Superuser] Authority validation failed; type={error.GetType().Name}; files preserved." ), Audit );
 		Store.StorageChanged += Policy.OnStorageChanged;
 		Commands = new Commands.CommandRegistry( Policy.RegisteredPermissions, Policy.ReplaceRegisteredPermissions,
-			() => ThreadSafe.IsMainThread && IsUsable );
+			() => ThreadSafe.IsMainThread && IsUsable ) { ReadDocumentationFile = FileSystem.Mounted.ReadAllText };
 		Dispatcher = new Commands.HostCommandDispatcher( Policy, Commands, () => ThreadSafe.IsMainThread && IsUsable,
 			OnlinePlayers, error => Log.Warning( $"[Superuser] Command execution failed; type={error.GetType().Name}; outcome may be Unknown." ), audit: Audit );
 		ConsoleRoot = new Core.Commands.ConsoleRootState( commandRoot, TypeLibrary.GetMemberAttributes<ConVarAttribute>().Select( attribute => attribute.Name ) );
@@ -109,14 +112,46 @@ internal sealed partial class BootstrapRuntime : IDisposable
 		Moderation = new Moderation.HostModerationService( Store, ModerationAvailable, Dispatcher.CanUse, CanModerateTarget, ReportModerationFailure );
 		Store.StorageChanged += Moderation.OnStorageChanged;
 		AdminQueries = new Admin.HostAdminQueries( Policy, Moderation, Audit, OnlinePlayers, () => Modules.Statuses,
-			() => Commands.Descriptors, () => ConsoleDiagnostics().Data, RecentChat );
+			() => Commands.Descriptors, () => ConsoleDiagnostics().Data, RecentChat, Commands );
 		Administration = new Commands.AdministrationCommands( Policy, Audit, Commands, Dispatcher, ConsoleDiagnostics, Modules,
 			Moderation, DisconnectModeratedAsync, NotifyModerationWarning );
 		Chat = new ChatIntegration.Platform.PlatformChatAdapter( this );
+		modules ??= new BootstrapModules( true, true, "" );
+		if ( modules.Prefixes )
+		{
+			Prefixes = new Prefixes.PrefixModule( new Prefixes.PrefixHost( Store,
+				() => OnlinePlayers()?.Select( player => player.SteamId ).ToArray() ?? Array.Empty<string>(),
+				PrefixGroups, PrefixAllGroups, PrefixScriptProblem, key => Policy.RegisteredPermissions.Contains( key ), modules.PrefixedChat, modules.PrefixGuide ) );
+		}
 		if ( !ConsoleRoot.IsAvailable )
 		{
 			Log.Warning( $"[Superuser] {ConsoleRoot.Message}" );
 		}
+	}
+
+	// Owners count as the "owner" group, above every real group, so a prefix can be given to all of them.
+	private IReadOnlyList<Core.Prefixes.GroupRank> PrefixGroups( string steamId )
+	{
+		var ranks = new List<Core.Prefixes.GroupRank>();
+		if ( Policy.IsOwner( steamId ) ) ranks.Add( new( Engine.Prefixes.PrefixModule.OwnerGroup, Core.Permissions.TargetProtection.OwnerLevel ) );
+		var policy = Policy.CurrentPolicy;
+		if ( policy is null ) return ranks;
+		foreach ( var id in policy.ApplicableGroups( steamId ) ) ranks.Add( new( id, policy.Groups[ id ].ProtectionLevel ) );
+		return ranks;
+	}
+
+	private IReadOnlyList<Core.Prefixes.GroupRank> PrefixAllGroups()
+	{
+		var owner = new Core.Prefixes.GroupRank( Engine.Prefixes.PrefixModule.OwnerGroup, Core.Permissions.TargetProtection.OwnerLevel );
+		var groups = Policy.CurrentPolicy?.Groups.Values.Select( group => new Core.Prefixes.GroupRank( group.Id, group.ProtectionLevel ) )
+			?? Enumerable.Empty<Core.Prefixes.GroupRank>();
+		return groups.Prepend( owner ).ToArray();
+	}
+
+	private static string PrefixScriptProblem( string source )
+	{
+		var compiled = Core.Effects.EffectCompiler.Compile( source );
+		return compiled.Diagnostics.FirstOrDefault()?.Describe( source );
 	}
 
 	private CommandResult ConsoleDiagnostics() => new( CommandStatus.Success, "Host administration health.", new Dictionary<string, string>

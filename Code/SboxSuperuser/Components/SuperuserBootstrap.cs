@@ -17,6 +17,14 @@ public sealed partial class SuperuserBootstrap : Component
 	[Property, Group( "Commands" )]
 	public string CommandRoot { get; set; } = "admin";
 
+	/// <summary>Installs the shipped Prefix module; re-enable to apply.</summary>
+	[Property, Group( "Prefixes" )]
+	public bool Prefixes { get; set; } = true;
+
+	/// <summary>Replaces the built-in chat box with Superuser's, which shows prefixes; re-enable to apply.</summary>
+	[Property, Group( "Prefixes" )]
+	public bool PrefixedChat { get; set; } = true;
+
 	protected override void OnEnabled() => Attach();
 
 	protected override void OnStart() => Attach();
@@ -24,7 +32,7 @@ public sealed partial class SuperuserBootstrap : Component
 	private void Attach()
 	{
 		_session = Scene.GetSystem<SuperuserSession>();
-		_session?.Attach( Id, AllowEditorTesting, CommandRoot );
+		_session?.Attach( Id, AllowEditorTesting, CommandRoot, Prefixes, PrefixedChat );
 	}
 
 	protected override void OnDisabled()

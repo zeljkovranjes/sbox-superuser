@@ -67,6 +67,12 @@ permission does not grant it to anyone.
 
 ## Registering it
 
+The quickest way is to mark the class with `[AdminModule]`: the bootstrap then
+creates and starts it by itself, and there is nothing else to write. The
+[greeter example](../dev/examples/greeter/README.md) works that way. The steps
+below register the module yourself instead, which you need when a module takes
+constructor arguments.
+
 For a runnable starter, copy [PingSetup.cs](../dev/fixtures/PingSetup.cs) into
 your Components layer, update its namespaces, and add one **Ping Setup** to the
 bootstrap scene. It waits for the bootstrap and installs the module.
@@ -96,8 +102,87 @@ admin user <steamid> permission allow example.ping
 
 `deny` refuses it explicitly; `unset` removes the entry so groups decide again.
 
+## Seeing it in the admin menu
+
+Add one **Superuser Admin Menu** to a GameObject that exists on every client and
+press **F6**. Your module is already in the menu; nothing extra is registered for
+it.
+
+### In the Commands window
+
+**Server › Commands** lists every command the viewer may run, yours included.
+Pick `ping` and press **Run**: the reply pops up in the corner and the attempt is
+recorded in **Activity**, exactly as if it was typed in the console.
+
+Commands with arguments get a form built from the method's parameters, so the
+types you choose decide what admins see:
+
+| Parameter type | Field in the form |
+|---|---|
+| `string` | A text box (a wide one for the last, remainder argument) |
+| `int`, `long`, `float`, `double` | A number box; the host enforces `Minimum` and `Maximum` |
+| `bool` | A checkbox |
+| an `enum` | A dropdown of its values |
+| `PlayerReference` | A Steam ID box with a picker of online players |
+| `CommandDuration` | A duration box with presets such as 30m, 2h and 7d |
+
+`[AdminArgument]` sets the label and limits. From the
+[dog example](../dev/fixtures/DogCommands.cs), this gives a player picker and a
+number box from 1 to 5:
+
+```csharp
+[AdminCommand( Name = "dog.spawn", Description = "Spawn a dog for a player", Permission = "dog.spawn", ModuleId = "sample.dogs", Aliases = new[] { "dog" } )]
+[AdminArgument( "target", Description = "Online recipient", TargetPolicy = CommandTargetPolicy.OnlinePlayer )]
+[AdminArgument( "count", Description = "Number of dogs", Minimum = 1, Maximum = 5 )]
+public static CommandResult Spawn( CommandContext context, PlayerReference target, int count = 1 )
+```
+
+Commands that change something (the default `ExecutionPolicy`) ask the admin to
+confirm before they run; `ReadOnly` commands like `ping` run straight away.
+
+### In Documentation and Permissions
+
+**Superuser › Documentation** shows your module with its commands and
+permission, generated from what you registered. Give it a version, an author and
+guide pages with ***[Documenting your module](documenting.md)***.
+
+Owners can grant `example.ping` from **Server › Permissions** instead of typing
+the command: pick a group or a player and allow the key, which is listed there as
+soon as your module registers it.
+
+### Your own button or window
+
+The Superuser menu does not host other modules' windows yet. To put a button in
+your own UI, use the same private request API the menu itself uses: it goes
+through the same permission check, audit and private reply as the console. The
+[replacement example](../dev/fixtures/ReplacementAdminExample.cs) is a complete,
+compiled version of this pattern.
+
+```csharp
+public sealed class PingButton : Component, IAdminResultEvent
+{
+	private Guid _request;
+
+	/// <summary>Call this from your button.</summary>
+	public void Press() => _request = Superuser.RequestAdminCommand( new AdminCommandRequest( "ping" ) );
+
+	/// <summary>Only the reply to this button's request is handled here.</summary>
+	public void OnAdminResult( AdminReply reply )
+	{
+		if ( reply.RequestId != _request ) return;
+		Log.Info( $"{reply.Status}: {reply.Message}" );
+	}
+}
+```
+
+Put it on a GameObject in the client scene, call `Press()` from a Razor button,
+and show `reply.Message` wherever your UI wants it. Arguments go in the second
+parameter of `AdminCommandRequest`, in the order the command declares them.
+
 ## Where to go from here
 
+- A complete module that loads itself: the
+  [greeter example](../dev/examples/greeter/README.md).
 - Arguments, services and results: ***[Commands](reference/commands.md)***.
 - Gameplay effects without coupling the library to your classes: the
   [arena and colony samples](../dev/samples/README.md).

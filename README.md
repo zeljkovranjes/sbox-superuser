@@ -84,6 +84,15 @@ in the chatbox or `admin ping` in the console.
 - **Storage** is versioned and recoverable, local by default, replaceable with
   your own backend. [Reference](docs/reference/storage.md).
 
+- **Prefixes** put a styled, animated tag in front of names, for groups or single
+  players, in the chat box and anywhere your UI asks. Effects are short scripts
+  written and previewed in the menu, with World at War presets. On by default.
+  [Guide](docs/prefixes.md).
+
+- **Module documentation** gives every module the same in-game pages: overview,
+  its own guides, generated commands and permissions.
+  [Reference](docs/reference/modules.md).
+
 - **The `Superuser` facade** is the whole public API: dispatch commands, check
   permissions, register modules, select storage and request private admin
   views. [Reference](docs/reference/facade.md).
@@ -103,6 +112,8 @@ own interface; console and chat keep working.
 <tr><td>Commands</td><td>Any permitted command, including your game's own, from a generated form</td></tr>
 <tr><td>Activity</td><td>The audit log, filtered by command, actor and outcome</td></tr>
 <tr><td>Permissions</td><td>Owners edit groups, members and permission entries</td></tr>
+<tr><td>Prefixes</td><td>Create, style and assign prefixes; write effects in the built-in code editor</td></tr>
+<tr><td>Documentation</td><td>Every module's guides, commands and permissions</td></tr>
 </table>
 
 Windows can be pinned to stay on screen while you play; layout and pins survive a

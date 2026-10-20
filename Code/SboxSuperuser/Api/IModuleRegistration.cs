@@ -20,4 +20,13 @@ public interface IModuleRegistration
 
 	/// <summary>Stages attributed commands through the verified engine discovery adapter.</summary>
 	void DiscoverCommands();
+
+	/// <summary>
+	/// Adds a documentation page written in Markdown. Pages appear under the module's Guides in the order added,
+	/// after its generated Overview and before its generated Commands and Permissions.
+	/// </summary>
+	void AddDocumentation( string title, string markdown );
+
+	/// <summary>Adds a documentation page from a Markdown file in the mounted file system, such as "docs/guide.md".</summary>
+	void AddDocumentationFile( string title, string path );
 }

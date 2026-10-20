@@ -62,6 +62,22 @@ restart. Repeated revocation returns NoChange when nothing is active. Warnings
 do not escalate automatically. Text mute covers integrated chat, not voice or
 unrelated channels.
 
+## Prefixes
+
+Reading needs nothing; changing needs `admin.prefixes.manage`.
+
+| Command | Purpose |
+|---|---|
+| `admin prefix list [page]` | Every prefix with its tag and effects |
+| `admin prefix create <id> [tag]` | A new prefix |
+| `admin prefix update <id> <field> <value>` | `name`, `tag`, `template`, `palette`, `tag-effect` or `name-effect` |
+| `admin prefix delete <id>` | Delete it and its assignments |
+| `admin prefix group set/clear <group> [id]` | A group's prefix; `owner` means every owner |
+| `admin prefix user set/clear <user> [id]` | A player's own prefix |
+| `admin prefix export` | The catalog as JSON |
+
+See ***[Prefixes](prefixes.md)*** for effects and examples.
+
 ## Settings
 
 After the game registers [native bindings](reference/settings.md), use `admin

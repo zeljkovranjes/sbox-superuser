@@ -18,7 +18,8 @@ public sealed partial class PolicySnapshot
 			new GroupPolicy( "admin", new[] { "moderator" }, new[]
 			{
 				Allow( "admin.players.ban" ), Allow( "admin.players.unban" ), Allow( "admin.players.history" ),
-				Allow( "admin.settings.get" ), Allow( "admin.settings.set" ), Allow( "admin.settings.reset" )
+				Allow( "admin.settings.get" ), Allow( "admin.settings.set" ), Allow( "admin.settings.reset" ),
+				Allow( "admin.prefixes.manage" )
 			}, 50 )
 		} );
 	}

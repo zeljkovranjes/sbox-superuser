@@ -29,10 +29,22 @@ too. See [replacing the menu](../menu/replace.md).
 
 | API | Use |
 |---|---|
-| `RequestAdminQuery( query )` | A private view: players, a player, activity, restrictions, chat, commands, permissions, about |
+| `RequestAdminQuery( query )` | A private view: players, a player, activity, restrictions, chat, commands, permissions, about, documentation |
 | `RequestAdminAction( request )` | An exact-target moderation action |
 | `RequestAdminCommand( request )` | Any registered command the caller may run |
 | `IAdminResultEvent` | Receives correlated private replies |
+
+## Every machine
+
+| API | Use |
+|---|---|
+| `Version`, `Author` | Which Superuser build is running |
+| `GetPrefix( steamId )` | The player's prefix as plain data, or null |
+| `RenderPrefix( steamId, name, time )` | The styled line for a frame: `ToMarkup()` for a rich Label, `ToPlain()` for text |
+| `RegisterTagEffect( effect )` | Add a C# prefix effect; call it on every machine |
+| `IPrefixChangedEvent` | Hear when a player's prefix changes |
+
+See ***[Prefixes](../prefixes.md)***.
 
 ## Keep these away from players
 

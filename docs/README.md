@@ -50,6 +50,9 @@ empty scene to a working command.
 - ***[Tutorial](tutorial.md)***: install the library, configure an owner,
   add your first command.
 
+- ***[Documenting your module](documenting.md)***: give your module
+  in-game pages with a version, author and guides.
+
 - ***[Where Superuser fits](context.md)***: what it is designed for, and
   what it deliberately leaves out.
 
@@ -59,11 +62,15 @@ empty scene to a working command.
     - [On a dedicated server](running/dedicated.md)
     - [When something fails](running/troubleshooting.md)
 
+- ***[Prefixes](prefixes.md)***: styled, animated name tags for groups and
+  players, the effect editor, and the prefixed chat box.
+
 - ***[Reference: the host API](reference.md)***: what your game's code
   calls.
     - [The Superuser facade](reference/facade.md)
     - [Commands](reference/commands.md)
     - [Modules](reference/modules.md)
+    - [Effect scripts](reference/effects.md)
     - [Permissions](reference/permissions.md)
     - [Chat](reference/chat.md)
     - [Native settings](reference/settings.md)
@@ -82,6 +89,7 @@ empty scene to a working command.
     - [Commands](menu/commands.md)
     - [Activity](menu/activity.md)
     - [Permissions](menu/permissions.md)
+    - [Prefixes and documentation](menu/prefixes.md)
     - [Replacing the menu](menu/replace.md)
 
 - ***[Verification](validation.md)***: how the library was tested and
@@ -90,5 +98,7 @@ empty scene to a working command.
 - ***[Release status](release.md)***: what this source candidate is, and
   what is not yet certified.
 
-The [game samples](../dev/samples/README.md) show two complete integrations, and
+The [greeter example](../dev/examples/greeter/README.md) is a complete module in
+one file, the [game samples](../dev/samples/README.md) show two complete
+integrations, and
 the [changelog](../CHANGELOG.md) lists every change.

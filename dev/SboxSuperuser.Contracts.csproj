@@ -11,7 +11,9 @@
     <Compile Include="../Code/SboxSuperuser/Assembly.cs" />
     <Compile Include="../Code/SboxSuperuser/Core/**/*.cs" />
     <!-- The scene-event contract is checked against the actual engine, without a Sandbox mock. -->
-    <Compile Include="../Code/SboxSuperuser/Api/**/*.cs" Exclude="../Code/SboxSuperuser/Api/IAdminChatResultEvent.cs;../Code/SboxSuperuser/Api/IAdminResultEvent.cs" />
+    <Compile Include="../Code/SboxSuperuser/Api/**/*.cs" Exclude="../Code/SboxSuperuser/Api/IAdminChatResultEvent.cs;../Code/SboxSuperuser/Api/IAdminResultEvent.cs;../Code/SboxSuperuser/Api/IPrefixChangedEvent.cs;../Code/SboxSuperuser/Api/ITagEffect.cs;../Code/SboxSuperuser/Api/TagLetter.cs;../Code/SboxSuperuser/Api/TagLetterStyle.cs;../Code/SboxSuperuser/Api/StyledLine.cs;../Code/SboxSuperuser/Api/StyledRun.cs" />
+    <Compile Include="examples/**/*.cs" />
+    <Compile Include="../Code/SboxSuperuser/Engine/Prefixes/PrefixModule*.cs;../Code/SboxSuperuser/Engine/Prefixes/PrefixHost.cs;../Code/SboxSuperuser/Engine/Admin/PrefixEditorModel.cs" />
     <Compile Include="../Code/SboxSuperuser/Engine/Admin/HostAdminQueries*.cs" />
     <Compile Include="../Code/SboxSuperuser/Engine/Admin/AdminRequestGate.cs" />
     <Compile Include="../Code/SboxSuperuser/Engine/Admin/AdminMenuModel.cs" />

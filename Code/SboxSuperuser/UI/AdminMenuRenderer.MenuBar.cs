@@ -16,6 +16,7 @@ internal sealed partial class AdminMenuRenderer
 		{
 			if ( ImGui.MenuItem( "Refresh" ) ) Model.Refresh();
 			ImGui.SetItemTooltip( "{0}", "Views also refresh every 5 seconds." );
+			WindowItem( "Documentation", DocumentationWindow );
 			WindowItem( "About Superuser", AboutWindow );
 			ImGui.Separator();
 			if ( ImGui.MenuItem( "Close", "Esc" ) ) CloseRequested = true;
@@ -36,6 +37,7 @@ internal sealed partial class AdminMenuRenderer
 			WindowItem( "Commands", CommandsWindow );
 			WindowItem( "Activity", ActivityWindow );
 			if ( CanEditPermissions ) WindowItem( "Permissions", PermissionsWindow );
+			if ( Server.Can( PrefixExportCommand ) ) WindowItem( "Prefixes", PrefixesWindow );
 			ImGui.EndMenu();
 		}
 

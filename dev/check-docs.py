@@ -7,6 +7,7 @@ root = pathlib.Path(__file__).resolve().parent.parent
 files = [root / "README.md", root / "CHANGELOG.md"]
 files += list((root / "docs").rglob("*.md"))
 files += list((root / "dev" / "fixtures").glob("*.md"))
+files += list((root / "dev" / "examples").rglob("*.md"))
 files += list((root / "dev" / "samples").rglob("*.md"))
 files += list((root / "dev" / "ui-source").rglob("*.md"))
 errors = []
@@ -27,9 +28,13 @@ for path in files:
 
 normalize = lambda text: re.sub(r"\s+", "", text)
 ping = (root / "dev/fixtures/PingModule.cs").read_text(encoding="utf-8-sig")
-for path in ("README.md", "docs/README.md", "docs/tutorial.md"):
+for path in ("README.md", "docs/README.md", "docs/tutorial.md", "docs/documenting.md"):
     if normalize(blocks[path][0]) not in normalize(ping):
         errors.append(f"Ping excerpt differs from compiled source: {path}")
+greeter = (root / "dev/examples/greeter/GreeterModule.cs").read_text(encoding="utf-8-sig")
+for path in ("dev/examples/greeter/README.md", "docs/reference/modules.md"):
+    if not any(normalize(block) in normalize(greeter) for block in blocks[path]):
+        errors.append(f"Greeter excerpt differs from its source: {path}")
 
 methods = [
     ("async Task RegisterAsync()", blocks["docs/tutorial.md"][1]),
@@ -42,6 +47,7 @@ methods = [
     ("void SubmitBan()", blocks["docs/menu/replace.md"][1]),
     ("void SubmitNote()", blocks["docs/menu/replace.md"][2]),
     ("void ConfigureStorage()", blocks["docs/reference/storage.md"][0]),
+    ("void ShowPrefix( string steamId, string name, Sandbox.UI.Label label )", blocks["docs/prefixes.md"][0]),
 ]
 source = "using Sandbox;\nusing SboxSuperuser;\n\nnamespace SuperuserExamples.Engine;\n\n"
 source += "/// <summary>Compiles the exact Markdown snippets for engine verification.</summary>\n"

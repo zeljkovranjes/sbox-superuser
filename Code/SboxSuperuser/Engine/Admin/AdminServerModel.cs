@@ -19,11 +19,15 @@ internal sealed class AdminServerModel
 	private Guid _runRequest;
 	private DateTimeOffset _restrictionsAfter;
 	private bool _permissionsStale = true;
+	private Guid _documentationRequest;
+	private readonly Dictionary<Guid, (string Module, int Page)> _pageRequests = new();
+	private readonly Dictionary<(string Module, int Page), AdminReply> _pages = new();
 
 	internal AdminReply Commands { get; private set; }
 	internal AdminReply Restrictions { get; private set; }
 	internal AdminReply Permissions { get; private set; }
 	internal AdminReply Chat { get; private set; }
+	internal AdminReply Documentation { get; private set; }
 
 	/// <summary>Reply to the last command run from the menu, and which command it was.</summary>
 	internal AdminReply LastResult { get; private set; }
@@ -62,6 +66,29 @@ internal sealed class AdminServerModel
 		if ( _chatRequest != Guid.Empty || now < _chatAfter ) return;
 		_chatAfter = now + ChatInterval;
 		Try( () => _chatRequest = _query( new AdminQuery( AdminQueryKind.Chat ) ) );
+	}
+
+	/// <summary>Loads the documented-module list once; Refresh reloads it with every page.</summary>
+	internal void RequestDocumentation()
+	{
+		if ( Documentation is not null || _documentationRequest != Guid.Empty ) return;
+		Try( () => _documentationRequest = _query( new AdminQuery( AdminQueryKind.Documentation ) ) );
+	}
+
+	internal void RefreshDocumentation()
+	{
+		Documentation = null;
+		_pages.Clear();
+		RequestDocumentation();
+	}
+
+	/// <summary>Returns a cached documentation page, asking the host for it the first time; null while it loads.</summary>
+	internal AdminReply DocumentationPage( string module, int page )
+	{
+		if ( _pages.TryGetValue( (module, page), out var reply ) ) return reply;
+		if ( !_pageRequests.ContainsValue( (module, page) ) )
+			Try( () => _pageRequests[ _query( new AdminQuery( AdminQueryKind.Documentation, module, page ) ) ] = (module, page) );
+		return null;
 	}
 
 	/// <summary>Reloads the policy when it is first shown and after every command that may have changed it.</summary>
@@ -104,6 +131,15 @@ internal sealed class AdminServerModel
 		{
 			_chatRequest = Guid.Empty;
 			Chat = reply;
+		}
+		else if ( reply.RequestId == _documentationRequest )
+		{
+			_documentationRequest = Guid.Empty;
+			Documentation = reply;
+		}
+		else if ( _pageRequests.Remove( reply.RequestId, out var page ) )
+		{
+			_pages[ page ] = reply;
 		}
 		else if ( reply.RequestId == _runRequest )
 		{

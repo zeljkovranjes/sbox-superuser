@@ -49,6 +49,18 @@ internal sealed class AdminMenuSystem : GameObjectSystem<AdminMenuSystem>
 		_view.SetInteractive( true );
 	}
 
+	/// <summary>Whether the menu can open now: its component is in the scene and a game session is running.</summary>
+	internal bool IsAvailable => CanShow;
+
+	/// <summary>Opens the menu on the Players window with this player selected; the host still decides what they may see.</summary>
+	internal void ShowPlayer( string steamId )
+	{
+		if ( !CanShow ) return;
+		EnsureView();
+		_view.SetInteractive( true );
+		_view.ShowPlayer( steamId );
+	}
+
 	private bool CanShow => _key is not null && Game.IsPlaying && Networking.IsActive && !Application.IsDedicatedServer;
 
 	private void EnsureView()

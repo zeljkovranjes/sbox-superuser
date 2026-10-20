@@ -12,6 +12,8 @@ internal sealed partial class AdminMenuRenderer
 	private const string CommandsWindow = "commands";
 	private const string PermissionsWindow = "permissions";
 	private const string ChatWindow = "chat";
+	private const string DocumentationWindow = "documentation";
+	private const string PrefixesWindow = "prefixes";
 
 	private const ImGuiWindowFlags PassiveFlags = ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoBringToFrontOnFocus;
 

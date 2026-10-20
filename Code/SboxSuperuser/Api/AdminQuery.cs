@@ -33,6 +33,7 @@ public sealed class AdminQuery
 		}
 		if ( kind == AdminQueryKind.Player ) SteamIdentity.Validate( search, nameof( search ) );
 		if ( kind == AdminQueryKind.ActivitySearch && search.Length != 0 ) ContractGuard.Key( search, nameof( search ) );
+		if ( kind == AdminQueryKind.Documentation && search.Length != 0 ) ContractGuard.Key( search, nameof( search ) );
 		if ( kind == AdminQueryKind.Chat )
 		{
 			if ( page != 0 ) throw new ArgumentException( "Chat accepts no page." );
