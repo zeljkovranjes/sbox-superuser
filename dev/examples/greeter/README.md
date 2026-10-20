@@ -12,15 +12,29 @@ documentation, and loads itself.
 
 ## Using it
 
-1. Copy `GreeterModule.cs` anywhere in your game's `Code` folder, and change its
-   namespace to yours if you like.
-2. Enter Play. The bootstrap finds the module and starts it; there is nothing to
-   register.
+1. Drag the `greeter` folder into your game's `Code/Superuser/Modules` folder
+   (create it the first time). Every drop-in module goes there, one folder each:
+
+   ```text
+   MyGame/
+     Code/
+       Superuser/
+         Modules/
+           greeter/
+             GreeterModule.cs
+   ```
+
+2. Enter Play, or restart it if it is running. The bootstrap finds the module
+   and starts it; there is nothing to register.
 3. As the owner, run `admin hello`. To let everyone use the greeter:
 
    ```text
    admin group player permission allow example.greeter.use
    ```
+
+Keep the module's own namespace, or use your game's. Don't start it with
+`Superuser`: a namespace by that name hides the `Superuser` class, and calls like
+`Superuser.GetPrefix( ... )` stop compiling.
 
 ## What to look at
 
@@ -43,6 +57,10 @@ handler, so no attributes are needed on the handler methods. The `roll`
 argument is an `Integer` between 2 and 1000; the host checks the range before the
 handler runs, and the admin menu turns it into a number field.
 
+**It has a window.** `AddMenuWindow` adds **Modules › Greeter** to the admin
+menu, with a "Say hello" button and the `roll` form. The
+[reports example](../reports/README.md) builds a bigger one.
+
 **It documents itself.** `AddDocumentation` adds a "Using the greeter" page next
 to the generated Commands and Permissions pages. See
 [Documenting your module](../../../docs/documenting.md).
@@ -53,6 +71,7 @@ heals players or spawns items asks the game for a service instead; the
 
 ## In the admin menu
 
+- **Modules › Greeter** has a "Say hello" button and the `roll` form.
 - **Server › Commands** lists `hello` and `roll`; `roll` has a number field.
 - **Superuser › Documentation** shows the greeter's Overview, its guide and its
   generated Commands and Permissions pages.

@@ -53,6 +53,8 @@ internal sealed partial class AdminMenuRenderer : IDisposable
 		if ( Interactive == interactive ) return;
 		if ( interactive )
 		{
+			// Modules may have started or stopped since the menu was last open.
+			Server.RefreshMenuWindows();
 			_previousMouse = Mouse.Visibility;
 			_input = new AdminInputPanel( _context.IO )
 			{
@@ -113,6 +115,7 @@ internal sealed partial class AdminMenuRenderer : IDisposable
 			_showCommandResult = true;
 			Notify( $"{Server.LastCommand}: {reply.Status}. {reply.Message}", AdminMenuTheme.Tone( reply.Status ) );
 			Model.Refresh();
+			Server.RefreshLive();
 		}
 	}
 
@@ -121,6 +124,7 @@ internal sealed partial class AdminMenuRenderer : IDisposable
 		var now = DateTimeOffset.UtcNow;
 		Model.Tick( now );
 		Server.RequestCommands();
+		Server.RequestMenuWindows();
 		if ( _layout.IsVisible( RestrictionsWindow, Interactive ) ) Server.RequestRestrictions( now );
 		if ( _layout.IsVisible( PermissionsWindow, Interactive ) ) Server.RequestPermissions();
 		if ( _layout.IsVisible( ChatWindow, Interactive ) || _wantPlayerChat ) Server.RequestChat( now );
@@ -141,6 +145,7 @@ internal sealed partial class AdminMenuRenderer : IDisposable
 			DrawActivityWindow();
 			DrawPermissionsWindow();
 			DrawPrefixesWindow();
+			DrawModuleWindows();
 			DrawDocumentationWindow();
 			DrawAboutWindow();
 			DrawEffectEditor();

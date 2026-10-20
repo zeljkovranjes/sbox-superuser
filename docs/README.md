@@ -99,6 +99,7 @@ empty scene to a working command.
   what is not yet certified.
 
 The [greeter example](../dev/examples/greeter/README.md) is a complete module in
-one file, the [game samples](../dev/samples/README.md) show two complete
+one file, the [reports example](../dev/examples/reports/README.md) a larger one
+with its own menu windows, the [game samples](../dev/samples/README.md) show two complete
 integrations, and
 the [changelog](../CHANGELOG.md) lists every change.

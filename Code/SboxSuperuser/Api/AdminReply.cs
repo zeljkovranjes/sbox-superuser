@@ -66,6 +66,9 @@ public sealed class AdminReply
 	/// <summary>Gets the Markdown of a documentation page, for a Documentation page query.</summary>
 	public string Document { get; init; } = "";
 
+	/// <summary>Gets the module windows for a MenuWindows query.</summary>
+	public AdminMenuWindowRow[] MenuWindows { get; init; } = Array.Empty<AdminMenuWindowRow>();
+
 	/// <summary>Gets a command's result fields, such as row1..row8, page and more for listings.</summary>
 	public Dictionary<string, string> Data { get; init; } = new();
 

@@ -31,10 +31,16 @@ ping = (root / "dev/fixtures/PingModule.cs").read_text(encoding="utf-8-sig")
 for path in ("README.md", "docs/README.md", "docs/tutorial.md", "docs/documenting.md"):
     if normalize(blocks[path][0]) not in normalize(ping):
         errors.append(f"Ping excerpt differs from compiled source: {path}")
-greeter = (root / "dev/examples/greeter/GreeterModule.cs").read_text(encoding="utf-8-sig")
-for path in ("dev/examples/greeter/README.md", "docs/reference/modules.md"):
-    if not any(normalize(block) in normalize(greeter) for block in blocks[path]):
-        errors.append(f"Greeter excerpt differs from its source: {path}")
+examples = {name: (root / f"dev/examples/{name}").read_text(encoding="utf-8-sig")
+            for name in ("greeter/GreeterModule.cs", "reports/ReportsModule.cs")}
+for path, source in (("dev/examples/greeter/README.md", "greeter/GreeterModule.cs"),
+                     ("dev/examples/reports/README.md", "reports/ReportsModule.cs"),
+                     ("docs/reference/modules.md", "greeter/GreeterModule.cs"),
+                     ("docs/tutorial.md", "greeter/GreeterModule.cs")):
+    for block in blocks[path]:
+        looks_like_example = "GreeterModule" in block or "AddMenuWindow" in block or "reports." in block
+        if looks_like_example and normalize(block) not in normalize(examples[source]):
+            errors.append(f"Example excerpt differs from {source}: {path}")
 
 methods = [
     ("async Task RegisterAsync()", blocks["docs/tutorial.md"][1]),

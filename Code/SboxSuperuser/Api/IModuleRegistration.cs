@@ -29,4 +29,10 @@ public interface IModuleRegistration
 
 	/// <summary>Adds a documentation page from a Markdown file in the mounted file system, such as "docs/guide.md".</summary>
 	void AddDocumentationFile( string title, string path );
+
+	/// <summary>
+	/// Adds a window to the admin menu's Modules menu, built from headings, text, buttons, command forms and live
+	/// command replies. Everything in it runs this module's commands through the usual checks.
+	/// </summary>
+	void AddMenuWindow( string title, Action<AdminMenuWindow> build );
 }

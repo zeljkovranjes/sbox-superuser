@@ -12,15 +12,20 @@ example.
 
 Mark a module with `[AdminModule]` and it loads itself: when the bootstrap
 starts, Superuser creates it with its public parameterless constructor, installs
-it and starts it. Adding the module's file to a game is then all it takes, which
-is how a module from someone else is meant to be used.
+it and starts it. Adding the module's folder to a game is then all it takes,
+which is how a module from someone else is meant to be used. Drop-in modules go
+in the game's `Code/Superuser/Modules` folder, one folder per module. The folder
+is only a convention, since everything under `Code` compiles, but it keeps
+third-party modules apart from the game's own code. Don't start a module's
+namespace with `Superuser`: it would hide the `Superuser` class.
 
 ```csharp
 [AdminModule]
 public sealed class GreeterModule : IAdminModule
 ```
 
-Modules load in dependency order whatever order they are found in. One that
+Modules load in dependency order whatever order they are found in. The console
+lists each one as it starts, with its version, author and what it added. One that
 can't load (a missing dependency, a duplicate ID, a constructor that throws) is
 skipped with a warning in the console and doesn't stop the others. Passing a
 marked module to `RegisterModulesAsync` as well is harmless: it is skipped there.
@@ -43,6 +48,30 @@ through ordinary module commands.
 
 Owners can list, enable and disable modules with `admin modules list`,
 `admin modules enable <id>` and `admin modules disable <id>`.
+
+## Menu windows
+
+A module can add its own windows to the admin menu, under **Modules**. A window
+is described, not drawn: headings, text, buttons that run a command, a command's
+generated form, and live replies of read-only commands, which refresh every few
+seconds.
+
+```csharp
+registration.AddMenuWindow( "Greeter", window => window
+	.Text( "The smallest useful module, with its own window in the admin menu." )
+	.Button( "Say hello", "hello" )
+	.CommandForm( "roll" ) );
+```
+
+Everything in a window runs one of the module's commands, so the host checks the
+permission, asks for confirmation when the command changes something, and
+records it in Activity; no module code runs on players' machines. Each viewer
+receives only the elements whose commands they may run, and a window only when
+something in it is theirs to use. A module can add up to 4 windows of 64 elements.
+The [reports example](../../dev/examples/reports/README.md) has a staff window and
+a player window side by side.
+
+![Module windows in the admin menu](../module-windows.png)
 
 ## Documentation
 

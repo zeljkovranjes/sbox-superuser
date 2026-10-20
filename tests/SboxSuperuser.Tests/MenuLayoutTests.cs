@@ -88,4 +88,17 @@ public sealed class MenuLayoutTests
 		var layout = MenuLayout.Parse( "{\"schemaVersion\":1,\"windows\":{\"activity\":{\"open\":false,\"pinned\":true}}}" );
 		Assert.False( layout.HasPinned );
 	}
+
+	[Fact]
+	public void ModuleWindowsGetStableValidNames()
+	{
+		var name = MenuLayout.ModuleWindowName( "example.reports", "Reports" );
+		var layout = new MenuLayout();
+
+		layout.SetOpen( name, true );
+
+		Assert.Equal( name, MenuLayout.ModuleWindowName( "example.reports", "Reports" ) );
+		Assert.NotEqual( name, MenuLayout.ModuleWindowName( "example.reports", "My reports" ) );
+		Assert.True( layout.IsVisible( name, true ) );
+	}
 }

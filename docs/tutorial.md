@@ -68,7 +68,8 @@ permission does not grant it to anyone.
 ## Registering it
 
 The quickest way is to mark the class with `[AdminModule]`: the bootstrap then
-creates and starts it by itself, and there is nothing else to write. The
+creates and starts it by itself, and there is nothing else to write. Modules
+like that, from you or anyone else, go in `Code/Superuser/Modules/<module>/`; the
 [greeter example](../dev/examples/greeter/README.md) works that way. The steps
 below register the module yourself instead, which you need when a module takes
 constructor arguments.
@@ -150,13 +151,28 @@ Owners can grant `example.ping` from **Server › Permissions** instead of typin
 the command: pick a group or a player and allow the key, which is listed there as
 soon as your module registers it.
 
-### Your own button or window
+### A window of its own
 
-The Superuser menu does not host other modules' windows yet. To put a button in
-your own UI, use the same private request API the menu itself uses: it goes
-through the same permission check, audit and private reply as the console. The
-[replacement example](../dev/fixtures/ReplacementAdminExample.cs) is a complete,
-compiled version of this pattern.
+Give the module a window under **Modules** with `AddMenuWindow` in `StartAsync`.
+It is built from headings, text, buttons, command forms and live command
+replies, and everything in it runs your commands with the usual checks:
+
+```csharp
+registration.AddMenuWindow( "Greeter", window => window
+	.Text( "The smallest useful module, with its own window in the admin menu." )
+	.Button( "Say hello", "hello" )
+	.CommandForm( "roll" ) );
+```
+
+See [Menu windows](reference/modules.md#menu-windows) and the
+[reports example](../dev/examples/reports/README.md) for a larger one.
+
+### A button in your own UI
+
+Outside the admin menu, use the same private request API the menu itself uses:
+it goes through the same permission check, audit and private reply as the
+console. The [replacement example](../dev/fixtures/ReplacementAdminExample.cs) is
+a complete, compiled version of this pattern.
 
 ```csharp
 public sealed class PingButton : Component, IAdminResultEvent

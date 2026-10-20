@@ -116,7 +116,6 @@ internal sealed partial class SuperuserSession : GameObjectSystem<SuperuserSessi
 			new BootstrapModules( _registrations.Prefixes, _registrations.PrefixedChat, Superuser.PrefixApiGuide ) );
 		_runtime.StartBuiltInModules();
 		SetState( _runtime.Health );
-		Log.Info( $"[Superuser] Runtime {_runtime.Id} initialized; owners={_runtime.Owners.Configuration?.Count ?? 0}; file={_runtime.Owners.Path}" );
 	}
 
 	private void Stop( BootstrapState state )

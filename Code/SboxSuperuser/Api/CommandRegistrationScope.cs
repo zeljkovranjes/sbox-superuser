@@ -17,6 +17,7 @@ public sealed class CommandRegistrationScope : IModuleRegistration, IDisposable
 	private readonly bool _managed;
 	private readonly List<IDisposable> _subscriptions = new();
 	private readonly List<Core.Documentation.DocumentationPage> _pages = new();
+	private readonly List<AdminMenuWindowRow> _windows = new();
 	internal Engine.Modules.ModuleExecution Execution { get; }
 
 	/// <summary>Gets the module that owns this registration batch.</summary>
@@ -108,8 +109,19 @@ public sealed class CommandRegistrationScope : IModuleRegistration, IDisposable
 		EnsureStaging();
 		var capabilities = new CommandCapabilities( _services );
 		_registry.Replace( ModuleId, _token, _commands.Select( command => command with { Capabilities = capabilities, Execution = Execution } ).ToArray(),
-			_permissions, _managed, _pages );
+			_permissions, _managed, _pages, _windows );
 		_committed = true;
+	}
+
+	/// <summary>Adds a window to the admin menu's Modules menu; see IModuleRegistration.AddMenuWindow.</summary>
+	public void AddMenuWindow( string title, Action<AdminMenuWindow> build )
+	{
+		EnsureStaging();
+		ArgumentNullException.ThrowIfNull( build );
+		if ( _windows.Count >= 4 ) throw new ArgumentException( "A module can add at most 4 menu windows." );
+		var window = new AdminMenuWindow( title );
+		build( window );
+		_windows.Add( new AdminMenuWindowRow { ModuleId = ModuleId, Title = window.Title, Elements = window.Elements.ToArray() } );
 	}
 
 	/// <summary>Adds a Markdown documentation page; pages keep the order they were added.</summary>

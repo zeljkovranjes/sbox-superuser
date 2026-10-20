@@ -40,7 +40,7 @@ internal sealed class CommandRegistry
 		.Distinct().Select( value => value.Descriptor ).OrderBy( value => value.Name, StringComparer.Ordinal ).ToArray() );
 
 	internal void Replace( string moduleId, Guid token, IReadOnlyList<RegisteredCommand> commands, IReadOnlyList<PermissionDescriptor> permissions,
-		bool managed = false, IReadOnlyList<Core.Documentation.DocumentationPage> pages = null )
+		bool managed = false, IReadOnlyList<Core.Documentation.DocumentationPage> pages = null, IReadOnlyList<AdminMenuWindowRow> windows = null )
 	{
 		EnsureAvailable( moduleId );
 		if ( _managed.Contains( moduleId ) && !managed )
@@ -96,7 +96,8 @@ internal sealed class CommandRegistry
 		_modules = modules;
 		_documentation = new Dictionary<string, ModuleDocumentation>( _documentation, StringComparer.Ordinal )
 		{
-			[ moduleId ] = new ModuleDocumentation( (pages ?? Array.Empty<Core.Documentation.DocumentationPage>()).ToArray(), permissions.ToArray() )
+			[ moduleId ] = new ModuleDocumentation( (pages ?? Array.Empty<Core.Documentation.DocumentationPage>()).ToArray(), permissions.ToArray(),
+				(windows ?? Array.Empty<AdminMenuWindowRow>()).ToArray() )
 		};
 	}
 

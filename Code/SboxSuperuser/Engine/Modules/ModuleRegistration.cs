@@ -13,4 +13,5 @@ internal sealed class ModuleRegistration : IModuleRegistration
 	public void Track( IDisposable subscription ) => _scope.Track( subscription );
 	public void AddDocumentation( string title, string markdown ) => _scope.AddDocumentation( title, markdown );
 	public void AddDocumentationFile( string title, string path ) => _scope.AddDocumentationFile( title, path );
+	public void AddMenuWindow( string title, Action<AdminMenuWindow> build ) => _scope.AddMenuWindow( title, build );
 }

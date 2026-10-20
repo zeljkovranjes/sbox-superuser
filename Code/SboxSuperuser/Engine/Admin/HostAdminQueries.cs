@@ -56,6 +56,7 @@ internal sealed partial class HostAdminQueries
 			case AdminQueryKind.Permissions: return ReadPermissions( id, actor );
 			case AdminQueryKind.Chat: return ReadChat( id, query, Can );
 			case AdminQueryKind.Documentation: return ReadDocumentation( id, query, actor, Can );
+			case AdminQueryKind.MenuWindows: return ReadMenuWindows( id, actor, Can );
 			case AdminQueryKind.Activity:
 			case AdminQueryKind.ActivitySearch: return await ReadActivityAsync( id, query, Current, cancellation );
 		}

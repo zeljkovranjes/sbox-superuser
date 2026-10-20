@@ -41,6 +41,8 @@ internal sealed partial class AdminMenuRenderer
 			ImGui.EndMenu();
 		}
 
+		DrawModulesMenu();
+
 		DrawLastResult();
 
 		ImGui.EndMainMenuBar();

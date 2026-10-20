@@ -7,7 +7,7 @@ namespace SuperuserExamples.Engine;
 
 /// <summary>
 /// A complete third-party module in one file: it loads itself, registers a permission and two commands, and
-/// documents itself. Copy this file into your game's Code folder and it works.
+/// documents itself. Drop its folder into your game's Code/Superuser/Modules folder and it works.
 /// </summary>
 [AdminModule]
 public sealed class GreeterModule : IAdminModule
@@ -52,6 +52,11 @@ public sealed class GreeterModule : IAdminModule
 			Both commands need the `example.greeter.use` permission. Give it to everyone with
 			`admin group player permission allow example.greeter.use`.
 			""" );
+
+		registration.AddMenuWindow( "Greeter", window => window
+			.Text( "The smallest useful module, with its own window in the admin menu." )
+			.Button( "Say hello", "hello" )
+			.CommandForm( "roll" ) );
 		return Task.CompletedTask;
 	}
 

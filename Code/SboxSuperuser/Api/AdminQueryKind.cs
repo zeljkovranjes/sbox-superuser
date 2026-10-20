@@ -22,5 +22,7 @@ public enum AdminQueryKind
 	/// <summary>Read the last 100 public chat lines kept in memory; search filters by an exact Steam ID.</summary>
 	Chat,
 	/// <summary>List documented modules (empty search), or read one page: search is the module ID, page its index.</summary>
-	Documentation
+	Documentation,
+	/// <summary>Read the windows modules added to the admin menu, filtered to what the caller may use.</summary>
+	MenuWindows
 }

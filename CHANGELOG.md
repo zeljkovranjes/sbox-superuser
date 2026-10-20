@@ -18,8 +18,12 @@ Chat history and names - Up and Down in the chat box bring back messages you sen
 Effect editor - Superuser's own code editor with numbered lines, live coloring, color swatches, error underlines, undo, auto-indent and clipboard, a live preview of the whole line, click-to-insert built-ins, templates, presets and a color picker
 Documentation window - Superuser > Documentation shows every module's overview, guides, commands and permissions; effect code blocks are colored
 # Modules
-Automatic loading - mark a module [AdminModule] and the bootstrap creates, installs and starts it, so adding its file to a game is all it takes; a module that can't load is skipped with a warning and the rest still load
-Greeter example - dev/examples/greeter is a complete third-party module in one file that loads itself, with two commands, a permission and its own documentation page
+Automatic loading - mark a module [AdminModule] and the bootstrap creates, installs and starts it, so dropping its folder into the game's Code/Superuser/Modules is all it takes; a module that can't load is skipped with a warning and the rest still load
+Startup banner - the console shows a SUPERUSER banner with the version and owners, then a line per module with its version, author, commands, permissions, guide pages and menu windows, or why it didn't load
+Drop folder - the editor creates Code/Superuser/Modules in every game that uses Superuser, with a DROP THIRD PARTY MODULES HERE note, once per project
+Module windows - modules add windows under a new Modules menu with AddMenuWindow: headings, text, buttons, command forms and live command replies that refresh every few seconds; each viewer only sees what they can use
+Greeter example - dev/examples/greeter is a complete third-party module in one file that loads itself, with two commands, a permission, its own documentation page and a menu window
+Reports example - dev/examples/reports lets players report players and staff claim and close the reports, with four permissions, six commands including multi-argument ones, four documentation pages and two menu windows
 Module documentation - modules add pages with AddDocumentation or AddDocumentationFile and set Version, Author and Website on their descriptor; every module's documentation has the same overview, guides, commands and permissions structure
 # Documentation
 Prefixes guide - a new chapter on prefixes, the effect editor and chat, plus an effect script reference and the documentation API in the modules reference

@@ -10,7 +10,7 @@ internal sealed class MenuLayout
 {
 	internal const int SchemaVersion = 1;
 	internal const int MaximumCharacters = 8192;
-	private const int MaximumWindows = 16;
+	private const int MaximumWindows = 32;
 	private const int MaximumNameLength = 32;
 
 	// A restored window keeps at least this much of itself on screen so it can still be grabbed.
@@ -22,6 +22,22 @@ internal sealed class MenuLayout
 	internal int Revision { get; private set; }
 
 	internal bool HasPinned => _windows.Values.Any( window => window.Pinned );
+
+	/// <summary>
+	/// A layout name for a module's window: names are lowercase letters only, so the module and title become a stable
+	/// hash spelled in letters. The same module and title always get the same name, so placement and pins survive.
+	/// </summary>
+	internal static string ModuleWindowName( string moduleId, string title )
+	{
+		unchecked
+		{
+			var hash = 14695981039346656037UL;
+			foreach ( var character in moduleId + "/" + title ) hash = (hash ^ character) * 1099511628211UL;
+			var letters = new char[ 13 ];
+			for ( var index = 0; index < letters.Length; index++, hash /= 26 ) letters[ index ] = (char)('a' + (int)(hash % 26));
+			return "mod" + new string( letters );
+		}
+	}
 
 	internal MenuWindowLayout Window( string name )
 	{

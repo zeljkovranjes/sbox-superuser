@@ -20,6 +20,9 @@ internal sealed class AdminServerModel
 	private DateTimeOffset _restrictionsAfter;
 	private bool _permissionsStale = true;
 	private Guid _documentationRequest;
+	private Guid _menuWindowsRequest;
+	private readonly Dictionary<Guid, string> _liveRequests = new();
+	private readonly Dictionary<string, (AdminReply Reply, DateTimeOffset At)> _live = new( StringComparer.Ordinal );
 	private readonly Dictionary<Guid, (string Module, int Page)> _pageRequests = new();
 	private readonly Dictionary<(string Module, int Page), AdminReply> _pages = new();
 
@@ -28,6 +31,9 @@ internal sealed class AdminServerModel
 	internal AdminReply Permissions { get; private set; }
 	internal AdminReply Chat { get; private set; }
 	internal AdminReply Documentation { get; private set; }
+
+	/// <summary>The windows modules added to the menu, filtered by the host to what this viewer may use.</summary>
+	internal AdminReply MenuWindows { get; private set; }
 
 	/// <summary>Reply to the last command run from the menu, and which command it was.</summary>
 	internal AdminReply LastResult { get; private set; }
@@ -91,6 +97,38 @@ internal sealed class AdminServerModel
 		return null;
 	}
 
+	/// <summary>Loads the module windows once; Refresh reloads them, for example when the menu opens.</summary>
+	internal void RequestMenuWindows()
+	{
+		if ( MenuWindows is not null || _menuWindowsRequest != Guid.Empty ) return;
+		Try( () => _menuWindowsRequest = _query( new AdminQuery( AdminQueryKind.MenuWindows ) ) );
+	}
+
+	internal void RefreshMenuWindows()
+	{
+		MenuWindows = null;
+		_live.Clear();
+		RequestMenuWindows();
+	}
+
+	/// <summary>
+	/// A live element's latest reply; null while the first one loads. It asks again every few seconds while shown and
+	/// right after RefreshLive, keeping the old reply on screen until the new one arrives.
+	/// </summary>
+	internal AdminReply Live( string key, string command, IReadOnlyList<string> arguments, DateTimeOffset now )
+	{
+		var cached = _live.TryGetValue( key, out var entry );
+		if ( (!cached || now - entry.At >= RefreshInterval) && !_liveRequests.ContainsValue( key ) )
+			Try( () => _liveRequests[ _command( new AdminCommandRequest( command, arguments ) ) ] = key );
+		return cached ? entry.Reply : null;
+	}
+
+	/// <summary>Makes every live element ask again now; called after any command runs from the menu.</summary>
+	internal void RefreshLive()
+	{
+		foreach ( var key in _live.Keys.ToArray() ) _live[ key ] = (_live[ key ].Reply, DateTimeOffset.MinValue);
+	}
+
 	/// <summary>Reloads the policy when it is first shown and after every command that may have changed it.</summary>
 	internal void RequestPermissions()
 	{
@@ -136,6 +174,15 @@ internal sealed class AdminServerModel
 		{
 			_documentationRequest = Guid.Empty;
 			Documentation = reply;
+		}
+		else if ( reply.RequestId == _menuWindowsRequest )
+		{
+			_menuWindowsRequest = Guid.Empty;
+			MenuWindows = reply;
+		}
+		else if ( _liveRequests.Remove( reply.RequestId, out var live ) )
+		{
+			_live[ live ] = (reply, DateTimeOffset.UtcNow);
 		}
 		else if ( _pageRequests.Remove( reply.RequestId, out var page ) )
 		{

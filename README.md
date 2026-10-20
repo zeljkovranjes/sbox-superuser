@@ -89,9 +89,10 @@ in the chatbox or `admin ping` in the console.
   written and previewed in the menu, with World at War presets. On by default.
   [Guide](docs/prefixes.md).
 
-- **Module documentation** gives every module the same in-game pages: overview,
-  its own guides, generated commands and permissions.
-  [Reference](docs/reference/modules.md).
+- **Modules** load themselves from the game's `Code/Superuser/Modules` folder,
+  add their own windows to the admin menu, and get the same in-game documentation
+  pages: overview, guides, generated commands and permissions. Two
+  [examples](dev/examples/reports/README.md). [Reference](docs/reference/modules.md).
 
 - **The `Superuser` facade** is the whole public API: dispatch commands, check
   permissions, register modules, select storage and request private admin
