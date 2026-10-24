@@ -6,6 +6,23 @@ internal sealed partial class HostAuditService
 {
 	internal Task<AuditPage> QueryAsync( Func<ActorIdentity> authenticate, Func<ActorIdentity, bool> canReadAll,
 		Func<ActorIdentity, bool> canReadOwn, AuditQuery query, CancellationToken cancellation )
+		=> QueryAsync( authenticate, canReadAll, canReadOwn, query, 0, cancellation );
+
+	/// <summary>Reads an offset page from one authorized journal snapshot, without replaying every earlier query.</summary>
+	internal Task<AuditPage> QueryPageAsync( Func<ActorIdentity> authenticate, Func<ActorIdentity, bool> canReadAll,
+		Func<ActorIdentity, bool> canReadOwn, AuditQuery query, int page, CancellationToken cancellation )
+	{
+		ArgumentNullException.ThrowIfNull( query );
+		if ( page is < 0 or > 64 || query.Cursor is not null )
+		{
+			throw new ArgumentException( "Offset audit pages require a zero-based page from 0 through 64 and no cursor.", nameof( page ) );
+		}
+
+		return QueryAsync( authenticate, canReadAll, canReadOwn, query, page * query.PageSize, cancellation );
+	}
+
+	private Task<AuditPage> QueryAsync( Func<ActorIdentity> authenticate, Func<ActorIdentity, bool> canReadAll,
+		Func<ActorIdentity, bool> canReadOwn, AuditQuery query, int skip, CancellationToken cancellation )
 	{
 		ArgumentNullException.ThrowIfNull( query );
 		return SerializedAsync( async () =>
@@ -42,7 +59,7 @@ internal sealed partial class HostAuditService
 			var now = _clock();
 			var matches = _journal.Records.Where( record => (all || record.ActorKind == "Player" && record.ActorSubject == actor.SubjectId)
 				&& (!_journal.IsExpired( record, now ) || _active.Contains( record.Id )) && Matches( record, query ) )
-				.OrderByDescending( record => record.Sequence ).Take( query.PageSize + 1 ).ToArray();
+				.OrderByDescending( record => record.Sequence ).Skip( skip ).Take( query.PageSize + 1 ).ToArray();
 			var selected = matches.Take( query.PageSize ).ToArray();
 			var cursor = matches.Length > query.PageSize ? new AuditCursor( _revision, selected[ selected.Length - 1 ].Sequence ) : null;
 			return new AuditPage( CommandStatus.Success, "Audit page read.", _revision, selected.Select( record => new AuditEntry( record ) ), cursor );
