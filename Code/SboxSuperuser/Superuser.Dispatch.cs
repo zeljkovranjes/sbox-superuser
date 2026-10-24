@@ -5,7 +5,7 @@ namespace SboxSuperuser;
 public static partial class Superuser
 {
 	/// <summary>Dispatches host-side authenticated player input; transport adapters supply the live caller, never a client-authored identity.</summary>
-	public static Task<CommandResult> ExecuteCommandAsync( Sandbox.Connection caller, CommandRequest request,
+	public static async Task<CommandResult> ExecuteCommandAsync( Sandbox.Connection caller, CommandRequest request,
 		CommandOrigin origin, CancellationToken cancellation = default )
 	{
 		ArgumentNullException.ThrowIfNull( request );
@@ -15,8 +15,19 @@ public static partial class Superuser
 		}
 
 		var runtime = FindAuthorityRuntime();
-		return runtime is null ? Task.FromResult( new CommandResult( CommandStatus.Unsupported, "An eligible authoritative runtime is required." ) )
-			: runtime.Dispatcher.SubmitAsync( () => runtime.TryResolvePlayer( caller, out var actor ) ? actor : null, origin, request, cancellation );
+		if ( runtime is null ) return new CommandResult( CommandStatus.Unsupported, "An eligible authoritative runtime is required." );
+		if ( !runtime.TryResolvePlayer( caller, out _ ) ) return new CommandResult( CommandStatus.Denied, "A live authenticated player is required." );
+		if ( !runtime.AdminRequests.TryEnter( caller.Id, DateTimeOffset.UtcNow ) )
+			return new CommandResult( CommandStatus.Conflict, "Too many administration requests; wait before trying again." );
+		try
+		{
+			return await runtime.Dispatcher.SubmitAsync( () => runtime.TryResolvePlayer( caller, out var actor ) ? actor : null,
+				origin, request, cancellation );
+		}
+		finally
+		{
+			runtime.AdminRequests.Exit( caller.Id );
+		}
 	}
 
 	/// <summary>Issues a host-code service caller with explicit exact permissions; never expose this factory through a player transport.</summary>
