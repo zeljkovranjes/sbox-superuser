@@ -65,15 +65,25 @@ public static partial class Superuser
 	private static async Task RunConsoleAsync( Connection caller, bool dedicatedLocal, Guid requestId, string root, string[] arguments )
 	{
 		CommandResult result;
+		var runtime = FindAuthorityRuntime();
+		var entered = false;
 		try
 		{
-			var runtime = FindAuthorityRuntime();
 			if ( runtime is null || !runtime.ConsoleRoot.IsAvailable || runtime.ConsoleRoot.Name != root )
 			{
 				result = new CommandResult( CommandStatus.Unsupported, "Console root unavailable or mismatched. Check superuser_status and the bootstrap Command Root." );
 			}
+			else if ( !dedicatedLocal && !runtime.TryResolvePlayer( caller, out _ ) )
+			{
+				result = new CommandResult( CommandStatus.Denied, "A live authenticated player is required." );
+			}
+			else if ( !dedicatedLocal && !runtime.AdminRequests.TryEnter( caller.Id, DateTimeOffset.UtcNow ) )
+			{
+				result = new CommandResult( CommandStatus.Conflict, "Too many administration requests; wait before trying again." );
+			}
 			else
 			{
+				entered = !dedicatedLocal;
 				ActorIdentity Authenticate() => dedicatedLocal
 					? runtime.TryResolveDedicatedConsole( out var local ) ? local : null
 					: runtime.TryResolvePlayer( caller, out var player ) ? player : null;
@@ -90,6 +100,10 @@ public static partial class Superuser
 		{
 			Log.Warning( $"[Superuser] Console request failed; type={error.GetType().Name}." );
 			result = new CommandResult( CommandStatus.Unknown, "Console request has no confirmed outcome." );
+		}
+		finally
+		{
+			if ( entered ) runtime.AdminRequests.Exit( caller.Id );
 		}
 
 		ConsoleReplies.Send( caller, dedicatedLocal, requestId, result );
