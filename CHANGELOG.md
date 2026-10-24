@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-24
+Title: Request Abuse Hardening
+### Fixed
+# Security
+Activity pagination - later pages read one authorized audit snapshot instead of making the caller trigger every earlier storage read
+Prefix snapshots - repeated client snapshot requests are throttled per connection to prevent bandwidth amplification
+Command transports - console, slash chat and custom player dispatch share the bounded administration request budget
+
 ## 2026-10-20
 Title: Prefixes and Module Documentation
 ### Added
