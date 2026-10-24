@@ -44,8 +44,10 @@ public static partial class Superuser
 	[Rpc.Host]
 	private static void ForwardPrefixRequest()
 	{
-		var json = Prefixes()?.Published;
-		if ( json is null || Rpc.Caller is not { IsActive: true } caller ) return;
+		var system = Prefixes();
+		var json = system?.Published;
+		if ( json is null || Rpc.Caller is not { IsActive: true } caller
+			|| !system.TryBeginRequest( caller.Id, DateTimeOffset.UtcNow ) ) return;
 		using ( Rpc.FilterInclude( caller ) ) ReceivePrefixes( json );
 	}
 

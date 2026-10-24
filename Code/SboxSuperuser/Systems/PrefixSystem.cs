@@ -15,6 +15,7 @@ internal sealed class PrefixSystem : GameObjectSystem<PrefixSystem>
 	private const float RequestInterval = 3;
 
 	private readonly PrefixRenderer _renderer = new();
+	private readonly PrefixRequestGate _requests = new();
 	private readonly List<LineRun> _runs = new();
 	private RealTimeSince _sincePublish = PublishInterval;
 	private RealTimeSince _sinceRequest = RequestInterval;
@@ -32,6 +33,9 @@ internal sealed class PrefixSystem : GameObjectSystem<PrefixSystem>
 
 	/// <summary>The snapshot the host last sent, for players who ask for it.</summary>
 	internal string Published { get; private set; }
+
+	/// <summary>Allows one snapshot reply per connection every two seconds.</summary>
+	internal bool TryBeginRequest( Guid connection, DateTimeOffset now ) => _requests.TryEnter( connection, now );
 
 	/// <summary>Whether Superuser's chat box replaces the built-in one.</summary>
 	internal bool ChatActive => Snapshot.Enabled && Snapshot.Chat;
