@@ -55,15 +55,32 @@ internal sealed class PlatformChatAdapter : IDisposable
 	private async Task ExecuteAsync( Connection sender, string message, Guid requestId )
 	{
 		CommandResult result;
+		var entered = false;
 		try
 		{
-			result = await _ingress.ExecuteAsync( () => _runtime.TryResolvePlayer( sender, out var actor ) ? actor : null,
-				message, requestId, CancellationToken.None );
+			if ( !_runtime.TryResolvePlayer( sender, out _ ) )
+			{
+				result = new CommandResult( CommandStatus.Denied, "A live authenticated player is required." );
+			}
+			else if ( !_runtime.AdminRequests.TryEnter( sender.Id, DateTimeOffset.UtcNow ) )
+			{
+				result = new CommandResult( CommandStatus.Conflict, "Too many administration requests; wait before trying again." );
+			}
+			else
+			{
+				entered = true;
+				result = await _ingress.ExecuteAsync( () => _runtime.TryResolvePlayer( sender, out var actor ) ? actor : null,
+					message, requestId, CancellationToken.None );
+			}
 		}
 		catch ( Exception error )
 		{
 			Log.Warning( $"[Superuser] Chat request {requestId:N} failed; type={error.GetType().Name}." );
 			result = new CommandResult( CommandStatus.Unknown, "The command outcome could not be determined. Contact the server owner." );
+		}
+		finally
+		{
+			if ( entered ) _runtime.AdminRequests.Exit( sender.Id );
 		}
 		if ( Available() )
 		{
