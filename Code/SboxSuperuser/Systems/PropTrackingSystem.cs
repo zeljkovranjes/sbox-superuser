@@ -8,7 +8,6 @@ namespace SboxSuperuser.Systems;
 /// </summary>
 internal sealed class PropTrackingSystem : GameObjectSystem<PropTrackingSystem>
 {
-	internal static readonly TimeSpan CleanupDelay = TimeSpan.FromMinutes( 2 );
 	private const float Interval = 0.5f;
 
 	private readonly Dictionary<string, DateTimeOffset> _left = new( StringComparer.Ordinal );
@@ -16,8 +15,11 @@ internal sealed class PropTrackingSystem : GameObjectSystem<PropTrackingSystem>
 
 	public PropTrackingSystem( Scene scene ) : base( scene ) => Listen( Stage.FinishUpdate, 49, Sweep, nameof( PropTrackingSystem ) );
 
-	/// <summary>Starts the countdown to removing this player's props.</summary>
-	internal void PlayerLeft( string steamId ) => _left[ steamId ] = DateTimeOffset.UtcNow + CleanupDelay;
+	/// <summary>Starts the countdown to removing this player's props; a null delay keeps them.</summary>
+	internal void PlayerLeft( string steamId, TimeSpan? delay )
+	{
+		if ( delay is { } wait ) _left[ steamId ] = DateTimeOffset.UtcNow + wait;
+	}
 
 	internal void PlayerReturned( string steamId ) => _left.Remove( steamId );
 

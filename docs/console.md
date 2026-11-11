@@ -157,10 +157,13 @@ that after they leave. Player bodies are never counted as props.
 | `admin props cleanup` | `admin.props.cleanupown` | everyone |
 | `admin props cleanup <user>` | also `admin.props.cleanup` | moderators |
 | `admin props cleanupall` | `admin.props.cleanupall` | admins |
+| `admin props delay <duration>` | `admin.props.manage` | admins |
 
 Staff with `admin.props.touchall` (moderators by default) may touch anything. A
 player's props are removed two minutes after they leave, unless they come back
-first; the map's own objects are never removed.
+first. `admin props delay` changes that (10s to 7d, or `permanent` to keep them
+until someone cleans up), and it is saved. The map's own objects are never
+removed.
 
 The engine already stops players moving objects they don't own, but anything
 your game does on the host for them, such as a physics gun, tool or delete,
@@ -210,6 +213,7 @@ Needs `admin.content.manage` (admins by default).
 | `admin content ban <kind> <pattern> [reason]` | Ban a map, addon or entity |
 | `admin content unban <kind> <pattern>` | Allow it again |
 | `admin content list [page]` | Everything banned |
+| `admin content search <kind> [query]` | Find what isn't banned yet; the menu's lists use it |
 
 `<kind>` is `map`, `addon` or `entity`. Patterns ignore case, and `*` matches
 anything, so `addon badauthor.*` bans every package from one author.

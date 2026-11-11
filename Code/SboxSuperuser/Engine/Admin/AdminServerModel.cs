@@ -16,6 +16,10 @@ internal sealed class AdminServerModel
 	private Guid _suspectsRequest;
 	private Guid _altsRequest;
 	private DateTimeOffset _suspectsAfter;
+	private Guid _contentBansRequest;
+	private DateTimeOffset _contentBansAfter;
+	private Guid _propsRequest;
+	private DateTimeOffset _propsAfter;
 	private Guid _permissionsRequest;
 	private Guid _chatRequest;
 	private DateTimeOffset _chatAfter;
@@ -36,6 +40,8 @@ internal sealed class AdminServerModel
 	/// <summary>The accounts linked to <see cref="AltsOf"/>.</summary>
 	internal AdminReply Alts { get; private set; }
 	internal string AltsOf { get; private set; } = "";
+	internal AdminReply ContentBans { get; private set; }
+	internal AdminReply Props { get; private set; }
 	internal int SuspectPage;
 	internal AdminReply Permissions { get; private set; }
 	internal AdminReply Chat { get; private set; }
@@ -81,6 +87,22 @@ internal sealed class AdminServerModel
 		AltsOf = steamId;
 		Alts = null;
 		Try( () => _altsRequest = _query( new AdminQuery( AdminQueryKind.Alts, steamId ) ) );
+	}
+
+	/// <summary>Keeps the banned-content list fresh while its window is open.</summary>
+	internal void RequestContentBans( DateTimeOffset now )
+	{
+		if ( _contentBansRequest != Guid.Empty || now < _contentBansAfter ) return;
+		_contentBansAfter = now + RefreshInterval;
+		Try( () => _contentBansRequest = _query( new AdminQuery( AdminQueryKind.ContentBans ) ) );
+	}
+
+	/// <summary>Keeps prop owners and the cleanup delay fresh while their window is open.</summary>
+	internal void RequestProps( DateTimeOffset now )
+	{
+		if ( _propsRequest != Guid.Empty || now < _propsAfter ) return;
+		_propsAfter = now + RefreshInterval;
+		Try( () => _propsRequest = _query( new AdminQuery( AdminQueryKind.Props ) ) );
 	}
 
 	internal void RequestRestrictions( DateTimeOffset now, bool force = false )
@@ -196,6 +218,16 @@ internal sealed class AdminServerModel
 			_altsRequest = Guid.Empty;
 			Alts = reply;
 		}
+		else if ( reply.RequestId == _contentBansRequest )
+		{
+			_contentBansRequest = Guid.Empty;
+			ContentBans = reply;
+		}
+		else if ( reply.RequestId == _propsRequest )
+		{
+			_propsRequest = Guid.Empty;
+			Props = reply;
+		}
 		else if ( reply.RequestId == _restrictionsRequest )
 		{
 			_restrictionsRequest = Guid.Empty;
@@ -234,8 +266,10 @@ internal sealed class AdminServerModel
 			_runRequest = Guid.Empty;
 			LastResult = reply;
 			RefreshLive();
-			// Any command may have changed restrictions or policy, so both views reload.
+			// Any command may have changed what these views show, so they reload.
 			_restrictionsAfter = DateTimeOffset.MinValue;
+			_contentBansAfter = DateTimeOffset.MinValue;
+			_propsAfter = DateTimeOffset.MinValue;
 			_permissionsStale = true;
 		}
 		else

@@ -30,6 +30,7 @@ internal sealed partial class AdminMenuRenderer
 			WindowItem( "Active restrictions", RestrictionsWindow );
 			WindowItem( "Chat", ChatWindow );
 			if ( Server.Can( AltsCommand ) ) WindowItem( "Alt accounts", AltsWindow );
+			if ( Server.Can( ContentListCommand ) ) WindowItem( "Content bans", ContentBansWindow );
 			DrawModuleItems( "Moderation" );
 			ImGui.EndMenu();
 		}
@@ -40,6 +41,7 @@ internal sealed partial class AdminMenuRenderer
 			WindowItem( "Activity", ActivityWindow );
 			if ( CanEditPermissions ) WindowItem( "Permissions", PermissionsWindow );
 			if ( Server.Can( PrefixExportCommand ) ) WindowItem( "Prefixes", PrefixesWindow );
+			if ( Server.Can( PropsCleanupCommand ) ) WindowItem( "Props", PropsWindow );
 			DrawModuleItems( "Server" );
 			ImGui.EndMenu();
 		}

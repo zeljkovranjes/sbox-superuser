@@ -22,8 +22,9 @@ public sealed partial class SuperuserBootstrap
 	{
 		if ( Networking.IsHost )
 		{
-			_session?.GetRuntime()?.ForgetEngineClaims( connection );
-			Scene.GetSystem<Systems.PropTrackingSystem>()?.PlayerLeft( connection.SteamId.ToString() );
+			var runtime = _session?.GetRuntime();
+			runtime?.ForgetEngineClaims( connection );
+			if ( runtime is not null ) Scene.GetSystem<Systems.PropTrackingSystem>()?.PlayerLeft( connection.SteamId.ToString(), runtime.PropCleanup.Current.Delay );
 		}
 		AnnouncePresence( connection, "leave" );
 	}

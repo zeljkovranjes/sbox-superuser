@@ -27,7 +27,7 @@ internal sealed partial class AdministrationCommands : IDisposable
 		Func<CommandContext, string, string, CommandResult> notifyWarning = null, Action<string> announce = null, Func<string,string> playerName = null,
 		Messaging.IPlayerMessenger messenger = null, Messages.HostMessageService messages = null,
 		Votes.VoteSession votes = null, Func<string, CommandResult> changeMap = null, Content.HostContentService content = null,
-		Alts.HostAltService alts = null )
+		Alts.HostAltService alts = null, Content.IContentCatalog contentCatalog = null )
 	{
 		_policy = policy;
 		_audit = audit;
@@ -50,7 +50,7 @@ internal sealed partial class AdministrationCommands : IDisposable
 		if ( messenger is not null ) RegisterMessages( messenger );
 		if ( messages is not null ) RegisterMessageTemplates( messages );
 		if ( votes is not null ) RegisterVotes( votes, changeMap );
-		if ( content is not null ) RegisterContent( content );
+		if ( content is not null ) RegisterContent( content, contentCatalog );
 		if ( alts is not null ) RegisterAlts( alts );
 		RegisterDocumentation();
 		_scope.Commit();

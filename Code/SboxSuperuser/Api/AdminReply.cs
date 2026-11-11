@@ -75,6 +75,15 @@ public sealed class AdminReply
 	/// <summary>Gets linked accounts for an Alts query, or suspects for an AltSuspects query.</summary>
 	public AdminAltRow[] Alts { get; init; } = Array.Empty<AdminAltRow>();
 
+	/// <summary>Gets banned content for a ContentBans query, grouped by kind.</summary>
+	public AdminContentBanRow[] ContentBans { get; init; } = Array.Empty<AdminContentBanRow>();
+
+	/// <summary>Gets prop owners for a Props query, most props first.</summary>
+	public AdminPropOwnerRow[] PropOwners { get; init; } = Array.Empty<AdminPropOwnerRow>();
+
+	/// <summary>Gets the prop cleanup delay in seconds for a Props query; null keeps props after their owner leaves.</summary>
+	public long? PropCleanupSeconds { get; init; }
+
 	/// <summary>Gets the module windows for a MenuWindows query.</summary>
 	public AdminMenuWindowRow[] MenuWindows { get; init; } = Array.Empty<AdminMenuWindowRow>();
 

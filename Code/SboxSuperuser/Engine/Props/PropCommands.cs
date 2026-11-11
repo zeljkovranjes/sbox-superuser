@@ -9,6 +9,7 @@ internal sealed class PropCommands : IDisposable
 	internal const string Module = "superuser.props";
 	internal const string TouchAllPermission = "admin.props.touchall";
 	internal const string CleanupPermission = "admin.props.cleanup";
+	internal const string ManagePermission = "admin.props.manage";
 
 	private readonly CommandRegistrationScope _scope;
 	private readonly PropOwnership _props;
@@ -16,8 +17,9 @@ internal sealed class PropCommands : IDisposable
 	private readonly Func<CommandContext, string, bool> _canUse;
 	private readonly Func<string, string> _playerName;
 
+	/// <param name="cleanup">The stored cleanup delay; without it there is no props delay command.</param>
 	internal PropCommands( CommandRegistry registry, PropOwnership props, IPropWorld world, Func<CommandContext, string, bool> canUse,
-		Func<string, string> playerName = null )
+		Func<string, string> playerName = null, HostPropCleanup cleanup = null )
 	{
 		_props = props;
 		_world = world;
@@ -34,6 +36,11 @@ internal sealed class PropCommands : IDisposable
 			(context, arguments) => Cleanup( context, arguments.Contains( "user" ) ? arguments.Get<PlayerReference>( "user" ).SteamId : null ) );
 		Register( "props.cleanupall", "Remove every player's props; the map's own objects stay", "admin.props.cleanupall",
 			Array.Empty<CommandArgumentDescriptor>(), (_, _) => Removed( _props.All, "everyone" ) );
+		if ( cleanup is not null )
+			_scope.RegisterCommand( new CommandDescriptor( "props.delay", "Set how long a player's props stay after they leave, or permanent to keep them",
+				ManagePermission, Module, new[] { new CommandArgumentDescriptor( "delay", "Between 10s and 7d, or permanent to keep props",
+					CommandArgumentKind.Duration, audit: CommandArgumentAudit.SafeValue ) }, executionPolicy: CommandExecutionPolicy.Mutation ),
+				(context, arguments) => cleanup.SetAsync( context, "props.delay", arguments.Get<CommandDuration>( "delay" ).Value ) );
 		_scope.Commit();
 	}
 

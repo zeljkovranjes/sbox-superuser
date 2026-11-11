@@ -26,6 +26,10 @@ internal sealed class PropOwnership
 
 	internal IReadOnlyList<Guid> All => _owners.Keys.ToArray();
 
+	/// <summary>Each owner and how many objects they own, most first.</summary>
+	internal IReadOnlyList<(string SteamId, int Count)> Owners() => _owners.Values.GroupBy( owner => owner, StringComparer.Ordinal )
+		.Select( group => (group.Key, group.Count()) ).OrderByDescending( owner => owner.Item2 ).ThenBy( owner => owner.Key, StringComparer.Ordinal ).ToArray();
+
 	/// <summary>Lets the friend touch everything the owner spawns; false when they already could.</summary>
 	internal bool Share( string ownerSteamId, string friendSteamId )
 	{

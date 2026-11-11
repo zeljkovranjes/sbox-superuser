@@ -28,5 +28,9 @@ public enum AdminQueryKind
 	/// <summary>Read one account's linked alts; search is the exact Steam ID. Needs admin.alts.read.</summary>
 	Alts,
 	/// <summary>Read the alt-account dashboard: accounts with links, riskiest first, paged. Needs admin.alts.read.</summary>
-	AltSuspects
+	AltSuspects,
+	/// <summary>Read banned maps, addons and entities. Needs admin.content.manage.</summary>
+	ContentBans,
+	/// <summary>Read who owns spawned objects and the cleanup delay. Needs admin.props.cleanup.</summary>
+	Props
 }

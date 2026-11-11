@@ -64,16 +64,18 @@ internal sealed class MessageCatalog
 	}
 
 	/// <summary>"for 10 days", "for 2 hours 30 minutes", or "permanently" when there is no end.</summary>
-	internal static string Phrase( TimeSpan? length )
+	internal static string Phrase( TimeSpan? length ) => length is { } time ? "for " + Length( time ) : "permanently";
+
+	/// <summary>A length of time as words, such as "2 minutes" or "1 day 3 hours".</summary>
+	internal static string Length( TimeSpan time )
 	{
-		if ( length is not { } time ) return "permanently";
 		var parts = new List<string>();
 		void Add( int amount, string unit ) { if ( amount > 0 ) parts.Add( $"{amount} {unit}{(amount == 1 ? "" : "s")}" ); }
 		Add( time.Days, "day" );
 		Add( time.Hours, "hour" );
 		Add( time.Minutes, "minute" );
 		if ( parts.Count == 0 ) Add( Math.Max( 1, time.Seconds ), "second" );
-		return "for " + string.Join( " ", parts );
+		return string.Join( " ", parts );
 	}
 
 	private static IReadOnlyDictionary<string, (string, string[])> Build()

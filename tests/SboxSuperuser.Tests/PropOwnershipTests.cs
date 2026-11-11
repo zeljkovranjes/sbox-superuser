@@ -36,4 +36,14 @@ public sealed class PropOwnershipTests
 		Assert.Null( props.OwnerOf( Crate ) );
 		Assert.False( props.Share( "alice", "alice" ) );
 	}
+
+	[Fact]
+	public void OwnersAreCountedMostFirst()
+	{
+		var props = new PropOwnership();
+		props.Record( Guid.NewGuid(), "bob" );
+		props.Record( Guid.NewGuid(), "alice" );
+		props.Record( Guid.NewGuid(), "alice" );
+		Assert.Equal( new[] { ("alice", 2), ("bob", 1) }, props.Owners() );
+	}
 }
