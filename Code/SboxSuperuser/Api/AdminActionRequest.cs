@@ -25,10 +25,10 @@ public sealed class AdminActionRequest
 		SteamIdentity.Validate( steamId, nameof( steamId ) );
 		if ( string.IsNullOrWhiteSpace( reason ) || reason.Length > 256 || reason.Any( char.IsControl )
 			|| duration is null || duration.Length > 32 || duration.Any( char.IsControl )
-			|| action is AdminAction.Ban or AdminAction.Mute && string.IsNullOrWhiteSpace( duration )
-			|| action is not (AdminAction.Ban or AdminAction.Mute) && duration.Length != 0 )
+			|| action.IsTimed() && string.IsNullOrWhiteSpace( duration )
+			|| !action.IsTimed() && duration.Length != 0 )
 		{
-			throw new ArgumentException( "A printable reason (1–256 characters) and an explicit ban/mute duration are required." );
+			throw new ArgumentException( "A printable reason (1–256 characters) and an explicit ban, mute or gag duration are required." );
 		}
 		Action = action;
 		SteamId = steamId;
@@ -37,5 +37,5 @@ public sealed class AdminActionRequest
 	}
 
 	internal CommandRequest ToCommand( Guid requestId ) => new( Action.ToString().ToLowerInvariant(),
-		Action is AdminAction.Ban or AdminAction.Mute ? new[] { SteamId, Duration, Reason } : new[] { SteamId, Reason }, requestId );
+		Action.IsTimed() ? new[] { SteamId, Duration, Reason } : new[] { SteamId, Reason }, requestId );
 }

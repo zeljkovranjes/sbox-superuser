@@ -27,6 +27,9 @@ public sealed class AdminReply
 	/// <summary>Gets actions currently permitted for this target; the host rechecks on execution.</summary>
 	public AdminAction[] Actions { get; init; } = Array.Empty<AdminAction>();
 
+	/// <summary>Gets permission-filtered module actions, using the module’s declared player/duration/reason command.</summary>
+	public AdminPlayerActionRow[] ModuleActions { get; init; } = Array.Empty<AdminPlayerActionRow>();
+
 	/// <summary>Gets active restrictions the caller may inspect; for a Restrictions query, across all players.</summary>
 	public AdminModerationRow[] Restrictions { get; init; } = Array.Empty<AdminModerationRow>();
 
@@ -65,6 +68,12 @@ public sealed class AdminReply
 
 	/// <summary>Gets the Markdown of a documentation page, for a Documentation page query.</summary>
 	public string Document { get; init; } = "";
+
+	/// <summary>Gets the player's IP address history for an Alts query, newest first, when the caller has admin.alts.ips.</summary>
+	public AdminAddressRow[] Addresses { get; init; } = Array.Empty<AdminAddressRow>();
+
+	/// <summary>Gets linked accounts for an Alts query, or suspects for an AltSuspects query.</summary>
+	public AdminAltRow[] Alts { get; init; } = Array.Empty<AdminAltRow>();
 
 	/// <summary>Gets the module windows for a MenuWindows query.</summary>
 	public AdminMenuWindowRow[] MenuWindows { get; init; } = Array.Empty<AdminMenuWindowRow>();

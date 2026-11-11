@@ -71,6 +71,17 @@ something in it is theirs to use. A module can add up to 4 windows of 64 element
 The [reports example](../../dev/examples/reports/README.md) has a staff window and
 a player window side by side.
 
+Windows are listed under **Modules** unless the third argument names another
+tab: one of Superuser's own, **Moderation** or **Server**, where they appear
+after its built-in entries, or a new tab of the module's choosing. The
+**Superuser** tab is reserved, and any tab name containing "superuser" throws
+when the module registers.
+
+```csharp
+registration.AddMenuWindow( "Reports", window => window.Live( "reports.list" ), "Moderation" );
+registration.AddMenuWindow( "Store", window => window.CommandForm( "shop.give" ), "Shop" );
+```
+
 ![Module windows in the admin menu](../module-windows.png)
 
 ## Documentation

@@ -13,6 +13,9 @@ internal sealed class AdminServerModel
 	private readonly Func<AdminCommandRequest, Guid> _command;
 	private Guid _commandsRequest;
 	private Guid _restrictionsRequest;
+	private Guid _suspectsRequest;
+	private Guid _altsRequest;
+	private DateTimeOffset _suspectsAfter;
 	private Guid _permissionsRequest;
 	private Guid _chatRequest;
 	private DateTimeOffset _chatAfter;
@@ -28,6 +31,12 @@ internal sealed class AdminServerModel
 
 	internal AdminReply Commands { get; private set; }
 	internal AdminReply Restrictions { get; private set; }
+	/// <summary>The alt-account dashboard, riskiest suspects first.</summary>
+	internal AdminReply AltSuspects { get; private set; }
+	/// <summary>The accounts linked to <see cref="AltsOf"/>.</summary>
+	internal AdminReply Alts { get; private set; }
+	internal string AltsOf { get; private set; } = "";
+	internal int SuspectPage;
 	internal AdminReply Permissions { get; private set; }
 	internal AdminReply Chat { get; private set; }
 	internal AdminReply Documentation { get; private set; }
@@ -59,6 +68,21 @@ internal sealed class AdminServerModel
 	}
 
 	/// <summary>Keeps the restrictions list fresh while its window is open.</summary>
+	internal void RequestAltSuspects( DateTimeOffset now, bool force = false )
+	{
+		if ( _suspectsRequest != Guid.Empty || !force && now < _suspectsAfter ) return;
+		_suspectsAfter = now + RefreshInterval;
+		Try( () => _suspectsRequest = _query( new AdminQuery( AdminQueryKind.AltSuspects, "", SuspectPage ) ) );
+	}
+
+	/// <summary>Asks for one account's linked alts; the reply replaces <see cref="Alts"/>.</summary>
+	internal void RequestAlts( string steamId )
+	{
+		AltsOf = steamId;
+		Alts = null;
+		Try( () => _altsRequest = _query( new AdminQuery( AdminQueryKind.Alts, steamId ) ) );
+	}
+
 	internal void RequestRestrictions( DateTimeOffset now, bool force = false )
 	{
 		if ( _restrictionsRequest != Guid.Empty || !force && now < _restrictionsAfter ) return;
@@ -123,6 +147,13 @@ internal sealed class AdminServerModel
 		return cached ? entry.Reply : null;
 	}
 
+	/// <summary>Discards this search and its pending replies when its arguments change.</summary>
+	internal void ResetLive( string key )
+	{
+		_live.Remove( key );
+		foreach ( var request in _liveRequests.Where( pair => pair.Value == key ).Select( pair => pair.Key ).ToArray() ) _liveRequests.Remove( request );
+	}
+
 	/// <summary>Makes every live element ask again now; called after any command runs from the menu.</summary>
 	internal void RefreshLive()
 	{
@@ -154,6 +185,16 @@ internal sealed class AdminServerModel
 		{
 			_commandsRequest = Guid.Empty;
 			Commands = reply;
+		}
+		else if ( reply.RequestId == _suspectsRequest )
+		{
+			_suspectsRequest = Guid.Empty;
+			AltSuspects = reply;
+		}
+		else if ( reply.RequestId == _altsRequest )
+		{
+			_altsRequest = Guid.Empty;
+			Alts = reply;
 		}
 		else if ( reply.RequestId == _restrictionsRequest )
 		{
@@ -192,6 +233,7 @@ internal sealed class AdminServerModel
 		{
 			_runRequest = Guid.Empty;
 			LastResult = reply;
+			RefreshLive();
 			// Any command may have changed restrictions or policy, so both views reload.
 			_restrictionsAfter = DateTimeOffset.MinValue;
 			_permissionsStale = true;

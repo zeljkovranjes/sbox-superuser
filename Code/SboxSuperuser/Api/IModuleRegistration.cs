@@ -31,8 +31,10 @@ public interface IModuleRegistration
 	void AddDocumentationFile( string title, string path );
 
 	/// <summary>
-	/// Adds a window to the admin menu's Modules menu, built from headings, text, buttons, command forms and live
-	/// command replies. Everything in it runs this module's commands through the usual checks.
+	/// Adds a window to the admin menu, built from headings, text, buttons, command forms and live command replies.
+	/// Everything in it runs this module's commands through the usual checks. It is listed under Modules unless
+	/// <paramref name="menu"/> names another tab: an existing one such as Moderation or Server, or a new tab. The
+	/// Superuser tab is reserved; a menu named after it throws.
 	/// </summary>
-	void AddMenuWindow( string title, Action<AdminMenuWindow> build );
+	void AddMenuWindow( string title, Action<AdminMenuWindow> build, string menu = null );
 }

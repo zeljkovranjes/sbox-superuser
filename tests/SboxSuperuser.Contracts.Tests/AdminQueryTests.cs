@@ -28,6 +28,20 @@ public sealed class AdminQueryTests
 	}
 
 	[Fact]
+	public async Task MenuAccessProbeRejectsStaffAfterRoleRevocation()
+	{
+		using var rig = new ModerationRig();
+		var queries = Queries( rig );
+		var probe = new AdminQuery( AdminQueryKind.Players );
+		await rig.Rig.Edit( PolicyChange.AddUserGroup( DispatcherRig.UserId, "moderator" ) );
+		Assert.Equal( CommandStatus.Success, (await Read( queries, probe, DispatcherRig.User )).Status );
+		await rig.Rig.Edit( PolicyChange.RemoveUserGroup( DispatcherRig.UserId, "moderator" ) );
+		var denied = await Read( queries, probe, DispatcherRig.User );
+		Assert.Equal( CommandStatus.Denied, denied.Status );
+		Assert.Empty( denied.Players );
+	}
+
+	[Fact]
 	public async Task SearchKeepsDuplicateNamesDistinctAndPagesAreBounded()
 	{
 		using var rig = new ModerationRig();
@@ -98,7 +112,9 @@ public sealed class AdminQueryTests
 		Assert.Equal( CommandStatus.Success, success.Status );
 		Assert.Contains( "Interface", rig.Rig.Store.Documents[ "moderation/history" ].PayloadJson );
 		var history = await Read( Queries( rig ), new AdminQuery( AdminQueryKind.Player, DispatcherRig.TargetId ) );
-		Assert.Equal( "Interface warning", Assert.Single( history.History ).Reason );
+		var row = Assert.Single( history.History );
+		Assert.Equal( "Interface warning", row.Reason );
+		Assert.Equal( DispatcherRig.OwnerId, row.Actor );
 	}
 
 	[Fact]

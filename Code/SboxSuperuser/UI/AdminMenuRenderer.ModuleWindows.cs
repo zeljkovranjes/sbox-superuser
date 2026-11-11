@@ -12,17 +12,33 @@ internal sealed partial class AdminMenuRenderer
 	private static string WindowKey( AdminMenuWindowRow window ) => MenuLayout.ModuleWindowName( window.ModuleId, window.Title );
 
 	/// <summary>The Modules menu: one entry per window the viewer's modules added, shown only when there are any.</summary>
+	/// <summary>The Modules tab, then one tab for each menu name modules added that isn't one of Superuser's own.</summary>
 	private void DrawModulesMenu()
 	{
 		var windows = Server.MenuWindows?.MenuWindows;
-		if ( windows is not { Length: > 0 } || !ImGui.BeginMenu( "Modules" ) ) return;
-		foreach ( var module in windows.GroupBy( window => window.ModuleId ) )
+		if ( windows is not { Length: > 0 } ) return;
+		foreach ( var menu in windows.Select( window => window.Menu ).Distinct().Where( menu => !IsBuiltInMenu( menu ) )
+			.OrderBy( menu => menu == AdminMenuWindow.DefaultMenu ? 1 : 0 ).ThenBy( menu => menu, StringComparer.OrdinalIgnoreCase ) )
+		{
+			if ( !ImGui.BeginMenu( menu ) ) continue;
+			DrawModuleItems( menu );
+			ImGui.EndMenu();
+		}
+	}
+
+	/// <summary>Module windows listed in a menu, each module under its own separator.</summary>
+	private void DrawModuleItems( string menu )
+	{
+		var windows = Server.MenuWindows?.MenuWindows;
+		if ( windows is null ) return;
+		foreach ( var module in windows.Where( window => window.Menu == menu ).GroupBy( window => window.ModuleId ) )
 		{
 			ImGui.SeparatorText( module.Key );
 			foreach ( var window in module ) WindowItem( Label( window.Title ) + "##" + WindowKey( window ), WindowKey( window ) );
 		}
-		ImGui.EndMenu();
 	}
+
+	private static bool IsBuiltInMenu( string menu ) => menu is "Moderation" or "Server";
 
 	private void DrawModuleWindows()
 	{
@@ -71,6 +87,12 @@ internal sealed partial class AdminMenuRenderer
 					ImGui.EndChild();
 				}
 				break;
+			case AdminMenuElementKind.Catalog:
+				DrawModuleCatalog( element, key );
+				break;
+			case AdminMenuElementKind.Settings:
+				DrawModuleSettings( element, key );
+				break;
 			case AdminMenuElementKind.Live:
 				DrawModuleLive( element, key );
 				break;
@@ -103,20 +125,7 @@ internal sealed partial class AdminMenuRenderer
 		{
 			ColoredWrapped( reply.Message, AdminMenuTheme.Tone( reply.Status ) );
 		}
-		else
-		{
-			ImGui.TextWrapped( "{0}", reply.Message );
-			var rows = reply.Data.Where( pair => pair.Key.StartsWith( "row", StringComparison.Ordinal ) )
-				.OrderBy( pair => int.TryParse( pair.Key.AsSpan( 3 ), out var number ) ? number : int.MaxValue ).ToArray();
-			foreach ( var row in rows )
-			{
-				ImGui.Bullet();
-				ImGui.SameLine();
-				ImGui.TextWrapped( "{0}", row.Value );
-			}
-			foreach ( var field in reply.Data.Where( pair => !pair.Key.StartsWith( "row", StringComparison.Ordinal ) && pair.Key is not ("more" or "page") ) )
-				ImGui.TextDisabled( "{0}: {1}", field.Key, field.Value );
-		}
+		else DrawCommandResult( reply );
 		if ( ImGui.SmallButton( "Refresh" ) ) Server.RefreshLive();
 	}
 

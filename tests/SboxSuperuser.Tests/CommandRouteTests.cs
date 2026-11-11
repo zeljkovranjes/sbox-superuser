@@ -19,6 +19,7 @@ public sealed class CommandRouteTests
 	[InlineData( "permissions", "explain", "permissions.explain" )]
 	[InlineData( "group", "create", "group.create" )]
 	[InlineData( "audit", "query", "audit.query" )]
+	[InlineData( "messages", "set", "messages.set" )]
 	public void NaturalAndCanonicalRoutesAgree( string category, string operation, string expected )
 	{
 		Assert.Equal( expected, CommandRoute.Resolve( new[] { category, operation } ).Command );

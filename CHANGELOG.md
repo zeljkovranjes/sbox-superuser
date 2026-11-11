@@ -1,5 +1,67 @@
 # Changelog
 
+## 2026-11-09
+Title: External Storage Recovery
+### Added
+# Interface
+Private notifications - trusted host modules can send one player a styled SUPERUSER chat message through the existing authenticated private reply channel
+Module catalogs - debounced search lists resource thumbnails with permission-checked block and unblock actions
+Public announcements - authenticated host announcements have a separate presentation event; successful moderation actions announce publicly while notes and command replies remain private
+Who acted - a player's restrictions and history show which staff member issued each ban, mute, warning, note, unban and unmute; right-clicking their name offers Open, Open Steam and Copy Steam ID
+Scoreboard - the optional Superuser Scoreboard shows every player's avatar, prefix, name and ping in the chat's style while the score key is held; right-click a player for their Steam profile, and staff get kick, warn, mute, gag and ban straight into the admin menu
+Module tabs - AddMenuWindow takes an optional tab: a module window can join Moderation or Server after their built-in entries, or open a tab of its own; the Superuser tab is reserved and a tab named after it throws
+Module settings - compact settings sections show current values, labeled defaults, boolean checkboxes and apply/reset actions, with host permission checks for both reading and changing settings
+# Chat
+Short commands - /mute Bob 1d spam works like /admin mute Bob 1d spam in any chat, including the engine's; slash text that isn't a Superuser command stays ordinary chat
+Command autocomplete - typing a command in Superuser's chat box, with or without /admin, opens a small popover above the input: the command with the argument you're on lit up and a line saying what it wants, then suggestions (online names for players; 30m, 1h, 1d, 7d or permanent for durations; what each command does while you type its name); Up and Down choose, Tab takes it, and it disappears once nothing more is needed; only commands you may run are offered
+Mentions - @name mentions any number of connected players in one message, Discord style: names show in gold, a line that mentions you gets a gold wash with the chat open or closed, and typing @ suggests names for Tab
+Avatars - each player line in Superuser's chat box starts with their Steam avatar, before their prefix
+Stock chat prefixes - when Superuser's own chat box is off, the engine's chat shows each player's prefix as text at the start of their message, such as [OWNER] hello
+# Permissions
+Engine users.json - players whose config/users.json entry has the superuser or owner claim are owners, and admin, moderator or mod claims put them in those groups, live while they are connected and never saved
+# Moderation
+Gag - admin gag and ungag silence a player's voice chat for a duration or permanently, enforced by the server on every voice packet; moderators get them by default on new servers (admin.players.gag, admin.players.ungag), and they appear in the menu, history and Bans & mutes
+Gimp - admin gimp and ungimp replace everything a player says in chat with one of a set of harmless stock lines for a duration or permanently; moderators get them by default on new servers (admin.players.gimp, admin.players.ungimp)
+# Messages
+Messages - admin psay whispers to one player, asay writes to online staff, csay shows text in the middle of every screen, tsay posts a nameless chat line and thetime shows the server's local time and UTC; each has its own admin.chat permission, and muted players cannot whisper or write to staff
+Message wording - every announcement, private and staff message, join and leave line, and the SUPERUSER tag itself can be reworded with admin messages set and reset, with placeholders for who, whom, how long, why and the map; changes are saved and audited (admin.messages.manage, admins by default)
+# Players
+Player commands - slay, sslay, slap, whip, maul, freeze, jail, jailtp, ignite, unigniteall, blind, strip, ragdoll, god, hp, armor, cloak, noclip, spectate, bring, goto, send, teleport, return, playsound and map, each with its own admin.players permission (most for moderators, the rest for admins on new servers)
+Player actions - games using the engine's PlayerController get every movement, freeze, jail, noclip, cloak, ragdoll, blind and spectate command with no code, and slay, slap damage and ignite through the engine's IDamageable; health, armor, god mode and inventory come from Superuser.ConfigurePlayerActions, and commands without them say so instead of doing nothing
+# Votes
+Votes - vote, votekick, voteban, votemap, votemap force, stopvote and veto, each with its own admin.votes permission; a vote passes only with more than half of everyone connected, a forced map vote takes the most votes, and passed kicks and bans are recorded like the commands
+Vote panel - the optional Superuser Vote Panel slides in from the left with the question, F1 and F2 (or a click) to vote, live counts and a lit-up avatar for each of up to 30 voters; games can draw their own from Superuser.CurrentVote, IVoteEvent and Superuser.CastVote
+# Props
+Prop protection - Superuser records who spawned each object and keeps it after they leave; owners share with admin props share, clean up with admin props cleanup, staff clean up anyone's and admin props cleanupall clears every player's, a player's props are removed two minutes after they leave, and games ask Superuser.CanTouch before their tools act
+# Alt accounts
+Alt detection - Superuser links accounts that share a Steam Family Sharing copy, an IP address or a Steam party; Moderation › Alt accounts lists suspects with those linked to banned accounts first, beside each one's linked accounts and why, the Player window gains an Alts tab, and admin alts check and suspects do the same from the console (admin.alts.read, admins by default)
+IP history - each player's last 5 IP addresses with first and last seen times, shown in the alt views and by admin alts ips to staff with admin.alts.ips (owners only by default); relayed connections don't reveal an address
+# Content
+Content bans - admin content ban, unban and list ban maps, addons and entities by name or with * wildcards (admin.content.manage, admins by default); banned maps are refused by map and map votes, banned entities players spawn are removed within half a second with a private reason, and games check addons with Superuser.IsContentAllowed
+# Storage
+Module state - validated state and audit intents persist together with revision checks; unconfirmed writes disable the state adapter until reloaded
+Recovery audit export - custom storage adapters can preserve the validated recovery intent using AuditIntent.ToJson
+### Changed
+# Interface
+Menu key - the admin menu now opens and closes with P instead of F6; scenes that saved F6 on the component keep it
+Player window - clicking a player opens them in their own window beside the list, with Restrictions, History, Chat, Notes and Prefix tabs instead of sections stacked under the table
+Steam profile link - the Steam ID at the top of the Player window opens their Steam profile when clicked and copies the ID when right-clicked
+Player actions - kick, warn, mute, gag, ban and module actions open a popup in the middle of the screen for the reason and duration, from the Actions button or by right-clicking a player; the Actions section is gone
+# Moderation
+Mute wording - text mute is now just mute in the menu and history; the command stays admin mute and saved mutes are unchanged
+Announcements - each is one sentence naming who did it, to whom, for how long and why, such as "chomnr banned Smithers for 10 days for spam", instead of "Smithers has been banned by chomnr for spam (10d)"
+Announcement tag - in Superuser's chat box the SUPERUSER tag is bold grey ahead of the message, so it reads as the server rather than a player
+Chat wrapping - long messages wrap back to the left edge of the chat instead of indenting under the name or tag
+Join and leave - the server's own "Smithers joined the game." and "Smithers left the game." lines replace the engine's, without the waving emoji
+Chat box scrolling - the history scrolls with the mouse wheel while the chat is open, with a thin bar showing where you are; opening, closing and sending no longer move the history, and new messages no longer shift it a frame after they arrive
+Chat Enter - Enter sends and closes the chat even after clicking elsewhere in the box
+Command limits - staff can send far more commands before being throttled: 40 every 2 seconds per player with 6 running at once, up from 8 and 2, and 128 at once server-wide, up from 32
+### Fixed
+# Interface
+Menu key on joining players - the admin menu no longer switches itself off for players whose connection was still joining when it first checked; their open key (P) now works once they are in
+# Prefixes
+Prefix editor fields - after Apply, the Name, Tag and Template fields no longer jump back to the old values (such as [OWNER]) while the saved prefix already shows the change
+
 ## 2026-10-24
 Title: Request Abuse Hardening
 ### Fixed

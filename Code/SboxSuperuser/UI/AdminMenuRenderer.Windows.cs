@@ -6,6 +6,7 @@ namespace SboxSuperuser.UI;
 internal sealed partial class AdminMenuRenderer
 {
 	private const string PlayersWindow = "players";
+	private const string PlayerWindow = "player";
 	private const string ActivityWindow = "activity";
 	private const string AboutWindow = "about";
 	private const string RestrictionsWindow = "restrictions";
@@ -14,6 +15,8 @@ internal sealed partial class AdminMenuRenderer
 	private const string ChatWindow = "chat";
 	private const string DocumentationWindow = "documentation";
 	private const string PrefixesWindow = "prefixes";
+	private const string AltsWindow = "alts";
+	private const string AltsCommand = "alts.suspects";
 
 	private const ImGuiWindowFlags PassiveFlags = ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoBringToFrontOnFocus;
 

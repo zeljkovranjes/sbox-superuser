@@ -13,7 +13,7 @@ public enum AdminQueryKind
 	About,
 	/// <summary>List the commands the caller may run, with their arguments.</summary>
 	Commands,
-	/// <summary>List active bans and text mutes across all players; search filters by Steam ID.</summary>
+	/// <summary>List active bans, mutes and gags across all players; search filters by Steam ID.</summary>
 	Restrictions,
 	/// <summary>Read groups, members and permission keys (owners only).</summary>
 	Permissions,
@@ -24,5 +24,9 @@ public enum AdminQueryKind
 	/// <summary>List documented modules (empty search), or read one page: search is the module ID, page its index.</summary>
 	Documentation,
 	/// <summary>Read the windows modules added to the admin menu, filtered to what the caller may use.</summary>
-	MenuWindows
+	MenuWindows,
+	/// <summary>Read one account's linked alts; search is the exact Steam ID. Needs admin.alts.read.</summary>
+	Alts,
+	/// <summary>Read the alt-account dashboard: accounts with links, riskiest first, paged. Needs admin.alts.read.</summary>
+	AltSuspects
 }

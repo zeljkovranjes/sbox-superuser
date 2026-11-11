@@ -13,6 +13,8 @@ public sealed class ModerationLedgerTests
 	[Theory]
 	[InlineData( "Ban" )]
 	[InlineData( "TextMute" )]
+	[InlineData( "Gag" )]
+	[InlineData( "Gimp" )]
 	public void ExpiryUsesTheOriginalUtcTimestampAfterReload( string kindName )
 	{
 		var kind = Enum.Parse<ModerationKind>( kindName );
@@ -35,6 +37,17 @@ public sealed class ModerationLedgerTests
 		Assert.Equal( ban.Id, ledger.Entries[ 1 ].Revokes );
 		Assert.Equal( 2, ledger.Entries.Count );
 		Assert.Throws<ArgumentException>( () => ledger.Append( Entry( ModerationKind.Unban, revokes: ban.Id ) ) );
+	}
+
+	[Fact]
+	public void UngagLiftsOnlyTheGag()
+	{
+		var mute = Entry( ModerationKind.TextMute );
+		var gag = Entry( ModerationKind.Gag );
+		var ledger = new ModerationLedger( 3, new[] { mute, gag, Entry( ModerationKind.Ungag, revokes: gag.Id ) } );
+		Assert.Null( ledger.Active( Target, ModerationKind.Gag, Now ) );
+		Assert.NotNull( ledger.Active( Target, ModerationKind.TextMute, Now ) );
+		Assert.Throws<ArgumentException>( () => new ModerationLedger( 2, new[] { mute, Entry( ModerationKind.Ungag, revokes: mute.Id ) } ) );
 	}
 
 	[Fact]

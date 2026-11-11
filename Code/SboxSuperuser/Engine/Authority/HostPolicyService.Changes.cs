@@ -4,7 +4,10 @@ namespace SboxSuperuser.Engine.Authority;
 
 internal sealed partial class HostPolicyService
 {
-	internal bool IsOwner( string steamId ) => IsUsable && _owners.Contains( steamId );
+	internal bool IsOwner( string steamId ) => IsUsable && (_owners.Contains( steamId ) || _resolver.Claims.IsOwner( steamId ));
+
+	/// <summary>Live access from the engine's users.json claims; see <see cref="Core.Permissions.ClaimMemberships"/>.</summary>
+	internal Core.Permissions.ClaimMemberships Claims => _resolver.Claims;
 
 	private bool CanManage( ActorIdentity actor ) => actor is not null
 		&& (actor.Kind == ActorKind.DedicatedConsole || actor.Kind == ActorKind.Player && IsOwner( actor.SubjectId ));

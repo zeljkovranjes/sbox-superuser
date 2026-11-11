@@ -19,15 +19,15 @@ internal sealed class ModerationLedger
 		foreach ( var entry in snapshot )
 		{
 			if ( !ids.Add( entry.Id ) ) throw new ArgumentException( "Duplicate moderation action ID." );
-			if ( entry.Kind is ModerationKind.Ban or ModerationKind.TextMute )
+			if ( entry.Kind.IsRestriction() )
 			{
 				if ( Active( entry.Target, entry.Kind, entry.CreatedUtc ) is not null )
 					throw new ArgumentException( "An active restriction already exists." );
 				_active[ (entry.Target, entry.Kind) ] = entry;
 			}
-			else if ( entry.Kind is ModerationKind.Unban or ModerationKind.Unmute )
+			else if ( entry.Kind.IsRevocation() )
 			{
-				var kind = entry.Kind == ModerationKind.Unban ? ModerationKind.Ban : ModerationKind.TextMute;
+				var kind = entry.Kind.Restricted();
 				var original = Active( entry.Target, kind, entry.CreatedUtc );
 				if ( original is null || original.Id != entry.Revokes )
 					throw new ArgumentException( "Revocation must link the target's active original restriction." );

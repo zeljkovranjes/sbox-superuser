@@ -33,8 +33,8 @@ prefixes needs no permission.
 **Server › Prefixes** lists every prefix with a live preview. Pick one to edit
 its name, tag, template and palette, choose its tag and name effects, duplicate
 or delete it. The **Groups** tab gives groups a prefix; the **Players** tab gives
-individual players their own. The selected player in **Players** also has a
-**Prefix** section.
+individual players their own. The **Player** window also has a **Prefix**
+tab.
 
 **Edit code** opens the effect editor: numbered lines, live coloring, swatches
 under colors, red underlines with a plain-English message for every mistake, and

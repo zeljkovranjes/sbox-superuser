@@ -8,6 +8,15 @@ namespace SboxSuperuser;
 
 public static partial class Superuser
 {
+	/// <summary>Reads an active player's inherited protection level on the host. Returns false with -1 when authority is unavailable; repeated reads allocate no policy data.</summary>
+	public static bool TryGetProtectionLevel( Connection player, out int level )
+	{
+		level = -1;
+		if ( player is not { IsActive: true } || !ReferenceEquals( Connection.Find( player.Id ), player ) ) return false;
+		var policy = FindAuthorityRuntime()?.Policy;
+		return policy is not null && policy.TryGetProtectionLevel( player.SteamId, out level );
+	}
+
 	/// <summary>Gets local authority health on the host main thread, or null without an eligible runtime.</summary>
 	public static AuthorityDiagnostics GetAuthorityDiagnostics()
 	{

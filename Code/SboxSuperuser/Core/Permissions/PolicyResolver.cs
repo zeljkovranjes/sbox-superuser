@@ -11,10 +11,14 @@ internal sealed class PolicyResolver
 	internal long RegistryRevision { get; private set; }
 	internal IReadOnlyList<string> RegisteredPermissions => Array.AsReadOnly( _registered.OrderBy( key => key, StringComparer.Ordinal ).ToArray() );
 
+	/// <summary>Access from the engine's users.json claims, overlaid on the saved policy and never written to it.</summary>
+	internal ClaimMemberships Claims { get; } = new();
+
 	internal PolicyResolver( PolicyGraph policy, IEnumerable<string> registered )
 	{
 		Policy = policy ?? throw new ArgumentNullException( nameof( policy ) );
 		ReplaceRegistered( registered );
+		Claims.Changed += _cache.Clear;
 	}
 
 	internal void ReplacePolicy( PolicyGraph policy )
@@ -62,7 +66,7 @@ internal sealed class PolicyResolver
 			return cached;
 		}
 
-		var result = PolicyResolution.Evaluate( Policy, steamId, permission, _registered.Contains( permission ), RegistryRevision );
+		var result = PolicyResolution.Evaluate( Policy, steamId, permission, _registered.Contains( permission ), RegistryRevision, Claims );
 		// A bounded disposable cache; policy and registry replacements invalidate every decision together.
 		if ( _cache.Count >= 1024 )
 		{

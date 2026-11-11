@@ -33,7 +33,7 @@ internal sealed partial class HostCommandDispatcher
 			return Result( CommandStatus.Denied, "Permission was revoked before execution." );
 		}
 
-		var targetError = ValidateTargets( original.Actor, command.Descriptor, arguments );
+		var targetError = ValidateTargets( original, command.Descriptor, arguments );
 		if ( targetError is not null )
 		{
 			return targetError;
@@ -107,7 +107,16 @@ internal sealed partial class HostCommandDispatcher
 	internal bool CanUse( CommandContext context, string permission ) => context.Services is CommandExecutionServices services
 		&& ReferenceEquals( services.Issuer, this ) && ValidateCaller( context, services ) is null && HasPermission( context, services, permission );
 
-	private CommandResult ValidateTargets( ActorIdentity actor, CommandDescriptor descriptor, CommandArguments arguments )
+	internal bool CanTarget( CommandContext context, string target )
+	{
+		if ( context.Services is not CommandExecutionServices services || !ReferenceEquals( services.Issuer, this )
+			|| ValidateCaller( context, services ) is not null ) return false;
+		if ( context.Actor.Kind != ActorKind.InternalService ) return _policy.CheckTarget( context.Actor, target ).IsAllowed;
+		return services.Service?.MaximumTargetLevel is int maximum && ulong.TryParse( target, out var id )
+			&& _policy.TryGetProtectionLevel( id, out var level ) && level <= maximum;
+	}
+
+	private CommandResult ValidateTargets( CommandContext context, CommandDescriptor descriptor, CommandArguments arguments )
 	{
 		var players = _players();
 		if ( players is null || players.Count > 1024 )
@@ -130,7 +139,7 @@ internal sealed partial class HostCommandDispatcher
 			}
 
 			if ( argument.TargetPolicy is CommandTargetPolicy.PunitiveAnyPlayer or CommandTargetPolicy.PunitiveOnlinePlayer
-				&& !_policy.CheckTarget( actor, target ).IsAllowed )
+				&& !CanTarget( context, target ) )
 			{
 				return Result( CommandStatus.Denied, "Target protection denied this action." );
 			}

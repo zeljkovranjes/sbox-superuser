@@ -19,5 +19,11 @@ public enum AdminMenuElementKind
 	Form = 4,
 
 	/// <summary>The reply of a read-only command, refreshed every few seconds while shown and right after a change from the menu.</summary>
-	Live = 5
+	Live = 5,
+
+	/// <summary>A settings card initialized from a read-only command, with defaults and an Apply button.</summary>
+	Settings = 6,
+
+	/// <summary>A searchable catalog with permission-checked block and unblock actions.</summary>
+	Catalog = 7
 }

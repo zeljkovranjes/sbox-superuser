@@ -5,7 +5,7 @@ port. It is a client of the same host API your own code uses: every view is a
 private query, every change an authorized and audited command.
 
 Add one **Superuser Admin Menu** to a GameObject that exists on each client; it
-needs a scene camera. Press **F6** to open or close it. Escape cancels a pending
+needs a scene camera. Press **P** to open or close it. Escape cancels a pending
 confirmation first, otherwise it closes the menu. Set **Open Key** to another key
 and re-enable the component to apply it, or call `menu.SetOpen( true )` from a
 game button. The host still needs **Superuser Bootstrap**, and opening the menu
@@ -14,7 +14,7 @@ grants no permissions.
 - ***[Layout, pins and pop-ups](menu/layout.md)*** &mdash; the menu bar, moving
   and pinning windows, what is saved on the player's machine, result pop-ups.
 
-- ***[Players](menu/players.md)*** &mdash; search, the selected player, actions,
+- ***[Players](menu/players.md)*** &mdash; search, the Player window, the action popup,
   notes, recent reasons and keyboard shortcuts.
 
 - ***[Bans & mutes](menu/bans.md)*** &mdash; every active restriction across all
@@ -40,6 +40,17 @@ grants no permissions.
 
 - ***[Replacing the menu](menu/replace.md)*** &mdash; building your own interface
   on the same private API.
+
+## Scoreboard
+
+Add **Superuser Scoreboard** for a scoreboard that matches the chat: while the
+score key (Tab by default; set **Show Action**) is held, it lists every player
+with their Steam avatar, prefix, name and ping. Press the right mouse button to
+free the cursor, then right-click a player for their Steam profile or Steam ID.
+Staff also get **Open in admin menu** and **Kick**, **Warn**, **Mute**, **Gag**
+and **Ban**, which open the admin menu on that player with the action's popup
+ready. It isn't part of the bootstrap, so a game with its own scoreboard just
+leaves it out.
 
 ## Who sees what
 

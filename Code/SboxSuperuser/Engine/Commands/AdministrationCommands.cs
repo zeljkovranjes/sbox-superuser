@@ -16,11 +16,18 @@ internal sealed partial class AdministrationCommands : IDisposable
 	private readonly Moderation.HostModerationService _moderation;
 	private readonly Func<CommandContext, string, string, bool, Task<CommandResult>> _disconnect;
 	private readonly Func<CommandContext, string, string, CommandResult> _notifyWarning;
+	private readonly Action<string> _announce;
+	private readonly Func<string,string> _playerName;
+	private readonly Core.Messages.MessageCatalog _messages;
+	private readonly Func<string, bool> _mapAllowed;
 
 	internal AdministrationCommands( HostPolicyService policy, HostAuditService audit, CommandRegistry registry,
 		HostCommandDispatcher dispatcher, Func<CommandResult> diagnostics, Modules.ModuleManager modules = null,
 		Moderation.HostModerationService moderation = null, Func<CommandContext, string, string, bool, Task<CommandResult>> disconnect = null,
-		Func<CommandContext, string, string, CommandResult> notifyWarning = null )
+		Func<CommandContext, string, string, CommandResult> notifyWarning = null, Action<string> announce = null, Func<string,string> playerName = null,
+		Messaging.IPlayerMessenger messenger = null, Messages.HostMessageService messages = null,
+		Votes.VoteSession votes = null, Func<string, CommandResult> changeMap = null, Content.HostContentService content = null,
+		Alts.HostAltService alts = null )
 	{
 		_policy = policy;
 		_audit = audit;
@@ -31,11 +38,20 @@ internal sealed partial class AdministrationCommands : IDisposable
 		_moderation = moderation;
 		_disconnect = disconnect;
 		_notifyWarning = notifyWarning;
+		_announce = announce;
+		_playerName = playerName ?? (id => id);
+		_messages = messages?.Catalog ?? new Core.Messages.MessageCatalog();
+		_mapAllowed = content is null ? null : map => content.IsAllowed( Core.Content.ContentBanList.Map, map );
 		_scope = new CommandRegistrationScope( registry, Module, managed: true );
 		RegisterDiscovery();
 		RegisterAccess();
 		RegisterModules();
 		if ( _moderation is not null ) RegisterModeration();
+		if ( messenger is not null ) RegisterMessages( messenger );
+		if ( messages is not null ) RegisterMessageTemplates( messages );
+		if ( votes is not null ) RegisterVotes( votes, changeMap );
+		if ( content is not null ) RegisterContent( content );
+		if ( alts is not null ) RegisterAlts( alts );
 		RegisterDocumentation();
 		_scope.Commit();
 	}

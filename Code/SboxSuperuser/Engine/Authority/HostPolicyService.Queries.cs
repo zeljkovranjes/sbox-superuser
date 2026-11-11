@@ -61,7 +61,7 @@ internal sealed partial class HostPolicyService : Permissions.IPermissionEvaluat
 		}
 
 		return TargetProtection.Check( _resolver.Policy, _owners, actor.SubjectId,
-			actor.Kind == ActorKind.DedicatedConsole, targetSteamId );
+			actor.Kind == ActorKind.DedicatedConsole, targetSteamId, _resolver.Claims );
 	}
 
 	internal void ReplaceRegisteredPermissions( IEnumerable<string> permissions ) => _resolver.ReplaceRegistered( permissions );

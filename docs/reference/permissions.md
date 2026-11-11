@@ -27,6 +27,27 @@ Only owners and the dedicated local console can change policy. Granting
 `admin.security.manage` to an ordinary administrator does not make that player
 an owner. The reserved `owner` identity cannot be assigned as a normal group.
 
+## Engine users.json
+
+The engine's own `config/users.json` gives Steam accounts claims. Superuser
+reads them when a player joins and grants:
+
+| Claim | Superuser access |
+|---|---|
+| `superuser` or `owner` | Owner |
+| `admin` | The `admin` group |
+| `moderator` or `mod` | The `moderator` group |
+
+```json
+{ "SteamId": "76561198000000001", "Claims": [ "admin", "kick", "ban" ], "Name": "Alice" }
+```
+
+This access is live and never saved: take someone out of `users.json` and they
+lose it when they next join; it ends at once when they leave. Other claims such
+as `kick` keep their engine meaning and grant nothing in Superuser. The engine
+only checks claims on Steam connections, and the host is skipped because the
+engine gives it every claim.
+
 ## Target protection
 
 Punitive actions require a strictly higher protection level than the target.

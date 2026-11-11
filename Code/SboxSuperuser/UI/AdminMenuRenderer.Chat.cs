@@ -54,7 +54,7 @@ internal sealed partial class AdminMenuRenderer
 			ImGui.TableNextColumn();
 			// Names and messages are player text, so the row ID is its index and the text is drawn over it.
 			if ( ImGui.Selectable( "##line", false, ImGuiSelectableFlags.SpanAllColumns | ImGuiSelectableFlags.AllowOverlap ) && showPlayer )
-				OpenPlayer( line.SteamId );
+				SelectPlayer( line.SteamId );
 			DrawChatLineMenu( line );
 			ImGui.SameLine();
 			ImGui.TextUnformatted( line.CreatedUtc.UtcDateTime.ToString( "HH:mm:ss" ) );
@@ -78,12 +78,8 @@ internal sealed partial class AdminMenuRenderer
 		if ( ImGui.MenuItem( "Copy message" ) ) Sandbox.UI.Clipboard.SetText( line.Message );
 		if ( ImGui.MenuItem( "Copy Steam ID" ) ) Sandbox.UI.Clipboard.SetText( line.SteamId );
 		ImGui.Separator();
-		if ( ImGui.MenuItem( "Open player" ) ) OpenPlayer( line.SteamId );
-		if ( ImGui.MenuItem( "Text mute..." ) )
-		{
-			_layout.SetOpen( PlayersWindow, true );
-			StartQuickAction( line.SteamId, AdminAction.Mute );
-		}
+		if ( ImGui.MenuItem( "Open player" ) ) SelectPlayer( line.SteamId );
+		if ( ImGui.MenuItem( "Mute..." ) ) StartAction( line.SteamId, AdminAction.Mute, null );
 		ImGui.EndPopup();
 	}
 

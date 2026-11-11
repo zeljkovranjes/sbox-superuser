@@ -79,7 +79,7 @@ away.
 
 ## 5. Check it in the game
 
-Start the game, open the menu with **F6**, choose **Superuser › Documentation**
+Start the game, open the menu with **P**, choose **Superuser › Documentation**
 and pick your module. If a page changed, press **Refresh** at the top of the list.
 Owners see every module; other players see a module once they may run one of its
 commands.

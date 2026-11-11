@@ -9,6 +9,7 @@ internal static class AdminMenuTheme
 	internal static readonly Vector4 Warning = Rgb( 0xFBBF24 );
 	internal static readonly Vector4 Danger = Rgb( 0xF87171 );
 	internal static readonly Vector4 Neutral = Rgb( 0x9CA3AF );
+	internal static readonly Vector4 Link = Rgb( 0x60A5FA );
 
 	/// <summary>Maps a host outcome to its color; Unknown is a warning because it is never success.</summary>
 	internal static Vector4 Tone( CommandStatus status ) => status switch
@@ -22,7 +23,7 @@ internal static class AdminMenuTheme
 	internal static Vector4 Tone( AdminAction action ) => action switch
 	{
 		AdminAction.Kick or AdminAction.Ban => Danger,
-		AdminAction.Warn or AdminAction.Mute => Warning,
+		AdminAction.Warn or AdminAction.Mute or AdminAction.Gag or AdminAction.Gimp => Warning,
 		_ => Success
 	};
 

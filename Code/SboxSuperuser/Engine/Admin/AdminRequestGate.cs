@@ -1,10 +1,16 @@
 namespace SboxSuperuser.Engine.Admin;
 
+/// <summary>Per-connection and server-wide limits on admin requests; generous enough that staff working quickly never hit them.</summary>
 internal sealed class AdminRequestGate
 {
+	internal const int BurstPerWindow = 40;
+	internal const int ConcurrentPerConnection = 6;
+	internal const int ConcurrentServerWide = 128;
+	internal static readonly TimeSpan Window = TimeSpan.FromSeconds( 2 );
+
 	private sealed class Budget
 	{
-		internal DateTimeOffset Window;
+		internal DateTimeOffset Start;
 		internal int Count;
 		internal int Active;
 	}
@@ -14,19 +20,19 @@ internal sealed class AdminRequestGate
 
 	internal bool TryEnter( Guid connection, DateTimeOffset now )
 	{
-		foreach ( var id in _budgets.Where( pair => pair.Value.Active == 0 && now - pair.Value.Window > TimeSpan.FromSeconds( 10 ) )
+		foreach ( var id in _budgets.Where( pair => pair.Value.Active == 0 && now - pair.Value.Start > TimeSpan.FromSeconds( 10 ) )
 			.Select( pair => pair.Key ).ToArray() ) _budgets.Remove( id );
 		if ( !_budgets.TryGetValue( connection, out var budget ) )
 		{
 			if ( _budgets.Count >= 1024 ) return false;
-			_budgets.Add( connection, budget = new Budget { Window = now } );
+			_budgets.Add( connection, budget = new Budget { Start = now } );
 		}
-		if ( now - budget.Window >= TimeSpan.FromSeconds( 2 ) )
+		if ( now - budget.Start >= Window )
 		{
-			budget.Window = now;
+			budget.Start = now;
 			budget.Count = 0;
 		}
-		if ( _active >= 32 || budget.Active >= 2 || budget.Count >= 8 ) return false;
+		if ( _active >= ConcurrentServerWide || budget.Active >= ConcurrentPerConnection || budget.Count >= BurstPerWindow ) return false;
 		budget.Active++;
 		budget.Count++;
 		_active++;

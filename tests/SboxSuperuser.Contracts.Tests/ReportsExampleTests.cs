@@ -100,4 +100,62 @@ public sealed class ReportsExampleTests
 		Assert.Throws<ArgumentException>( () => scope.AddMenuWindow( "Bad", window => window.Button( "Go", "Not A Command" ) ) );
 		Assert.Throws<ArgumentException>( () => scope.AddMenuWindow( new string( 'x', 60 ), window => window.Text( "too long a title" ) ) );
 	}
+	[Fact]
+	public async Task WindowsGoUnderTheirTabButNeverTheSuperuserOne()
+	{
+		using var rig = new ModerationRig();
+		var scope = new CommandRegistrationScope( rig.Rig.Registry, "example.tabs" );
+		scope.RegisterCommand( new CommandDescriptor( "tabs.read", "Read", "test.use", scope.ModuleId ),
+			(_, _) => Task.FromResult( new CommandResult( CommandStatus.Success, "Done" ) ) );
+		foreach ( var reserved in new[] { "Superuser", "superuser tools", "My SUPERUSER" } )
+			Assert.Throws<ArgumentException>( () => scope.AddMenuWindow( "Window", window => window.Text( "x" ), reserved ) );
+		scope.AddMenuWindow( "Default", window => window.Live( "tabs.read" ) );
+		scope.AddMenuWindow( "Staff", window => window.Live( "tabs.read" ), "Moderation" );
+		scope.AddMenuWindow( "Economy", window => window.Live( "tabs.read" ), " Shop " );
+		scope.Commit();
+		var queries = new HostAdminQueries( rig.Rig.Policy, rig.Moderation, null, () => rig.Rig.Players, registry: rig.Rig.Registry );
+		var reply = await queries.QueryAsync( () => DispatcherRig.Owner, new AdminQuery( AdminQueryKind.MenuWindows ), Guid.NewGuid(), CancellationToken.None );
+		Assert.Equal( new[] { "Moderation", "Modules", "Shop" }, reply.MenuWindows.Where( window => window.ModuleId == "example.tabs" ).Select( window => window.Menu ).Order() );
+	}
+
+	[Fact]
+	public void SettingsCopyDefaultsAndRejectInvalidInput()
+	{
+		var defaults = new[] { "16", "4" };
+		var window = new AdminMenuWindow( "Limits" ).Settings( "Spawn limits", "limits.configure", "limits.status", defaults );
+		defaults[0] = "999";
+		var element = Assert.Single( window.Elements );
+		Assert.Equal( AdminMenuElementKind.Settings, element.Kind );
+		Assert.Equal( "limits.status", element.StatusCommand );
+		Assert.Equal( "16", element.Arguments[0] );
+		Assert.Throws<ArgumentException>( () => window.Settings( "Limits", "limits.configure", "Bad Command" ) );
+		Assert.Throws<ArgumentException>( () => window.Settings( "Bad\nTitle", "limits.configure", "limits.status" ) );
+		Assert.Throws<ArgumentException>( () => window.Settings( "Limits", "limits.configure", "limits.status", new string( 'x', 2048 ) ) );
+	}
+
+	[Fact]
+	public async Task SettingsRequireBothReadAndWritePermission()
+	{
+		using var rig = new ModerationRig();
+		using var scope = new CommandRegistrationScope( rig.Rig.Registry, "example.settings" );
+		foreach ( var name in new[] { "limits.read", "limits.write" } )
+		{
+			scope.RegisterPermission( new PermissionDescriptor( name, "Settings permission" ) );
+			scope.RegisterCommand( new CommandDescriptor( name, "Settings command", name, scope.ModuleId ),
+				(_, _) => Task.FromResult( new CommandResult( CommandStatus.Success, "Done" ) ) );
+		}
+		scope.AddMenuWindow( "Settings", window => window.Settings( "Limits", "limits.write", "limits.read", "1" ) );
+		scope.Commit();
+		var queries = new HostAdminQueries( rig.Rig.Policy, rig.Moderation, null, () => rig.Rig.Players, registry: rig.Rig.Registry );
+		async Task<bool> Visible() => (await queries.QueryAsync( () => DispatcherRig.User,
+			new AdminQuery( AdminQueryKind.MenuWindows ), Guid.NewGuid(), CancellationToken.None )).MenuWindows.Any( window => window.Title == "Settings" );
+		Assert.False( await Visible() );
+		await rig.Rig.Edit( PolicyChange.SetUserPermission( DispatcherRig.UserId, "limits.write", PermissionEffect.Allow ) );
+		Assert.False( await Visible() );
+		await rig.Rig.Edit( PolicyChange.SetUserPermission( DispatcherRig.UserId, "limits.read", PermissionEffect.Allow ) );
+		Assert.True( await Visible() );
+		await rig.Rig.Edit( PolicyChange.SetUserPermission( DispatcherRig.UserId, "limits.write", PermissionEffect.Deny ) );
+		Assert.False( await Visible() );
+	}
+
 }

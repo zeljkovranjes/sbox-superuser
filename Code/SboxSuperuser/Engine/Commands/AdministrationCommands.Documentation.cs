@@ -45,9 +45,9 @@ internal sealed partial class AdministrationCommands
 
 		| Group | Grants |
 		|---|---|
-		| `player` | Help and your own results; everyone has it |
-		| `moderator` | Kick, warn, text mute, notes, recent chat |
-		| `admin` | Ban, history and settings, plus everything a moderator has |
+		| `player` | Help, your own results, psay, asay and thetime; everyone has it |
+		| `moderator` | Kick, warn, mute, gag, notes, recent chat, staff messages |
+		| `admin` | Ban, history, settings, csay and tsay, plus everything a moderator has |
 
 		Owners are set by the host and outrank every group.
 

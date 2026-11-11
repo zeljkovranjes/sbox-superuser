@@ -44,7 +44,7 @@ internal sealed partial class HostPolicyService
 		_owners = _bootstrapOwners;
 		var defaults = PolicySnapshot.CreateDefault().Graph;
 		var permissions = defaults.Groups.Values.SelectMany( group => group.Entries.Keys )
-			.Concat( new[] { "admin.permissions.explain", "admin.security.manage", "admin.audit.read" } )
+			.Concat( new[] { "admin.permissions.explain", "admin.security.manage", "admin.audit.read", "admin.alts.ips" } )
 			.Distinct( StringComparer.Ordinal );
 		_resolver = new PolicyResolver( defaults, permissions );
 		Initialization = LoadAsync( CancellationToken.None );

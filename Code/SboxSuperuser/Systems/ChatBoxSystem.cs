@@ -23,9 +23,19 @@ internal sealed class ChatBoxSystem : GameObjectSystem<ChatBoxSystem>
 
 	internal bool Active => _box is not null;
 
+	internal bool IsOpen => _box?.IsOpen == true;
+
 	internal void Observe( ChatMessageEvent message )
 	{
 		if ( Active && message is not null && !message.Suppress ) _pending.Add( message );
+	}
+
+	/// <summary>Shows a tagged public announcement; returns false when the built-in chat should show it.</summary>
+	internal bool ShowAnnouncement( string tag, string message )
+	{
+		if ( !Active ) return false;
+		_box.AddAnnouncement( tag, message );
+		return true;
 	}
 
 	/// <summary>Shows Superuser's own private replies; returns false when the built-in chat should show them.</summary>
@@ -50,6 +60,9 @@ internal sealed class ChatBoxSystem : GameObjectSystem<ChatBoxSystem>
 		Deliver();
 		var menuOpen = Scene.GetSystem<AdminMenuSystem>()?.IsOpen == true;
 		if ( !_box.IsOpen && !menuOpen && Input.Pressed( "chat" ) ) _box.Open();
+		// However the box opened, fetch the commands this player may run for autocomplete.
+		if ( _box.IsOpen && !_wasOpen ) RequestCommands();
+		_wasOpen = _box.IsOpen;
 		if ( menuOpen ) _box.Close();
 		_box.CaptureInput();
 	}
@@ -68,7 +81,10 @@ internal sealed class ChatBoxSystem : GameObjectSystem<ChatBoxSystem>
 			var sender = message.Sender.SteamId.ToString();
 			if ( _last.Sender == sender && _last.Text == message.Message && RealTime.Now - _last.At < 0.25f ) continue;
 			_last = (sender, message.Message, RealTime.Now);
-			_box.AddPlayer( sender, message.Sender.DisplayName, message.Message );
+			var names = Connection.All.Select( connection => connection.DisplayName ).ToArray();
+			var mentions = Core.Chat.Mentions.Find( message.Message, names );
+			var mentionsMe = Connection.Local is { } local && mentions.Any( mention => string.Equals( mention.Name, local.DisplayName, StringComparison.OrdinalIgnoreCase ) );
+			_box.AddPlayer( sender, message.Sender.DisplayName, message.Message, mentions, mentionsMe );
 		}
 		_pending.Clear();
 	}
@@ -87,7 +103,45 @@ internal sealed class ChatBoxSystem : GameObjectSystem<ChatBoxSystem>
 	{
 		_builtInShown = ProjectSettings.Platform.ChatShowUI;
 		ProjectSettings.Platform.ChatShowUI = false;
-		_box = new ChatBoxRenderer( Scene, OpenPlayer, () => Scene.GetSystem<AdminMenuSystem>()?.IsAvailable == true );
+		_box = new ChatBoxRenderer( Scene, OpenPlayer, () => Scene.GetSystem<AdminMenuSystem>()?.IsAvailable == true, Complete );
+	}
+
+	// Commands this player may run, refreshed each time the chat opens since permissions can change.
+	private IReadOnlyList<Core.Commands.CompletionCommand> _commands = Array.Empty<Core.Commands.CompletionCommand>();
+	private Guid _commandsRequest;
+	private bool _wasOpen;
+
+	private void RequestCommands()
+	{
+		try { _commandsRequest = Superuser.RequestAdminQuery( new AdminQuery( AdminQueryKind.Commands ) ); }
+		catch ( InvalidOperationException ) { _commandsRequest = Guid.Empty; }
+	}
+
+	/// <summary>Takes the command list for autocomplete; every other admin reply is someone else's.</summary>
+	internal void Receive( AdminReply reply )
+	{
+		if ( reply.RequestId != _commandsRequest || reply.Status != CommandStatus.Success ) return;
+		_commands = reply.Commands.Select( command => new Core.Commands.CompletionCommand( command.Name.Replace( '.', ' ' ),
+			command.Arguments.Select( argument => new Core.Commands.CompletionArgument( argument.Name, Kind( argument ), argument.Optional,
+				argument.Remainder, argument.Choices, argument.Description ) ).ToArray(), command.Description ) ).ToArray();
+		_box?.RefreshCompletion();
+	}
+
+	private static Core.Commands.CompletionKind Kind( AdminCommandArgumentRow argument ) => argument.Kind switch
+	{
+		CommandArgumentKind.Player => Core.Commands.CompletionKind.Player,
+		CommandArgumentKind.Duration => Core.Commands.CompletionKind.Duration,
+		CommandArgumentKind.Boolean => Core.Commands.CompletionKind.Boolean,
+		CommandArgumentKind.Integer or CommandArgumentKind.Number => Core.Commands.CompletionKind.Number,
+		_ => argument.Choices.Length > 0 ? Core.Commands.CompletionKind.Choice : Core.Commands.CompletionKind.Text
+	};
+
+	private Core.Commands.Completion Complete( string line )
+	{
+		var players = Connection.All.Select( connection => connection.DisplayName ).ToArray();
+		if ( !line.StartsWith( '/' ) ) return Core.Chat.Mentions.Complete( line, players );
+		var root = Scene.GetAllComponents<Components.SuperuserBootstrap>().FirstOrDefault()?.CommandRoot ?? "admin";
+		return Core.Commands.CommandCompletion.Complete( line, root, _commands, players );
 	}
 
 	private void OpenPlayer( string steamId )

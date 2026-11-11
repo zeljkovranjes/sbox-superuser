@@ -48,9 +48,14 @@ internal sealed class PolicyGraph
 		}
 	}
 
-	internal IReadOnlyList<string> ApplicableGroups( string steamId )
+	/// <param name="claims">Live engine claims; their groups count like saved memberships when the groups exist.</param>
+	internal IReadOnlyList<string> ApplicableGroups( string steamId, ClaimMemberships claims = null )
 	{
 		var result = new HashSet<string>( _ancestors[ "player" ], StringComparer.Ordinal );
+		foreach ( var id in claims?.GroupsOf( steamId ) ?? Array.Empty<string>() )
+		{
+			if ( _ancestors.TryGetValue( id, out var claimed ) ) result.UnionWith( claimed );
+		}
 		if ( Users.TryGetValue( steamId, out var user ) )
 		{
 			foreach ( var id in user.Groups )
