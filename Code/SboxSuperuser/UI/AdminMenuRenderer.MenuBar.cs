@@ -27,8 +27,10 @@ internal sealed partial class AdminMenuRenderer
 		if ( ImGui.BeginMenu( "Moderation" ) )
 		{
 			WindowItem( "Players", PlayersWindow );
-			WindowItem( "Bans & mutes", RestrictionsWindow );
+			WindowItem( "Active restrictions", RestrictionsWindow );
 			WindowItem( "Chat", ChatWindow );
+			if ( Server.Can( AltsCommand ) ) WindowItem( "Alt accounts", AltsWindow );
+			DrawModuleItems( "Moderation" );
 			ImGui.EndMenu();
 		}
 
@@ -38,6 +40,7 @@ internal sealed partial class AdminMenuRenderer
 			WindowItem( "Activity", ActivityWindow );
 			if ( CanEditPermissions ) WindowItem( "Permissions", PermissionsWindow );
 			if ( Server.Can( PrefixExportCommand ) ) WindowItem( "Prefixes", PrefixesWindow );
+			DrawModuleItems( "Server" );
 			ImGui.EndMenu();
 		}
 

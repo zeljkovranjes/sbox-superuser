@@ -3,7 +3,7 @@ namespace SboxSuperuser.Core.Permissions;
 internal static class PolicyResolution
 {
 	internal static PolicyDecision Evaluate( PolicyGraph graph, string steamId, string permission,
-		bool registered, long registryRevision )
+		bool registered, long registryRevision, ClaimMemberships claims = null )
 	{
 		var direct = 0;
 		if ( graph.Users.TryGetValue( steamId, out var user ) )
@@ -12,7 +12,7 @@ internal static class PolicyResolution
 		}
 
 		var contributions = new List<PolicyContribution>();
-		foreach ( var id in graph.ApplicableGroups( steamId ) )
+		foreach ( var id in graph.ApplicableGroups( steamId, claims ) )
 		{
 			if ( graph.Groups[ id ].Entries.TryGetValue( permission, out var effect ) )
 			{

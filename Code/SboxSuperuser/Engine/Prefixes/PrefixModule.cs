@@ -47,6 +47,13 @@ internal sealed partial class PrefixModule : IAdminModule
 		return Task.CompletedTask;
 	}
 
+	/// <summary>
+	/// The player's prefix as plain text, such as [OWNER], for chats that can only show text. Null without a prefix
+	/// or while Superuser's own chat box draws prefixes itself.
+	/// </summary>
+	internal string PlainTag( string steamId ) =>
+		_running && !_host.Chat ? _catalog.Resolve( steamId, _host.GroupsOf( steamId ) )?.Tag : null;
+
 	/// <summary>What clients should see now: the prefixes plus each online player's resolved prefix.</summary>
 	internal PrefixSnapshot Snapshot()
 	{

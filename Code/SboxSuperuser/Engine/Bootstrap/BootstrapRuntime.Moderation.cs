@@ -6,15 +6,15 @@ namespace SboxSuperuser.Engine.Bootstrap;
 internal sealed partial class BootstrapRuntime
 {
 	private bool ModerationAvailable() => ThreadSafe.IsMainThread && IsUsable;
-	private bool CanModerateTarget( ActorIdentity actor, string target ) => Policy.CheckTarget( actor, target ).IsAllowed;
+	private bool CanModerateTarget( CommandContext context, string target ) => Dispatcher.CanTarget( context, target );
 	private static void ReportModerationFailure( Exception error ) => Log.Warning( $"[Superuser] Moderation storage degraded; type={error.GetType().Name}; admission fails closed." );
 
 	private CommandResult NotifyModerationWarning( CommandContext context, string target, string reason )
 	{
-		if ( !Dispatcher.CanUse( context, "admin.players.warn" ) || !CanModerateTarget( context.Actor, target ) )
+		if ( !Dispatcher.CanUse( context, "admin.players.warn" ) || !CanModerateTarget( context, target ) )
 			return new CommandResult( CommandStatus.Unknown, "Warning persisted; authority changed before notification." );
 		foreach ( var connection in Connection.All.Where( connection => connection.IsActive && connection.SteamId.ToString() == target ) )
-			connection.SendLog( LogLevel.Warn, "Server warning: " + reason );
+			Superuser.Notify( connection, "Warning: " + reason );
 		return new CommandResult( CommandStatus.Success, "Warning persisted; private console notification sent to any active target connection." );
 	}
 
@@ -33,7 +33,7 @@ internal sealed partial class BootstrapRuntime
 
 	private async Task<CommandResult> DisconnectModeratedAsync( CommandContext context, string target, string permission, bool ban )
 	{
-		if ( !Dispatcher.CanUse( context, permission ) || !CanModerateTarget( context.Actor, target ) )
+		if ( !Dispatcher.CanUse( context, permission ) || !CanModerateTarget( context, target ) )
 			return new CommandResult( CommandStatus.Unknown, "Record persisted; authority changed before disconnect, so no disconnect was attempted." );
 		if ( ban )
 		{

@@ -23,6 +23,10 @@ the bootstrap is ready.
 - ***[Chat](reference/chat.md)*** &mdash; platform chat, an independent chat
   backend, and rendering private results in your own view.
 
+- ***[Player actions](reference/players.md)*** &mdash; what slay, freeze, bring
+  and the other player commands do to bodies, and how a game supplies health,
+  armor and god mode.
+
 - ***[Native settings](reference/settings.md)*** &mdash; exposing a ConVar or
   native command without bypassing engine rules.
 

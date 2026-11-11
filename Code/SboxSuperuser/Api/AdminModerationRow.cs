@@ -6,6 +6,9 @@ public sealed class AdminModerationRow
 	/// <summary>Gets the target Steam ID; filled in server-wide views such as Restrictions.</summary>
 	public string SteamId { get; init; } = "";
 
+	/// <summary>Gets a permitted restore command for module restrictions, or empty if restoring is unauthorized.</summary>
+	public string RestoreCommand { get; init; } = "";
+
 	/// <summary>Gets the recorded action kind.</summary>
 	public string Kind { get; init; }
 
@@ -20,6 +23,9 @@ public sealed class AdminModerationRow
 
 	/// <summary>Gets whether this record is the active restriction.</summary>
 	public bool Active { get; init; }
+
+	/// <summary>Gets who recorded it: a Steam ID for players, otherwise the console or service identity.</summary>
+	public string Actor { get; init; } = "";
 
 	/// <summary>Gets the operator's reason.</summary>
 	public string Reason { get; init; }

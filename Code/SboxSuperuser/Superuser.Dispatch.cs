@@ -30,8 +30,8 @@ public static partial class Superuser
 		}
 	}
 
-	/// <summary>Issues a host-code service caller with explicit exact permissions; never expose this factory through a player transport.</summary>
-	public static CommandService CreateCommandService( string serviceId, IReadOnlyList<string> permissions )
+	/// <summary>Issues a host-code service caller with explicit exact permissions; optional maximumTargetLevel (0–99) explicitly permits punitive targets up to that rank, never owners. Never expose this factory through a player transport.</summary>
+	public static CommandService CreateCommandService( string serviceId, IReadOnlyList<string> permissions, int? maximumTargetLevel = null )
 	{
 		ContractGuard.Key( serviceId, nameof( serviceId ) );
 		var runtime = FindAuthorityRuntime() ?? throw new InvalidOperationException( "An eligible authoritative runtime is required." );
@@ -43,6 +43,6 @@ public static partial class Superuser
 
 		return new CommandService( serviceId, permissions, ( service, request, cancellation ) => runtime.Dispatcher.SubmitAsync(
 			() => service.IsActive && runtime.IsUsable ? new ActorIdentity( ActorKind.InternalService, service.Id ) : null,
-			CommandOrigin.InternalService, request, cancellation, service ) );
+			CommandOrigin.InternalService, request, cancellation, service ), maximumTargetLevel );
 	}
 }

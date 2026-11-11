@@ -20,6 +20,7 @@ menu, or an authenticated game RPC.
 | `CheckOrdinaryChat( sender )` | Authorize ordinary chat before broadcast |
 | `GetStore()` | Host-local versioned storage |
 | `ConfigureStorage( factory )` | Select a storage backend before enabling the bootstrap |
+| `ConfigurePlayerActions( actions )` | Choose how player commands act on bodies; see [player actions](players.md) |
 | `QueryAuditAsync( connection, query )` | Permission-filtered audit pages |
 
 ## Client entry points

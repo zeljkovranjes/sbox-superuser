@@ -2,8 +2,8 @@
 
 Shows the last 100 public chat messages, newest first, so staff can see what was
 said before acting. Filter by name, Steam ID or text. Click a line to open the
-player, or right-click it to copy it or start a text mute. A player's own lines
-also appear under **Recent chat** in their details.
+player, or right-click it to copy it or start a mute. A player's own lines
+also appear in the **Chat** tab of their **Player** window.
 
 ## Privacy
 

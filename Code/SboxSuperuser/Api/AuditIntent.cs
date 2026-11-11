@@ -41,5 +41,6 @@ public sealed class AuditIntent
 		}
 	}
 
-	internal string ToJson() => _json;
+	/// <summary>Returns the validated intent for a host storage adapter; never send this record to clients.</summary>
+	public string ToJson() => _json;
 }

@@ -126,6 +126,7 @@ internal sealed partial class AdminMenuRenderer : IDisposable
 		Server.RequestCommands();
 		Server.RequestMenuWindows();
 		if ( _layout.IsVisible( RestrictionsWindow, Interactive ) ) Server.RequestRestrictions( now );
+		if ( _layout.IsVisible( AltsWindow, Interactive ) ) Server.RequestAltSuspects( now );
 		if ( _layout.IsVisible( PermissionsWindow, Interactive ) ) Server.RequestPermissions();
 		if ( _layout.IsVisible( ChatWindow, Interactive ) || _wantPlayerChat ) Server.RequestChat( now );
 		_wantPlayerChat = false;
@@ -139,7 +140,9 @@ internal sealed partial class AdminMenuRenderer : IDisposable
 			ImGui.NewFrame();
 			if ( Interactive ) DrawMenuBar();
 			DrawPlayersWindow();
+			DrawPlayerWindow();
 			DrawRestrictionsWindow();
+			DrawAltsWindow();
 			DrawChatWindow();
 			DrawCommandsWindow();
 			DrawActivityWindow();
@@ -152,7 +155,7 @@ internal sealed partial class AdminMenuRenderer : IDisposable
 			DrawNotices();
 			if ( Interactive )
 			{
-				DrawConfirmation();
+				DrawActionPopup();
 				DrawRunConfirmation();
 			}
 			var lists = ImGui.Render();

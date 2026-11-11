@@ -83,4 +83,11 @@ internal sealed partial class AdminMenuRenderer
 		}
 		ImGui.EndPopup();
 	}
+
+	private void ConfirmRow( string key, string value )
+	{
+		ImGui.TextDisabled( "{0}", key );
+		ImGui.SameLine( 80 * Scale );
+		ImGui.TextWrapped( "{0}", value );
+	}
 }

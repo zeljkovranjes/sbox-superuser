@@ -5,31 +5,95 @@ namespace SboxSuperuser.UI;
 
 internal sealed partial class AdminMenuRenderer
 {
-	private static readonly string[] DurationPresets = { "30m", "2h", "1d", "7d", "permanent" };
-
 	private const string NoteCommand = "note";
+	private const string SteamProfileUrl = "https://steamcommunity.com/profiles/";
 	private string _note = "";
+	private bool _focusPlayerWindow;
 
-	// Set from a row's right-click menu: the action Enter in the reason field will ask to confirm.
-	private AdminAction? _quickAction;
-	private bool _focusReason;
+	/// <summary>The selected player in their own window: who they are, an actions menu, and tabs for the rest.</summary>
+	private void DrawPlayerWindow()
+	{
+		if ( Model.Selected.Length == 0 ) return;
+		// The first time it opens, it sits beside the player list rather than over it.
+		var list = _layout.Window( PlayersWindow );
+		var offset = list.HasBounds ? new Vector2( (list.X + list.Width) / Scale + 8, 16 ) : new Vector2( 790, 16 );
+		if ( !BeginWindow( PlayerWindow, "Player###player", offset, new Vector2( 520, 560 ), new Vector2( 380, 300 ), out var expanded ) ) return;
+		// Focus from inside: the vendored SetNextWindowFocus fails on a window's first frame.
+		if ( _focusPlayerWindow && Interactive )
+		{
+			ImGui.SetWindowFocus();
+			_focusPlayerWindow = false;
+		}
+		if ( expanded ) DrawPlayer();
+		ImGui.End();
+	}
 
 	private void DrawPlayer()
 	{
-		if ( Model.Selected.Length == 0 )
-		{
-			Caption( "No player selected." );
-			return;
-		}
-
-		var name = Model.Players?.Players.FirstOrDefault( player => player.SteamId == Model.Selected )?.Name;
-		ImGui.TextUnformatted( name ?? "Offline player" );
-		ImGui.SameLine();
-		ImGui.TextDisabled( "{0}", Model.Selected );
-
 		var details = Model.Details;
+		DrawPlayerHeader( details );
+		ImGui.Separator();
 		if ( details is null ) { Caption( "Loading player..." ); return; }
 		if ( details.Status != CommandStatus.Success ) { ColoredWrapped( details.Message, AdminMenuTheme.Tone( details.Status ) ); return; }
+
+		if ( !ImGui.BeginTabBar( "player-tabs" ) ) return;
+		if ( ImGui.BeginTabItem( $"Restrictions ({details.Restrictions.Length})###restrictions" ) )
+		{
+			if ( details.Restrictions.Length == 0 ) Caption( "No active restrictions visible to you." );
+			else DrawRecords( "restrictions", details.Restrictions, false );
+			ImGui.EndTabItem();
+		}
+		if ( ImGui.BeginTabItem( details.HistoryAllowed ? $"History ({details.History.Length})###history" : "History###history" ) )
+		{
+			DrawHistory( details );
+			ImGui.EndTabItem();
+		}
+		if ( ImGui.BeginTabItem( "Chat" ) )
+		{
+			DrawPlayerChat();
+			ImGui.EndTabItem();
+		}
+		if ( Server.Can( NoteCommand ) && ImGui.BeginTabItem( "Notes" ) )
+		{
+			DrawNoteInput();
+			ImGui.EndTabItem();
+		}
+		if ( Server.Can( AltsCommand ) && ImGui.BeginTabItem( "Alts" ) )
+		{
+			DrawLinkedAccounts( Model.Selected, false );
+			ImGui.EndTabItem();
+		}
+		if ( Server.Can( "prefix.user.set" ) && ImGui.BeginTabItem( "Prefix" ) )
+		{
+			DrawPlayerPrefix();
+			ImGui.EndTabItem();
+		}
+		ImGui.EndTabBar();
+	}
+
+	/// <summary>Name, Steam ID, online state and roles, with the actions menu on the right.</summary>
+	private void DrawPlayerHeader( AdminReply details )
+	{
+		var actionsWidth = ButtonWidth( "Actions" ) + ImGui.GetFrameHeight();
+		ImGui.TextUnformatted( NameOf( Model.Selected ) ?? "Offline player" );
+		ImGui.SameLine();
+		if ( SteamProfileLink( Model.Selected, null, "Click to open the Steam profile; right-click to copy the Steam ID." ) ) OpenSteamProfile( Model.Selected );
+		if ( ImGui.IsItemClicked( ImGuiMouseButton.Right ) ) Sandbox.UI.Clipboard.SetText( Model.Selected );
+
+		var loaded = details?.Status == CommandStatus.Success;
+		if ( loaded )
+		{
+			ImGui.SameLine( ImGui.GetContentRegionMax().x - actionsWidth );
+			ImGui.BeginDisabled( details.Actions.Length == 0 && details.ModuleActions.Length == 0 );
+			if ( ImGui.Button( "Actions", new Vector2( actionsWidth, 0 ) ) ) ImGui.OpenPopup( "player-actions" );
+			ImGui.EndDisabled();
+			if ( ImGui.BeginPopup( "player-actions" ) )
+			{
+				ActionMenuItems( Model.Selected, details.Actions, details.ModuleActions );
+				ImGui.EndPopup();
+			}
+		}
+		if ( !loaded ) return;
 
 		if ( details.Online ) ImGui.TextColored( AdminMenuTheme.Success, "{0}", "Online" );
 		else ImGui.TextDisabled( "{0}", "Offline" );
@@ -38,112 +102,25 @@ internal sealed partial class AdminMenuRenderer
 			ImGui.SameLine();
 			ImGui.TextDisabled( "[{0}]", role );
 		}
-		ImGui.Separator();
-
-		if ( ImGui.CollapsingHeader( $"Active restrictions ({details.Restrictions.Length})###restrictions", ImGuiTreeNodeFlags.DefaultOpen ) )
-		{
-			if ( details.Restrictions.Length == 0 ) Caption( "No active restrictions visible to you." );
-			else DrawRecords( "restrictions", details.Restrictions, false );
-		}
-
-		if ( _quickAction is not null ) ImGui.SetNextItemOpen( true );
-		if ( ImGui.CollapsingHeader( "Actions", ImGuiTreeNodeFlags.DefaultOpen ) ) DrawActions( details );
-
-		if ( Server.Can( NoteCommand ) && ImGui.CollapsingHeader( "Add a note" ) ) DrawNoteInput();
-		if ( Server.Can( "prefix.user.set" ) && ImGui.CollapsingHeader( "Prefix" ) ) DrawPlayerPrefix();
-		if ( ImGui.CollapsingHeader( "Recent chat" ) ) DrawPlayerChat();
-
-		var historyLabel = details.HistoryAllowed ? $"History ({details.History.Length})###history" : "History###history";
-		if ( ImGui.CollapsingHeader( historyLabel ) ) DrawHistory( details );
 	}
 
-	private void DrawActions( AdminReply details )
+	/// <summary>A Steam ID shown as a link, labelled with a name when known. Returns true when it was left-clicked.</summary>
+	private static bool SteamProfileLink( string steamId, string label, string hint )
 	{
-		if ( details.Actions.Length == 0 )
+		ImGui.TextColored( AdminMenuTheme.Link, "{0}", label ?? steamId );
+		if ( ImGui.IsItemHovered() )
 		{
-			Caption( "No permitted actions for this target." );
-			return;
+			var min = ImGui.GetItemRectMin();
+			var max = ImGui.GetItemRectMax();
+			ImGui.GetWindowDrawList().AddLine( new Vector2( min.x, max.y ), max, ImGui.GetColorU32( AdminMenuTheme.Link ) );
+			ImGui.SetMouseCursor( ImGuiMouseCursor.Hand );
+			ImGui.SetTooltip( "{0}", $"{SteamProfileUrl}{steamId}\n{hint}" );
 		}
-		var quick = _quickAction is { } wanted && details.Actions.Contains( wanted ) ? _quickAction : null;
-		if ( _quickAction is { } refused && quick is null )
-		{
-			ColoredWrapped( $"You can't {ActionLabel( refused ).ToLowerInvariant()} this player.", AdminMenuTheme.Warning );
-			_quickAction = null;
-		}
-		else if ( quick is { } pending )
-		{
-			ColoredWrapped( $"{ActionLabel( pending )}: type a reason, then press Enter.", AdminMenuTheme.Tone( pending ) );
-		}
-
-		ImGui.BeginDisabled( Model.Busy || Model.Confirmation is not null );
-		if ( DrawReason() && quick is { } submit )
-		{
-			_quickAction = null;
-			Model.Prepare( submit );
-		}
-		if ( details.Actions.Any( action => action is AdminAction.Ban or AdminAction.Mute ) )
-		{
-			Field( "##duration", "e.g. 30m", ref Model.Duration, 32, 120 * Scale );
-			ImGui.SameLine();
-			ImGui.SetNextItemWidth( 120 * Scale );
-			if ( ImGui.BeginCombo( "Duration", "Presets" ) )
-			{
-				foreach ( var preset in DurationPresets )
-				{
-					var active = string.Equals( Model.Duration, preset, StringComparison.OrdinalIgnoreCase );
-					if ( ImGui.Selectable( preset, active ) ) Model.Duration = preset;
-				}
-				ImGui.EndCombo();
-			}
-		}
-
-		for ( var index = 0; index < details.Actions.Length; index++ )
-		{
-			if ( index > 0 ) ImGui.SameLine();
-			var action = details.Actions[ index ];
-			ImGui.PushStyleColor( ImGuiCol.Text, AdminMenuTheme.Tone( action ) );
-			if ( ImGui.Button( ActionLabel( action ) ) )
-			{
-				_quickAction = null;
-				Model.Prepare( action );
-			}
-			ImGui.PopStyleColor();
-			if ( ImGui.IsItemHovered( ImGuiHoveredFlags.ForTooltip | ImGuiHoveredFlags.AllowWhenDisabled ) ) ImGui.SetTooltip( "{0}", ActionHint( action ) );
-		}
-		ImGui.EndDisabled();
+		return ImGui.IsItemClicked();
 	}
 
-	/// <summary>Reason field with a dropdown of recently used reasons; returns true when Enter was pressed in it.</summary>
-	private bool DrawReason()
-	{
-		var style = ImGui.GetStyle();
-		var recentWidth = ButtonWidth( "Recent" ) + ImGui.GetFrameHeight();
-		if ( _focusReason )
-		{
-			ImGui.SetKeyboardFocusHere();
-			_focusReason = false;
-		}
-		var submitted = Field( "##reason", "Reason (required, recorded in history)", ref Model.Reason, 256,
-			ImGui.GetContentRegionAvail().x - recentWidth - style.ItemSpacing.x, ImGuiInputTextFlags.EnterReturnsTrue );
-		ImGui.SameLine();
-		ImGui.SetNextItemWidth( recentWidth );
-		ImGui.BeginDisabled( _preferences.RecentReasons.Count == 0 );
-		if ( ImGui.BeginCombo( "##recent", "Recent" ) )
-		{
-			for ( var index = 0; index < _preferences.RecentReasons.Count; index++ )
-			{
-				// Reasons are user text, so the selectable label is an index; the text is drawn over it.
-				ImGui.PushID( index );
-				if ( ImGui.Selectable( "##reason", false, ImGuiSelectableFlags.AllowOverlap ) ) Model.Reason = _preferences.RecentReasons[ index ];
-				ImGui.SameLine();
-				ImGui.TextUnformatted( _preferences.RecentReasons[ index ] );
-				ImGui.PopID();
-			}
-			ImGui.EndCombo();
-		}
-		ImGui.EndDisabled();
-		return submitted;
-	}
+	/// <summary>Opens the Steam profile; the engine asks before opening a browser.</summary>
+	private static void OpenSteamProfile( string steamId ) => Game.Overlay.OpenUrl( SteamProfileUrl + steamId );
 
 	/// <summary>Private staff note on the selected player; it is kept in their moderation history.</summary>
 	private void DrawNoteInput()
@@ -179,22 +156,24 @@ internal sealed partial class AdminMenuRenderer
 	{
 		var date = ImGui.CalcTextSize( "0000-00-00 00:00" ).x;
 		var flags = ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable;
-		if ( !ImGui.BeginTable( id, history ? 5 : 4, flags ) ) return;
-		ImGui.TableSetupColumn( "Type", ImGuiTableColumnFlags.WidthFixed, ImGui.CalcTextSize( "Text mute" ).x );
+		if ( !ImGui.BeginTable( id, history ? 6 : 5, flags ) ) return;
+		ImGui.TableSetupColumn( "Type", ImGuiTableColumnFlags.WidthFixed, ImGui.CalcTextSize( "Unmute" ).x );
 		ImGui.TableSetupColumn( "Created (UTC)", ImGuiTableColumnFlags.WidthFixed, date );
 		ImGui.TableSetupColumn( "Expires", ImGuiTableColumnFlags.WidthFixed, date );
 		if ( history ) ImGui.TableSetupColumn( "State", ImGuiTableColumnFlags.WidthFixed, ImGui.CalcTextSize( "Active" ).x );
+		ImGui.TableSetupColumn( "By", ImGuiTableColumnFlags.WidthFixed, ImGui.CalcTextSize( "00000000000000000" ).x );
 		ImGui.TableSetupColumn( "Reason", ImGuiTableColumnFlags.WidthStretch );
 		ImGui.TableHeadersRow();
-		foreach ( var entry in rows )
+		for ( var row = 0; row < rows.Length; row++ )
 		{
+			var entry = rows[ row ];
 			ImGui.TableNextRow();
 			ImGui.TableNextColumn();
 			ImGui.TextColored( KindTone( entry.Kind ), "{0}", KindLabel( entry.Kind ) );
 			ImGui.TableNextColumn();
 			ImGui.TextUnformatted( Utc( entry.CreatedUtc ) );
 			ImGui.TableNextColumn();
-			if ( entry.Kind is "Ban" or "TextMute" ) DrawExpiry( entry.ExpiresUtc, entry.Active );
+			if ( entry.Active || entry.Kind is "Ban" or "TextMute" or "Gag" or "Gimp" ) DrawExpiry( entry.ExpiresUtc, entry.Active );
 			else if ( entry.Kind == "Kick" )
 			{
 				ImGui.TextColored( AdminMenuTheme.Warning, "{0}", "Intent only" );
@@ -208,12 +187,38 @@ internal sealed partial class AdminMenuRenderer
 				else ImGui.TextDisabled( "{0}", "Past" );
 			}
 			ImGui.TableNextColumn();
+			DrawActor( entry.Actor, row );
+			ImGui.TableNextColumn();
 			ImGui.TextWrapped( "{0}", entry.Reason );
 		}
 		ImGui.EndTable();
 	}
 
-	private static string ActionLabel( AdminAction action ) => action == AdminAction.Mute ? "Text mute" : action.ToString();
+	/// <summary>Staff names open a menu on right-click: their Player window, their Steam profile, or copy the ID. The console and host services are plain text.</summary>
+	private void DrawActor( string actor, int row )
+	{
+		if ( actor.Length != SteamIdLength || !actor.All( char.IsAsciiDigit ) ) { ImGui.TextDisabled( "{0}", actor ); return; }
+		SteamProfileLink( actor, NameOf( actor ), "Right-click for options." );
+		DrawActorMenu( actor, row );
+	}
+
+	/// <summary>The right-click menu on the item just drawn: open the player here or on Steam, or copy their ID.</summary>
+	private void DrawActorMenu( string steamId, int row )
+	{
+		// One menu per row: the same player can appear on several rows.
+		ImGui.PushID( row );
+		if ( ImGui.BeginPopupContextItem( "actor-menu" ) )
+		{
+			if ( ImGui.MenuItem( "Open..." ) ) SelectPlayer( steamId );
+			if ( ImGui.MenuItem( "Open Steam..." ) ) OpenSteamProfile( steamId );
+			ImGui.Separator();
+			if ( ImGui.MenuItem( "Copy Steam ID" ) ) Sandbox.UI.Clipboard.SetText( steamId );
+			ImGui.EndPopup();
+		}
+		ImGui.PopID();
+	}
+
+	private static string ActionLabel( AdminAction action ) => action.ToString();
 
 	private static string ActionHint( AdminAction action ) => action switch
 	{
@@ -221,16 +226,21 @@ internal sealed partial class AdminMenuRenderer
 		AdminAction.Warn => "Record a warning and notify the player if online.",
 		AdminAction.Ban => "Ban this Steam ID for the duration, or permanently.",
 		AdminAction.Unban => "Revoke the active ban.",
-		AdminAction.Mute => "Restrict ordinary text chat for the duration.",
-		_ => "Revoke the text restriction."
+		AdminAction.Mute => "Stop their text chat for the duration, or permanently.",
+		AdminAction.Unmute => "Revoke the active mute.",
+		AdminAction.Gag => "Stop their voice chat for the duration, or permanently.",
+		AdminAction.Ungag => "Revoke the active gag.",
+		AdminAction.Gimp => "Replace their chat messages with silly lines for the duration, or permanently.",
+		_ => "Revoke the active gimp."
 	};
 
-	private static string KindLabel( string kind ) => kind == "TextMute" ? "Text mute" : kind;
+	// "TextMute" is the stored name; players and staff just call it a mute.
+	private static string KindLabel( string kind ) => kind == "TextMute" ? "Mute" : kind;
 
 	private static Vector4 KindTone( string kind ) => kind switch
 	{
 		"Ban" or "Kick" => AdminMenuTheme.Danger,
-		"TextMute" or "Warn" => AdminMenuTheme.Warning,
+		"TextMute" or "Gag" or "Gimp" or "Warn" => AdminMenuTheme.Warning,
 		"Note" => AdminMenuTheme.Neutral,
 		_ => AdminMenuTheme.Success
 	};

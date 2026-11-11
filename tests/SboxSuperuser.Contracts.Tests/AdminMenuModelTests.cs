@@ -68,13 +68,12 @@ public sealed class AdminMenuModelTests
 		var gate = new AdminRequestGate();
 		var client = Guid.NewGuid();
 		var now = DateTimeOffset.UtcNow;
-		Assert.True( gate.TryEnter( client, now ) );
-		Assert.True( gate.TryEnter( client, now ) );
+		for ( var i = 0; i < AdminRequestGate.ConcurrentPerConnection; i++ ) Assert.True( gate.TryEnter( client, now ) );
 		Assert.False( gate.TryEnter( client, now ) );
-		gate.Exit( client );
-		gate.Exit( client );
-		for ( var i = 0; i < 6; i++ ) { Assert.True( gate.TryEnter( client, now ) ); gate.Exit( client ); }
+		for ( var i = 0; i < AdminRequestGate.ConcurrentPerConnection; i++ ) gate.Exit( client );
+		var remaining = AdminRequestGate.BurstPerWindow - AdminRequestGate.ConcurrentPerConnection;
+		for ( var i = 0; i < remaining; i++ ) { Assert.True( gate.TryEnter( client, now ) ); gate.Exit( client ); }
 		Assert.False( gate.TryEnter( client, now ) );
-		Assert.True( gate.TryEnter( client, now.AddSeconds( 2 ) ) );
+		Assert.True( gate.TryEnter( client, now + AdminRequestGate.Window ) );
 	}
 }

@@ -9,13 +9,16 @@ public sealed class CommandService : IDisposable
 	private readonly Func<CommandService, CommandRequest, CancellationToken, Task<CommandResult>> _execute;
 	private bool _disposed;
 	internal bool IsActive => !_disposed;
+	internal int? MaximumTargetLevel { get; }
 
 	/// <summary>Gets the stable service identity used to scope requests and audit evidence.</summary>
 	public string Id { get; }
 
 	internal CommandService( string id, IReadOnlyList<string> permissions,
-		Func<CommandService, CommandRequest, CancellationToken, Task<CommandResult>> execute )
+		Func<CommandService, CommandRequest, CancellationToken, Task<CommandResult>> execute, int? maximumTargetLevel = null )
 	{
+		if ( maximumTargetLevel is < 0 or > 99 ) throw new ArgumentOutOfRangeException( nameof(maximumTargetLevel) );
+		MaximumTargetLevel = maximumTargetLevel;
 		Id = ContractGuard.Key( id, nameof( id ) );
 		if ( id.Length > 96 || permissions is null || permissions.Count > 64 )
 		{

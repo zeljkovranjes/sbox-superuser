@@ -106,7 +106,7 @@ admin user <steamid> permission allow example.ping
 ## Seeing it in the admin menu
 
 Add one **Superuser Admin Menu** to a GameObject that exists on every client and
-press **F6**. Your module is already in the menu; nothing extra is registered for
+press **P**. Your module is already in the menu; nothing extra is registered for
 it.
 
 ### In the Commands window

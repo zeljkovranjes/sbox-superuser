@@ -219,7 +219,7 @@ internal sealed partial class AdminMenuRenderer
 
 		var flags = ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable;
 		if ( !ImGui.BeginTable( "command-result", 2, flags ) ) return;
-		ImGui.TableSetupColumn( "Field", ImGuiTableColumnFlags.WidthFixed, ImGui.CalcTextSize( "retentionPending" ).x );
+		ImGui.TableSetupColumn( "Field", ImGuiTableColumnFlags.WidthFixed, ImGui.GetContentRegionAvail().x * 0.35f );
 		ImGui.TableSetupColumn( "Value", ImGuiTableColumnFlags.WidthStretch );
 		foreach ( var (field, value) in result.Data.OrderBy( pair => ResultOrder( pair.Key ) ) )
 		{

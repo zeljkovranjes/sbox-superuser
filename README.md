@@ -75,7 +75,7 @@ in the chatbox or `admin ping` in the console.
   Owners are configured by the host; policy changes are owner-only, and owners
   cannot punish each other. [Reference](docs/reference/permissions.md).
 
-- **Moderation** covers kick, ban, warnings, text mute and staff notes, with
+- **Moderation** covers kick, ban, warnings, mute, voice gag and staff notes, with
   persistent history and original UTC expiry kept across restarts.
 
 - **Audit** records every attempt before it runs and its outcome after. An
@@ -102,12 +102,12 @@ in the chatbox or `admin ping` in the console.
 
 ## Admin menu
 
-Add **Superuser Admin Menu** on clients and press **F6**. Disable it to use your
+Add **Superuser Admin Menu** on clients and press **P**. Disable it to use your
 own interface; console and chat keep working.
 
 <table>
 <tr><th>Window</th><th>What it does</th></tr>
-<tr><td>Players</td><td>Search, warnings, the selected player's restrictions, actions, notes and recent chat</td></tr>
+<tr><td>Players</td><td>Search and warnings; clicking a player opens their restrictions, history, notes and recent chat in a separate window</td></tr>
 <tr><td>Bans &amp; mutes</td><td>Every active restriction across all players, with time left and revoke buttons</td></tr>
 <tr><td>Chat</td><td>The last 100 public messages, kept in server memory only</td></tr>
 <tr><td>Commands</td><td>Any permitted command, including your game's own, from a generated form</td></tr>

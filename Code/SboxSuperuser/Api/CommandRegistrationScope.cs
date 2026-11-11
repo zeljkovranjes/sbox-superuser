@@ -113,15 +113,16 @@ public sealed class CommandRegistrationScope : IModuleRegistration, IDisposable
 		_committed = true;
 	}
 
-	/// <summary>Adds a window to the admin menu's Modules menu; see IModuleRegistration.AddMenuWindow.</summary>
-	public void AddMenuWindow( string title, Action<AdminMenuWindow> build )
+	/// <summary>Adds a window to the admin menu, under Modules or the named tab; see IModuleRegistration.AddMenuWindow.</summary>
+	public void AddMenuWindow( string title, Action<AdminMenuWindow> build, string menu = null )
 	{
 		EnsureStaging();
 		ArgumentNullException.ThrowIfNull( build );
+		menu = AdminMenuWindow.ValidateMenu( menu );
 		if ( _windows.Count >= 4 ) throw new ArgumentException( "A module can add at most 4 menu windows." );
 		var window = new AdminMenuWindow( title );
 		build( window );
-		_windows.Add( new AdminMenuWindowRow { ModuleId = ModuleId, Title = window.Title, Elements = window.Elements.ToArray() } );
+		_windows.Add( new AdminMenuWindowRow { ModuleId = ModuleId, Title = window.Title, Menu = menu, Elements = window.Elements.ToArray() } );
 	}
 
 	/// <summary>Adds a Markdown documentation page; pages keep the order they were added.</summary>

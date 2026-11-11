@@ -14,17 +14,21 @@ internal sealed partial class HostModerationService
 			context.Cancellation.ThrowIfCancellationRequested();
 			if ( !_canUse( context, permission ) ) return Denied();
 			if ( !IsUsable ) return Unavailable();
-			if ( kind is ModerationKind.Kick or ModerationKind.Ban or ModerationKind.Warn or ModerationKind.TextMute
-				&& !_canTarget( context.Actor, target ) )
+			if ( kind.IsPunitive() && !_canTarget( context, target ) )
 				return new CommandResult( CommandStatus.Denied, "Target protection denied this action." );
+			var duplicate = _ledger.Entries.FirstOrDefault( entry => entry.RequestId == context.RequestId
+				&& entry.ActorKind == context.Actor.Kind.ToString() && entry.ActorSubject == context.Actor.SubjectId
+				&& entry.Origin == context.Origin.ToString() );
+			if ( duplicate is not null ) return new CommandResult(
+				duplicate.Target == target && duplicate.Kind == kind ? CommandStatus.NoChange : CommandStatus.Conflict,
+				"This moderation request was already persisted; no additional action was recorded." );
 			var now = _clock();
-			var restrictedKind = kind is ModerationKind.Unban ? ModerationKind.Ban : kind is ModerationKind.Unmute ? ModerationKind.TextMute : kind;
-			var active = _ledger.Active( target, restrictedKind, now );
-			var revoking = kind is ModerationKind.Unban or ModerationKind.Unmute;
+			var active = _ledger.Active( target, kind.Restricted(), now );
+			var revoking = kind.IsRevocation();
 			if ( revoking && active is null ) return new CommandResult( CommandStatus.NoChange, "No active restriction exists; history was retained." );
 			if ( !revoking && active is not null ) return new CommandResult( CommandStatus.Conflict, "An active restriction already exists; revoke it explicitly before replacing it." );
 			DateTimeOffset? expires = null;
-			if ( kind is ModerationKind.Ban or ModerationKind.TextMute )
+			if ( kind.IsRestriction() )
 			{
 				if ( duration is null ) return new CommandResult( CommandStatus.InvalidArguments, "An explicit positive duration or permanent is required." );
 				try { expires = duration.Value.HasValue ? now.Add( duration.Value.Value ) : null; }

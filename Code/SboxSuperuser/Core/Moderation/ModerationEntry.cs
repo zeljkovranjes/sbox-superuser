@@ -36,8 +36,8 @@ internal sealed class ModerationEntry
 			|| actorSubject.Length > 96 || string.IsNullOrWhiteSpace( reason ) || reason.Length > 256 || reason.Any( char.IsControl ) )
 			throw new ArgumentException( "Moderation requires a valid origin and a reason of 1–256 printable characters." );
 		if ( createdUtc.Offset != TimeSpan.Zero || expiresUtc.HasValue && (expiresUtc.Value.Offset != TimeSpan.Zero || expiresUtc <= createdUtc)
-			|| expiresUtc.HasValue && kind is not (ModerationKind.Ban or ModerationKind.TextMute)
-			|| revokes.HasValue != (kind is ModerationKind.Unban or ModerationKind.Unmute) )
+			|| expiresUtc.HasValue && !kind.IsRestriction()
+			|| revokes.HasValue != kind.IsRevocation() )
 			throw new ArgumentException( "Invalid UTC expiry or revocation contract." );
 		Id = id;
 		RequestId = requestId;

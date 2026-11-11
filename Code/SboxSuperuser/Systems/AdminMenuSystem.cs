@@ -8,6 +8,8 @@ namespace SboxSuperuser.Systems;
 internal sealed class AdminMenuSystem : GameObjectSystem<AdminMenuSystem>
 {
 	private const float SaveInterval = 1;
+	private const double AccessRefreshSeconds = 5;
+	private const double AccessLifetimeSeconds = 10;
 
 	private readonly Dictionary<Guid, string> _registrations = new();
 	private AdminMenuRenderer _view;
@@ -17,6 +19,14 @@ internal sealed class AdminMenuSystem : GameObjectSystem<AdminMenuSystem>
 	private int _savedLayoutRevision;
 	private int _savedPreferencesRevision;
 	private RealTimeSince _sinceSave;
+	private Connection _accessHost;
+	private Guid _accessRequest;
+	private double _nextAccessCheck;
+	private double _accessUntil;
+	private bool _authorized;
+	private bool _openRequested;
+	private string _selectedPlayer;
+	private AdminAction? _selectedAction;
 
 	public AdminMenuSystem( Scene scene ) : base( scene )
 	{
@@ -38,15 +48,29 @@ internal sealed class AdminMenuSystem : GameObjectSystem<AdminMenuSystem>
 		_key = _registrations.Count == 1 ? _registrations.Values.First() : null;
 	}
 
-	internal void Receive( AdminReply reply ) => _view?.Receive( reply );
+	internal void Receive( AdminReply reply )
+	{
+		if ( reply.RequestId != _accessRequest ) { _view?.Receive( reply ); return; }
+		_accessRequest = Guid.Empty;
+		_authorized = reply.Status == CommandStatus.Success && ReferenceEquals( _accessHost, Connection.Host );
+		_accessUntil = RealTime.Now + AccessLifetimeSeconds;
+		if ( !_authorized ) { _openRequested = false; Shutdown(); return; }
+		if ( !_openRequested || !CanShow ) return;
+		_openRequested = false;
+		EnsureView();
+		_view.SetInteractive( true );
+		if ( _selectedPlayer is not null ) _view.ShowPlayer( _selectedPlayer, _selectedAction );
+		_selectedPlayer = null;
+		_selectedAction = null;
+	}
 	internal bool IsOpen => _view?.Interactive == true;
 
 	internal void SetOpen( bool open )
 	{
 		if ( !open ) { Close(); return; }
-		if ( !CanShow ) return;
-		EnsureView();
-		_view.SetInteractive( true );
+		if ( !SessionReady ) return;
+		_openRequested = true;
+		RequestAccess();
 	}
 
 	/// <summary>Whether the menu can open now: its component is in the scene and a game session is running.</summary>
@@ -55,13 +79,29 @@ internal sealed class AdminMenuSystem : GameObjectSystem<AdminMenuSystem>
 	/// <summary>Opens the menu on the Players window with this player selected; the host still decides what they may see.</summary>
 	internal void ShowPlayer( string steamId )
 	{
-		if ( !CanShow ) return;
-		EnsureView();
-		_view.SetInteractive( true );
-		_view.ShowPlayer( steamId );
+		_selectedPlayer = steamId;
+		SetOpen( true );
 	}
 
-	private bool CanShow => _key is not null && Game.IsPlaying && Networking.IsActive && !Application.IsDedicatedServer;
+	/// <summary>Opens the menu on this player with the action's popup ready for a reason; the host checks it as usual.</summary>
+	internal void ShowPlayerAction( string steamId, AdminAction action )
+	{
+		_selectedAction = action;
+		ShowPlayer( steamId );
+	}
+
+	// A joining client updates its systems before its own connection is active; requests then would throw.
+	private bool SessionReady => _key is not null && Game.IsPlaying && Networking.IsActive && !Application.IsDedicatedServer && Connection.Local is { IsActive: true };
+	private bool CanShow => SessionReady && _authorized && ReferenceEquals( _accessHost, Connection.Host ) && RealTime.Now < _accessUntil;
+
+	private void RequestAccess()
+	{
+		if ( _accessRequest != Guid.Empty ) return;
+		_accessHost = Connection.Host;
+		_nextAccessCheck = RealTime.Now + AccessRefreshSeconds;
+		// The host already restricts the player directory to staff, including module-defined moderators.
+		_accessRequest = Superuser.RequestAdminQuery( new AdminQuery( AdminQueryKind.Players ) );
+	}
 
 	private void EnsureView()
 	{
@@ -80,13 +120,24 @@ internal sealed class AdminMenuSystem : GameObjectSystem<AdminMenuSystem>
 
 	private void UpdateInput()
 	{
-		if ( !CanShow ) { Shutdown(); return; }
+		if ( !SessionReady || !ReferenceEquals( _accessHost, Connection.Host ) )
+		{
+			_authorized = false;
+			_accessRequest = Guid.Empty;
+			_accessHost = Connection.Host;
+			_nextAccessCheck = 0;
+			Shutdown();
+			if ( !SessionReady ) { _openRequested = false; return; }
+		}
 		try
 		{
+			if ( RealTime.Now >= _nextAccessCheck ) RequestAccess();
 			if ( Input.Keyboard.Pressed( _key ) )
 			{
 				SetOpen( !IsOpen );
 			}
+
+			if ( !CanShow ) { Shutdown(); return; }
 
 			// Pinned windows from the last session come back as soon as the menu may show.
 			LoadSettings();
@@ -98,7 +149,7 @@ internal sealed class AdminMenuSystem : GameObjectSystem<AdminMenuSystem>
 		{
 			Shutdown();
 			_key = null;
-			Log.Warning( $"[Superuser] Admin input disabled; check its Open Key. type={error.GetType().Name}." );
+			Log.Warning( $"[Superuser] Admin input disabled; check its Open Key. type={error.GetType().Name}: {error.Message}" );
 		}
 	}
 
@@ -117,6 +168,8 @@ internal sealed class AdminMenuSystem : GameObjectSystem<AdminMenuSystem>
 	/// <summary>Closes the menu; pinned windows stay on screen without taking input.</summary>
 	private void Close()
 	{
+		_openRequested = false;
+		_selectedPlayer = null;
 		if ( _view is null ) return;
 		if ( _layout.HasPinned ) _view.SetInteractive( false );
 		else Shutdown();

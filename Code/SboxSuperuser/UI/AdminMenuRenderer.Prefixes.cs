@@ -241,7 +241,7 @@ internal sealed partial class AdminMenuRenderer
 		if ( draft.Template != saved.Template ) PrefixEditor.Queue( "prefix.update", new[] { saved.Id, "template", draft.Template } );
 		if ( !draft.Palette.SequenceEqual( saved.Palette ) )
 			PrefixEditor.Queue( "prefix.update", new[] { saved.Id, "palette", string.Join( ",", draft.Palette ) } );
-		_draftSource = null;
+		// The fields keep the draft: reloading now would show the old values until the host's reply arrives.
 	}
 
 	private void DrawStylePicker( PrefixDefinition prefix, string part, PrefixStyle style )

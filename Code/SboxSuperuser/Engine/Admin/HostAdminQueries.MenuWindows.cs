@@ -19,10 +19,10 @@ internal sealed partial class HostAdminQueries
 			if ( !moduleVisible ) continue;
 			foreach ( var window in _registry.DocumentationOf( module ).Windows )
 			{
-				var elements = window.Elements.Where( element => element.Command.Length == 0 || Usable( element.Command ) ).ToArray();
+				var elements = window.Elements.Where( element => (element.Command.Length == 0 || Usable( element.Command )) && (element.StatusCommand.Length == 0 || Usable( element.StatusCommand )) ).ToArray();
 				var usesCommands = window.Elements.Any( element => element.Command.Length > 0 );
 				if ( usesCommands && elements.All( element => element.Command.Length == 0 ) ) continue;
-				windows.Add( new AdminMenuWindowRow { ModuleId = window.ModuleId, Title = window.Title, Elements = elements } );
+				windows.Add( new AdminMenuWindowRow { ModuleId = window.ModuleId, Title = window.Title, Menu = window.Menu, Elements = elements } );
 			}
 		}
 		return new AdminReply

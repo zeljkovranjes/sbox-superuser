@@ -11,7 +11,7 @@ public sealed class SuperuserAdminMenu : Component, IAdminResultEvent
 
 	/// <summary>Keyboard key that opens/closes the menu; re-enable this component after changing it.</summary>
 	[Property]
-	public string OpenKey { get; set; } = "f6";
+	public string OpenKey { get; set; } = "p";
 
 	/// <summary>Gets whether the optional local menu is open.</summary>
 	public bool IsOpen => _menu?.IsOpen == true;

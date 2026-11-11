@@ -47,6 +47,24 @@ public sealed class AuthorityTests
 	}
 
 	[Fact]
+	public async Task EngineClaimsGrantAccessLiveWithoutBeingSaved()
+	{
+		using var rig = new DispatcherRig();
+		await rig.Policy.Initialization;
+		var saved = rig.Store.WriteCount;
+		Assert.False( rig.Policy.Explain( DispatcherRig.User, "admin.players.ban" ).IsAllowed );
+		rig.Policy.Claims.Set( DispatcherRig.UserId, new[] { "admin" } );
+		Assert.True( rig.Policy.Explain( DispatcherRig.User, "admin.players.ban" ).IsAllowed );
+		Assert.True( rig.Policy.CheckTarget( DispatcherRig.User, DispatcherRig.TargetId ).IsAllowed );
+		rig.Policy.Claims.Set( DispatcherRig.UserId, new[] { "superuser" } );
+		Assert.True( rig.Policy.IsOwner( DispatcherRig.UserId ) );
+		rig.Policy.Claims.Remove( DispatcherRig.UserId );
+		Assert.False( rig.Policy.Explain( DispatcherRig.User, "admin.players.ban" ).IsAllowed );
+		Assert.False( rig.Policy.IsOwner( DispatcherRig.UserId ) );
+		Assert.Equal( saved, rig.Store.WriteCount );
+	}
+
+	[Fact]
 	public void ProtectionUsesHighestInheritedLevelAndRefusesSelfEvenForOwner()
 	{
 		var defaults = PolicySnapshot.CreateDefault();

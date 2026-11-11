@@ -8,7 +8,7 @@ internal sealed partial class HostModerationService
 	private readonly IAdminStore _store;
 	private readonly Func<bool> _available;
 	private readonly Func<CommandContext, string, bool> _canUse;
-	private readonly Func<ActorIdentity, string, bool> _canTarget;
+	private readonly Func<CommandContext, string, bool> _canTarget;
 	private readonly Func<DateTimeOffset> _clock;
 	private readonly Action<Exception> _report;
 	private readonly SemaphoreSlim _gate = new( 1, 1 );
@@ -19,7 +19,7 @@ internal sealed partial class HostModerationService
 	internal bool IsUsable => _available() && Status is StoreReadStatus.Found or StoreReadStatus.Missing;
 
 	internal HostModerationService( IAdminStore store, Func<bool> available, Func<CommandContext, string, bool> canUse,
-		Func<ActorIdentity, string, bool> canTarget, Action<Exception> report, Func<DateTimeOffset> clock = null )
+		Func<CommandContext, string, bool> canTarget, Action<Exception> report, Func<DateTimeOffset> clock = null )
 	{
 		_store = store;
 		_available = available;
@@ -67,12 +67,21 @@ internal sealed partial class HostModerationService
 		}
 	}
 
+	/// <summary>Allocation-free check for per-packet paths; unusable storage counts as restricted, like chat.</summary>
+	internal bool IsRestricted( string target, ModerationKind kind ) => !IsUsable || _ledger.Active( target, kind, _clock() ) is not null;
+
 	internal CommandResult CheckRestriction( string target, ModerationKind kind )
 	{
 		if ( !IsUsable ) return Unavailable();
 		return _ledger.Active( target, kind, _clock() ) is null
 			? new CommandResult( CommandStatus.Success, "No active restriction." )
-			: new CommandResult( CommandStatus.Denied, kind == ModerationKind.Ban ? "Connection denied by server moderation." : "Text chat is muted by server moderation." );
+			: new CommandResult( CommandStatus.Denied, kind switch
+			{
+				ModerationKind.Ban => "Connection denied by server moderation.",
+				ModerationKind.Gag => "Voice chat is gagged by server moderation.",
+				_ => "Chat is muted by server moderation."
+			},
+				new Dictionary<string, string> { ["restriction"] = kind.ToString() } );
 	}
 
 	internal CommandResult History( CommandContext context, string target, int page )

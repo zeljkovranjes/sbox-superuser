@@ -10,12 +10,13 @@ internal sealed partial class AdminMenuRenderer
 	private bool _playersFocused;
 	private bool _scrollToSelected;
 
-	/// <summary>Search, a full-width player table and the selected player below it, laid out like Activity.</summary>
-	/// <summary>Opens the Players window with this player selected, for links from outside the menu.</summary>
-	internal void ShowPlayer( string steamId )
+	private static readonly AdminAction[] RowActions = { AdminAction.Kick, AdminAction.Warn, AdminAction.Mute, AdminAction.Gag, AdminAction.Ban };
+
+	/// <summary>Opens this player's window, for links from outside the menu, optionally with an action's popup ready.</summary>
+	internal void ShowPlayer( string steamId, AdminAction? action = null )
 	{
-		_layout.SetOpen( PlayersWindow, true );
-		Model.Select( steamId );
+		SelectPlayer( steamId );
+		if ( action is { } chosen ) StartAction( steamId, chosen, null );
 	}
 
 	private void DrawPlayersWindow()
@@ -24,13 +25,9 @@ internal sealed partial class AdminMenuRenderer
 		if ( expanded )
 		{
 			_playersFocused = ImGui.IsWindowFocused( ImGuiFocusedFlags.RootAndChildWindows );
-			Caption( "Click a player, or right-click for quick actions. Ctrl+F searches; Up and Down move through the list." );
+			Caption( "Click a player to open them, or right-click for actions. Ctrl+F searches; Up and Down move through the list." );
 			DrawSearch();
 			DrawPlayerTable();
-			ImGui.Separator();
-			ImGui.BeginChild( "details" );
-			DrawPlayer();
-			ImGui.EndChild();
 		}
 		ImGui.End();
 	}
@@ -68,8 +65,9 @@ internal sealed partial class AdminMenuRenderer
 
 		MoveSelectionWithArrows( players.Players );
 
-		// The table keeps a share of the window so the selected player stays visible below it.
-		var height = MathF.Max( 120 * Scale, ImGui.GetContentRegionAvail().y * 0.4f );
+		// The table fills the window, leaving a row for the pager.
+		var pager = Model.PlayerPage > 0 || players.HasMore ? ImGui.GetFrameHeightWithSpacing() : 0;
+		var height = MathF.Max( 120 * Scale, ImGui.GetContentRegionAvail().y - pager );
 		var flags = ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.ScrollY;
 		if ( ImGui.BeginTable( "players-table", 3, flags, new Vector2( 0, height ) ) )
 		{
@@ -131,23 +129,16 @@ internal sealed partial class AdminMenuRenderer
 		if ( ImGui.MenuItem( "Copy Steam ID" ) ) Sandbox.UI.Clipboard.SetText( player.SteamId );
 		if ( ImGui.MenuItem( "Copy name" ) ) Sandbox.UI.Clipboard.SetText( player.Name );
 		ImGui.Separator();
-		if ( ImGui.MenuItem( "Kick..." ) ) StartQuickAction( player.SteamId, AdminAction.Kick );
-		if ( ImGui.MenuItem( "Text mute..." ) ) StartQuickAction( player.SteamId, AdminAction.Mute );
-		if ( ImGui.MenuItem( "Ban..." ) ) StartQuickAction( player.SteamId, AdminAction.Ban );
+		// The host has not said yet what this row allows; it refuses what the sender can't do.
+		ActionMenuItems( player.SteamId, RowActions, Model.Players?.ModuleActions ?? Array.Empty<AdminPlayerActionRow>() );
 		ImGui.EndPopup();
 	}
 
+	/// <summary>Selects the player and brings their window forward.</summary>
 	private void SelectPlayer( string steamId )
 	{
-		_quickAction = null;
 		if ( Model.Selected != steamId ) Model.Select( steamId );
-	}
-
-	/// <summary>Selects the player and puts the cursor in the reason field; Enter then asks to confirm the action.</summary>
-	private void StartQuickAction( string steamId, AdminAction action )
-	{
-		SelectPlayer( steamId );
-		_quickAction = action;
-		_focusReason = true;
+		_layout.SetOpen( PlayerWindow, true );
+		_focusPlayerWindow = true;
 	}
 }

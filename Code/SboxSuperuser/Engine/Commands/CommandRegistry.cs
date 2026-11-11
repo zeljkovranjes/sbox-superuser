@@ -34,6 +34,10 @@ internal sealed class CommandRegistry
 		}
 	}
 
+	internal IEnumerable<(string Module, IAdminRestrictions Provider)> RestrictionProviders => _commands.Values
+		.GroupBy( command => command.Descriptor.ModuleId ).Select( group => (group.Key, group.First().Capabilities.GetService<IAdminRestrictions>()) )
+		.Where( item => item.Item2 is not null );
+
 	internal RegisteredCommand Find( string name ) => _commands.TryGetValue( name, out var command ) ? command : null;
 
 	internal IReadOnlyList<CommandDescriptor> Descriptors => Array.AsReadOnly( _commands.Values

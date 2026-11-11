@@ -49,11 +49,40 @@ public sealed class ModerationServiceTests
 	}
 
 	[Fact]
+	public async Task GagRestrictsVoiceUntilUngaggedWithoutMuting()
+	{
+		using var fixture = new ModerationRig();
+		Assert.Equal( CommandStatus.Success, (await fixture.Run( "gag", DispatcherRig.TargetId, "permanent", "Mic spam" )).Status );
+		Assert.True( fixture.Moderation.IsRestricted( DispatcherRig.TargetId, ModerationKind.Gag ) );
+		Assert.False( fixture.Moderation.IsRestricted( DispatcherRig.TargetId, ModerationKind.TextMute ) );
+		Assert.Equal( "Gag", fixture.Moderation.CheckRestriction( DispatcherRig.TargetId, ModerationKind.Gag ).Data["restriction"] );
+		Assert.Equal( CommandStatus.Conflict, (await fixture.Run( "gag", DispatcherRig.TargetId, "30m", "Again" )).Status );
+		Assert.Equal( CommandStatus.Success, (await fixture.Run( "ungag", DispatcherRig.TargetId )).Status );
+		Assert.False( fixture.Moderation.IsRestricted( DispatcherRig.TargetId, ModerationKind.Gag ) );
+	}
+
+	[Fact]
+	public async Task GimpIsItsOwnRestrictionAndLinesAreStable()
+	{
+		using var fixture = new ModerationRig();
+		Assert.Equal( CommandStatus.Success, (await fixture.Run( "gimp", DispatcherRig.TargetId, "10m", "Spam" )).Status );
+		Assert.True( fixture.Moderation.IsRestricted( DispatcherRig.TargetId, ModerationKind.Gimp ) );
+		Assert.False( fixture.Moderation.IsRestricted( DispatcherRig.TargetId, ModerationKind.TextMute ) );
+		Assert.Equal( "Owner gimped Target for 10 minutes for Spam.", fixture.Announcements[ ^1 ] );
+		Assert.Equal( GimpLines.For( "hello" ), GimpLines.For( "hello" ) );
+		Assert.Contains( GimpLines.For( "anything" ), GimpLines.Lines );
+		Assert.Equal( CommandStatus.Success, (await fixture.Run( "ungimp", DispatcherRig.TargetId )).Status );
+		Assert.False( fixture.Moderation.IsRestricted( DispatcherRig.TargetId, ModerationKind.Gimp ) );
+	}
+
+	[Fact]
 	public async Task ExpiredMuteStopsEnforcementWithoutATimerOrDeletion()
 	{
 		using var fixture = new ModerationRig();
 		Assert.Equal( CommandStatus.Success, (await fixture.Run( "mute", DispatcherRig.TargetId, "30m", "Test" )).Status );
-		Assert.Equal( CommandStatus.Denied, fixture.Moderation.CheckRestriction( DispatcherRig.TargetId, ModerationKind.TextMute ).Status );
+		var restriction = fixture.Moderation.CheckRestriction( DispatcherRig.TargetId, ModerationKind.TextMute );
+		Assert.Equal( CommandStatus.Denied, restriction.Status );
+		Assert.Equal( "TextMute", restriction.Data["restriction"] );
 		fixture.Now = fixture.Now.AddMinutes( 30 );
 		Assert.Equal( CommandStatus.Success, fixture.Moderation.CheckRestriction( DispatcherRig.TargetId, ModerationKind.TextMute ).Status );
 		Assert.Equal( CommandStatus.NoChange, (await fixture.Run( "unmute", DispatcherRig.TargetId )).Status );
