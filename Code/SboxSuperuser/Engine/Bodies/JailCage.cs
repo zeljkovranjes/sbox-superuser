@@ -1,6 +1,6 @@
 using Sandbox;
 
-namespace SboxSuperuser.Engine.Players;
+namespace SboxSuperuser.Engine.Bodies;
 
 /// <summary>Builds a networked box of solid walls around a player; destroying the root frees them.</summary>
 internal static class JailCage

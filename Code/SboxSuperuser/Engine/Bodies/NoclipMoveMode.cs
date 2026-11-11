@@ -1,7 +1,7 @@
 using Sandbox;
 using Sandbox.Movement;
 
-namespace SboxSuperuser.Engine.Players;
+namespace SboxSuperuser.Engine.Bodies;
 
 /// <summary>Flying through walls: wins over every other mode while present, with gravity and collision off.</summary>
 [Hide]

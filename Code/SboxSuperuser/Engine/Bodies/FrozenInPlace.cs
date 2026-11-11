@@ -1,6 +1,6 @@
 using Sandbox;
 
-namespace SboxSuperuser.Engine.Players;
+namespace SboxSuperuser.Engine.Bodies;
 
 /// <summary>Holds its owner's body where it was frozen every physics step; removing it lets them move again.</summary>
 [Hide]
