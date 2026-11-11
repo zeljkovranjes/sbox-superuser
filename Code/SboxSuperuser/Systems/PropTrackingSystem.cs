@@ -32,10 +32,10 @@ internal sealed class PropTrackingSystem : GameObjectSystem<PropTrackingSystem>
 		}
 		foreach ( var id in props.All )
 			if ( Scene.Directory.FindByGuid( id ) is null ) props.Forget( id );
-		CleanUpAfterLeavers( props );
+		if ( Superuser.PropWorld is { } world ) CleanUpAfterLeavers( props, world );
 	}
 
-	private void CleanUpAfterLeavers( Core.Props.PropOwnership props )
+	private void CleanUpAfterLeavers( Core.Props.PropOwnership props, Engine.Props.IPropWorld world )
 	{
 		if ( _left.Count == 0 ) return;
 		var now = DateTimeOffset.UtcNow;
@@ -44,7 +44,7 @@ internal sealed class PropTrackingSystem : GameObjectSystem<PropTrackingSystem>
 			if ( due > now ) continue;
 			_left.Remove( steamId );
 			var objects = props.ObjectsOf( steamId );
-			var removed = new Engine.Props.ScenePropWorld().Remove( objects );
+			var removed = world.Remove( objects );
 			foreach ( var id in objects ) props.Forget( id );
 			if ( removed > 0 ) Log.Info( $"[Superuser] Removed {removed} props left behind by {steamId}." );
 		}

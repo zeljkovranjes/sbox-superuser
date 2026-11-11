@@ -28,6 +28,7 @@ internal sealed partial class BootstrapRuntime : IDisposable
 	internal Votes.VoteSession Votes { get; }
 	internal Content.HostContentService Content { get; }
 	internal Core.Props.PropOwnership Props { get; } = new();
+	internal Props.IPropWorld PropWorld { get; } = new Props.ScenePropWorld();
 	internal Alts.HostAltService Alts { get; }
 	internal Props.PropCommands PropCommands { get; }
 	internal Admin.HostAdminQueries AdminQueries { get; }
@@ -139,7 +140,7 @@ internal sealed partial class BootstrapRuntime : IDisposable
 			() => OnlinePlayers()?.Select( player => player.SteamId ).ToArray() ?? Array.Empty<string>(), Dispatcher.CanTarget,
 			Superuser.PlayerName, Superuser.Announce, wait => GameTask.DelayRealtime( (int)wait.TotalMilliseconds ), Messages.Catalog,
 			map => Content.IsAllowed( Core.Content.ContentBanList.Map, map ) );
-		PropCommands = new Props.PropCommands( Commands, Props, new Props.ScenePropWorld(), Dispatcher.CanUse, Superuser.PlayerName );
+		PropCommands = new Props.PropCommands( Commands, Props, PropWorld, Dispatcher.CanUse, Superuser.PlayerName );
 		Chat = new ChatIntegration.Platform.PlatformChatAdapter( this );
 		modules ??= new BootstrapModules( true, true, "" );
 		if ( modules.Prefixes )
