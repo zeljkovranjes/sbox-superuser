@@ -23,4 +23,6 @@ public static partial class Superuser
 	public static string PropOwner( GameObject target ) => target is null ? null : FindAuthorityRuntime()?.Props.OwnerOf( target.Root.Id );
 
 	internal static Core.Props.PropOwnership Props => FindAuthorityRuntime()?.Props;
+
+	internal static Engine.Props.IPropWorld PropWorld => FindAuthorityRuntime()?.PropWorld;
 }

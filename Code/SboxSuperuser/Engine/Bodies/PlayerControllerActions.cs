@@ -1,5 +1,5 @@
 using Sandbox;
-using SboxSuperuser.Engine.Players;
+using SboxSuperuser.Engine.Bodies;
 
 namespace SboxSuperuser;
 

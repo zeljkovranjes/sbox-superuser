@@ -1,4 +1,4 @@
-namespace SboxSuperuser.Engine.Players;
+namespace SboxSuperuser.Engine.Bodies;
 
 /// <summary>Changes the host asks a body's owner to make, since only the owner moves its own player.</summary>
 internal enum BodyEffect

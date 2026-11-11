@@ -1,6 +1,6 @@
 using Sandbox;
 
-namespace SboxSuperuser.Engine.Players;
+namespace SboxSuperuser.Engine.Bodies;
 
 /// <summary>Finds the PlayerController a connected Steam ID controls in the active scene.</summary>
 internal static class PlayerBodies

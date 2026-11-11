@@ -1,6 +1,6 @@
 using Sandbox;
 
-namespace SboxSuperuser.Engine.Players;
+namespace SboxSuperuser.Engine.Bodies;
 
 /// <summary>
 /// Applies a host-requested change on this machine. Movement only takes effect on the body's owner; ragdolls and

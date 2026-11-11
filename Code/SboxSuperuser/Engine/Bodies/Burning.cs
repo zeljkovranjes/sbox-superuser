@@ -1,6 +1,6 @@
 using Sandbox;
 
-namespace SboxSuperuser.Engine.Players;
+namespace SboxSuperuser.Engine.Bodies;
 
 /// <summary>
 /// Burns a player from a host-owned object outside their body. FireDamage can't be used on the body itself:
