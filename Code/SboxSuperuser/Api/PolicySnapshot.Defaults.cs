@@ -30,7 +30,7 @@ public sealed partial class PolicySnapshot
 				Allow( "admin.players.ban" ), Allow( "admin.players.unban" ), Allow( "admin.players.history" ),
 				Allow( "admin.settings.get" ), Allow( "admin.settings.set" ), Allow( "admin.settings.reset" ),
 				Allow( "admin.prefixes.manage" ), Allow( "admin.messages.manage" ), Allow( "admin.chat.csay" ), Allow( "admin.chat.tsay" ),
-				Allow( "admin.votes.mapforce" ), Allow( "admin.votes.stop" ), Allow( "admin.votes.veto" ), Allow( "admin.content.manage" ), Allow( "admin.props.cleanupall" ), Allow( "admin.alts.read" )
+				Allow( "admin.votes.mapforce" ), Allow( "admin.votes.stop" ), Allow( "admin.votes.veto" ), Allow( "admin.content.manage" ), Allow( "admin.props.cleanupall" ), Allow( "admin.props.manage" ), Allow( "admin.alts.read" )
 			}.Concat( Players( "maul", "strip", "ragdoll", "unragdoll", "god", "ungod", "hp", "armor", "cloak", "uncloak", "playsound", "map" ) ).ToArray(), 50 )
 		} );
 	}

@@ -29,6 +29,8 @@ internal sealed partial class BootstrapRuntime : IDisposable
 	internal Content.HostContentService Content { get; }
 	internal Core.Props.PropOwnership Props { get; } = new();
 	internal Props.IPropWorld PropWorld { get; } = new Props.ScenePropWorld();
+	internal Props.HostPropCleanup PropCleanup { get; }
+	internal Content.IContentCatalog ContentCatalog { get; } = new Content.EngineContentCatalog();
 	internal Alts.HostAltService Alts { get; }
 	internal Props.PropCommands PropCommands { get; }
 	internal Admin.HostAdminQueries AdminQueries { get; }
@@ -129,18 +131,21 @@ internal sealed partial class BootstrapRuntime : IDisposable
 			error => Log.Warning( $"[Superuser] Alt-account records failed to load; type={error.GetType().Name}; detection starts fresh." ),
 			wait => GameTask.DelayRealtime( (int)wait.TotalMilliseconds ) );
 		Store.StorageChanged += Alts.OnStorageChanged;
+		PropCleanup = new Props.HostPropCleanup( Store, () => IsUsable,
+			error => Log.Warning( $"[Superuser] Prop cleanup delay failed to load; type={error.GetType().Name}; the 2 minute default is used." ) );
+		Store.StorageChanged += PropCleanup.OnStorageChanged;
 		Votes = new Votes.VoteSession( Superuser.PublishVote, () => OnlinePlayers()?.Select( player => player.SteamId ).ToArray() ?? Array.Empty<string>(),
 			wait => GameTask.DelayRealtime( (int)wait.TotalMilliseconds ) );
 		AdminQueries = new Admin.HostAdminQueries( Policy, Moderation, Audit, OnlinePlayers, () => Modules.Statuses,
-			() => Commands.Descriptors, () => ConsoleDiagnostics().Data, RecentChat, Commands, Alts );
+			() => Commands.Descriptors, () => ConsoleDiagnostics().Data, RecentChat, Commands, Alts, Content, Props, PropCleanup, ContentCatalog );
 		Administration = new Commands.AdministrationCommands( Policy, Audit, Commands, Dispatcher, ConsoleDiagnostics, Modules,
 			Moderation, DisconnectModeratedAsync, NotifyModerationWarning, Superuser.Announce, Superuser.PlayerName,
-			new Messaging.EngineMessenger(), Messages, Votes, map => Superuser.PlayerActions.ChangeMap( map ), Content, Alts );
+			new Messaging.EngineMessenger(), Messages, Votes, map => Superuser.PlayerActions.ChangeMap( map ), Content, Alts, ContentCatalog );
 		PlayerCommands = new Players.PlayerCommands( Commands, () => Superuser.PlayerActions,
 			() => OnlinePlayers()?.Select( player => player.SteamId ).ToArray() ?? Array.Empty<string>(), Dispatcher.CanTarget,
 			Superuser.PlayerName, Superuser.Announce, wait => GameTask.DelayRealtime( (int)wait.TotalMilliseconds ), Messages.Catalog,
 			map => Content.IsAllowed( Core.Content.ContentBanList.Map, map ) );
-		PropCommands = new Props.PropCommands( Commands, Props, PropWorld, Dispatcher.CanUse, Superuser.PlayerName );
+		PropCommands = new Props.PropCommands( Commands, Props, PropWorld, Dispatcher.CanUse, Superuser.PlayerName, PropCleanup );
 		Chat = new ChatIntegration.Platform.PlatformChatAdapter( this );
 		modules ??= new BootstrapModules( true, true, "" );
 		if ( modules.Prefixes )

@@ -17,15 +17,25 @@ internal sealed partial class HostAdminQueries
 	private readonly Core.Chat.RecentChat _chat;
 	private readonly Commands.CommandRegistry _registry;
 	private readonly Alts.HostAltService _alts;
+	private readonly Content.HostContentService _content;
+	private readonly Content.IContentCatalog _contentCatalog;
+	private readonly Core.Props.PropOwnership _props;
+	private readonly Props.HostPropCleanup _propCleanup;
 	private static readonly AdminAction[] AllActions = Enum.GetValues<AdminAction>();
 
 	// The server-view providers are optional so hosts and tests that only need player views stay unchanged.
 	internal HostAdminQueries( HostPolicyService policy, HostModerationService moderation, HostAuditService audit,
 		Func<IReadOnlyList<CommandPlayer>> players, Func<IReadOnlyList<ModuleStatus>> modules = null,
 		Func<IReadOnlyList<CommandDescriptor>> commands = null, Func<IReadOnlyDictionary<string, string>> diagnostics = null,
-		Core.Chat.RecentChat chat = null, Commands.CommandRegistry registry = null, Alts.HostAltService alts = null )
+		Core.Chat.RecentChat chat = null, Commands.CommandRegistry registry = null, Alts.HostAltService alts = null,
+		Content.HostContentService content = null, Core.Props.PropOwnership props = null, Props.HostPropCleanup propCleanup = null,
+		Content.IContentCatalog contentCatalog = null )
 	{
+		_contentCatalog = contentCatalog;
 		_alts = alts;
+		_content = content;
+		_props = props;
+		_propCleanup = propCleanup;
 		_policy = policy;
 		_moderation = moderation;
 		_audit = audit;
@@ -62,6 +72,8 @@ internal sealed partial class HostAdminQueries
 			case AdminQueryKind.MenuWindows: return ReadMenuWindows( id, actor, Can );
 			case AdminQueryKind.Alts:
 			case AdminQueryKind.AltSuspects: return ReadAlts( id, query, Can );
+			case AdminQueryKind.ContentBans: return await ReadContentBansAsync( id, Can );
+			case AdminQueryKind.Props: return ReadProps( id, Can );
 			case AdminQueryKind.Activity:
 			case AdminQueryKind.ActivitySearch: return await ReadActivityAsync( id, query, Current, cancellation );
 		}

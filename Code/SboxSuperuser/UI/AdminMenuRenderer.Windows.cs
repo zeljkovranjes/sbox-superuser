@@ -17,6 +17,8 @@ internal sealed partial class AdminMenuRenderer
 	private const string PrefixesWindow = "prefixes";
 	private const string AltsWindow = "alts";
 	private const string AltsCommand = "alts.suspects";
+	private const string ContentBansWindow = "contentbans";
+	private const string PropsWindow = "props";
 
 	private const ImGuiWindowFlags PassiveFlags = ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoBringToFrontOnFocus;
 

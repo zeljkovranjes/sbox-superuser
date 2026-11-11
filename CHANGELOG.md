@@ -32,12 +32,14 @@ Player actions - games using the engine's PlayerController get every movement, f
 Votes - vote, votekick, voteban, votemap, votemap force, stopvote and veto, each with its own admin.votes permission; a vote passes only with more than half of everyone connected, a forced map vote takes the most votes, and passed kicks and bans are recorded like the commands
 Vote panel - the optional Superuser Vote Panel slides in from the left with the question, F1 and F2 (or a click) to vote, live counts and a lit-up avatar for each of up to 30 voters; games can draw their own from Superuser.CurrentVote, IVoteEvent and Superuser.CastVote
 # Props
-Prop protection - Superuser records who spawned each object and keeps it after they leave; owners share with admin props share, clean up with admin props cleanup, staff clean up anyone's and admin props cleanupall clears every player's, a player's props are removed two minutes after they leave, and games ask Superuser.CanTouch before their tools act
+Prop protection - Superuser records who spawned each object and keeps it after they leave; owners share with admin props share, clean up with admin props cleanup, staff clean up anyone's and admin props cleanupall clears every player's, a player's props are removed two minutes after they leave (admin props delay sets 10 seconds to 7 days, or permanent; admin.props.manage, admins by default), and games ask Superuser.CanTouch before their tools act
+Props window - Server › Props shows the cleanup delay with Apply, and who owns how many spawned objects with Clean up each and Clean up all
 # Alt accounts
 Alt detection - Superuser links accounts that share a Steam Family Sharing copy, an IP address or a Steam party; Moderation › Alt accounts lists suspects with those linked to banned accounts first, beside each one's linked accounts and why, the Player window gains an Alts tab, and admin alts check and suspects do the same from the console (admin.alts.read, admins by default)
 IP history - each player's last 5 IP addresses with first and last seen times, shown in the alt views and by admin alts ips to staff with admin.alts.ips (owners only by default); relayed connections don't reveal an address
 # Content
 Content bans - admin content ban, unban and list ban maps, addons and entities by name or with * wildcards (admin.content.manage, admins by default); banned maps are refused by map and map votes, banned entities players spawn are removed within half a second with a private reason, and games check addons with Superuser.IsContentAllowed
+Content bans window - Moderation › Content bans has a tab each for maps, addons and entities, with what isn't banned on the left (searchable, with icons, Ban) and what is on the right (filterable, Unban), plus typed patterns such as author.* and an optional reason
 # Storage
 Module state - validated state and audit intents persist together with revision checks; unconfirmed writes disable the state adapter until reloaded
 Recovery audit export - custom storage adapters can preserve the validated recovery intent using AuditIntent.ToJson

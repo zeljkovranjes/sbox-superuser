@@ -20,6 +20,14 @@ grants no permissions.
 - ***[Bans & mutes](menu/bans.md)*** &mdash; every active restriction across all
   players, with time left and revoke buttons.
 
+- **Content bans** (Moderation): a tab each for maps, addons and entities, with
+  what isn't banned on the left (search it, with icons, and **Ban**) and what is
+  on the right (filter it, **Unban**). Typed patterns such as `author.*` go in
+  **Ban pattern**, and the reason field at the top applies to new bans.
+
+- **Props** (Server): the cleanup delay, and who owns how many spawned objects
+  with **Clean up** each and **Clean up all**.
+
 - ***[Chat](menu/chat.md)*** &mdash; recent public chat for moderators, and its
   privacy rule.
 
@@ -62,6 +70,8 @@ leaves it out.
 | Moderation history, warning counts | `admin.players.history` |
 | Bans & mutes | Same as ban and text restriction details |
 | Chat | `admin.chat.read` |
+| Content bans | `admin.content.manage` |
+| Props | `admin.props.cleanup`; the delay needs `admin.props.manage`, Clean up all `admin.props.cleanupall` |
 | All recent activity | `admin.audit.read` |
 | Own recent activity only | `admin.results.own` |
 | Commands | Each command's own permission |

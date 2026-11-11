@@ -32,8 +32,10 @@
     <Compile Include="../Code/SboxSuperuser/Engine/Messages/HostMessageService.cs" />
     <Compile Include="../Code/SboxSuperuser/Engine/Storage/AuditedDocument.cs" />
     <Compile Include="../Code/SboxSuperuser/Engine/Content/HostContentService.cs" />
+    <Compile Include="../Code/SboxSuperuser/Engine/Content/IContentCatalog.cs" />
     <Compile Include="../Code/SboxSuperuser/Engine/Props/IPropWorld.cs" />
     <Compile Include="../Code/SboxSuperuser/Engine/Props/PropCommands.cs" />
+    <Compile Include="../Code/SboxSuperuser/Engine/Props/HostPropCleanup.cs" />
     <Compile Include="../Code/SboxSuperuser/Engine/Alts/HostAltService.cs" />
     <Compile Include="../Code/SboxSuperuser/Engine/Votes/VoteSession.cs" />
     <Compile Include="../Code/SboxSuperuser/Engine/Players/PlayerCommands*.cs" />
