@@ -63,9 +63,12 @@ Steam IDs.
 
 Bans persist before disconnect. Expiry retains its original UTC timestamp after
 restart. Repeated revocation returns NoChange when nothing is active. Warnings
-do not escalate automatically. Mute stops integrated text chat; gag stops voice
-chat; gimp swaps each chat message for a stock line. Each is lifted only by its own revocation. While moderation storage is
-unavailable, chat and voice are both held back rather than let through.
+do not escalate automatically. Mute stops integrated text chat; gimp swaps each
+chat message for a stock line; gag stops voice chat. Voice goes between players
+without the host, so a gag switches off the gagged player's `Voice` component on
+every player's machine; games must play voice through a `Voice` component, as
+the sandbox gamemode does. Each is lifted only by its own revocation. While
+moderation storage is unavailable, chat is held back rather than let through.
 
 ## Messages
 

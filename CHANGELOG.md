@@ -20,7 +20,7 @@ Stock chat prefixes - when Superuser's own chat box is off, the engine's chat sh
 # Permissions
 Engine users.json - players whose config/users.json entry has the superuser or owner claim are owners, and admin, moderator or mod claims put them in those groups, live while they are connected and never saved
 # Moderation
-Gag - admin gag and ungag silence a player's voice chat for a duration or permanently, enforced by the server on every voice packet; moderators get them by default on new servers (admin.players.gag, admin.players.ungag), and they appear in the menu, history and Bans & mutes
+Gag - admin gag and ungag silence a player's voice chat for a duration or permanently, enforced by every player's Superuser switching off the gagged player's Voice component (the public engine sends voice between players without the host, so games must play voice through a Voice component, as the sandbox gamemode does); moderators get them by default on new servers (admin.players.gag, admin.players.ungag), and they appear in the menu, history and Bans & mutes
 Gimp - admin gimp and ungimp replace everything a player says in chat with one of a set of harmless stock lines for a duration or permanently; moderators get them by default on new servers (admin.players.gimp, admin.players.ungimp)
 # Messages
 Messages - admin psay whispers to one player, asay writes to online staff, csay shows text in the middle of every screen, tsay posts a nameless chat line and thetime shows the server's local time and UTC; each has its own admin.chat permission, and muted players cannot whisper or write to staff
