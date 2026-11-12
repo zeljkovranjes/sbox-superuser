@@ -96,6 +96,7 @@ internal sealed partial class SuperuserSession : GameObjectSystem<SuperuserSessi
 		if ( _runtime is not null )
 		{
 			_runtime.MaintainAudit();
+			_runtime.PublishVoiceGags( Superuser.PublishVoiceGags );
 			SetState( _runtime.Health );
 			return;
 		}

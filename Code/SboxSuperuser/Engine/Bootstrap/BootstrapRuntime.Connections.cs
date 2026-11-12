@@ -30,14 +30,28 @@ internal sealed partial class BootstrapRuntime
 		if ( connection is not null ) Policy.Claims.Remove( connection.SteamId.ToString() );
 	}
 
-	// Voice arrives many times a second per speaker; the Steam ID string is made once per connection.
-	private readonly System.Runtime.CompilerServices.ConditionalWeakTable<Connection, string> _voiceSenders = new();
+	private const double VoiceGagRefreshSeconds = 5;
+	// Called every frame by the session; gags are only worked out twice a second.
+	private const double VoiceGagCheckSeconds = 0.5;
+	private string[] _publishedGags = Array.Empty<string>();
+	private DateTimeOffset _nextGagPublish;
+	private DateTimeOffset _nextGagCheck;
 
-	/// <summary>Whether the host should relay this sender's voice; gagged players and unusable state are refused.</summary>
-	internal bool AllowsVoice( Connection sender )
+	/// <summary>
+	/// Tells every player who is gagged, whenever that changes and every few seconds for players who just joined.
+	/// The host never sees voice on the public engine, so each player's Superuser silences gagged speakers itself.
+	/// </summary>
+	internal void PublishVoiceGags( Action<string[]> publish )
 	{
-		if ( !IsUsable || sender is null || !sender.IsActive ) return false;
-		var steamId = _voiceSenders.GetValue( sender, connection => connection.SteamId.ToString() );
-		return !Moderation.IsRestricted( steamId, Core.Moderation.ModerationKind.Gag );
+		var now = DateTimeOffset.UtcNow;
+		if ( now < _nextGagCheck ) return;
+		_nextGagCheck = now.AddSeconds( VoiceGagCheckSeconds );
+		if ( !IsUsable || OnlinePlayers() is not { } players ) return;
+		var gagged = players.Select( player => player.SteamId )
+			.Where( steamId => Moderation.IsRestricted( steamId, Core.Moderation.ModerationKind.Gag ) ).OrderBy( id => id, StringComparer.Ordinal ).ToArray();
+		if ( gagged.SequenceEqual( _publishedGags ) && now < _nextGagPublish ) return;
+		_publishedGags = gagged;
+		_nextGagPublish = now.AddSeconds( VoiceGagRefreshSeconds );
+		publish( gagged );
 	}
 }
